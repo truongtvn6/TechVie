@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
+  // id sẽ là tên sản phẩm
   _id: {
     type: String,
     required: true,
