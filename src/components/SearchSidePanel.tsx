@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, TabType } from '../types';
-import { products as allProducts } from '../data';
+import { products as fallbackProducts } from '../data';
 import { Search, X, History, Grid2X2 } from 'lucide-react';
 
 interface SearchSidePanelProps {
   isOpen: boolean;
   onClose: () => void;
+  products?: Product[];
   onNavigate: (tab: TabType) => void;
   onAddToCart: (product: Product) => void;
 }
 
-export default function SearchSidePanel({ isOpen, onClose, onNavigate, onAddToCart }: SearchSidePanelProps) {
+export default function SearchSidePanel({ isOpen, onClose, products, onNavigate, onAddToCart }: SearchSidePanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [popularSearches] = useState([
     'Giao diện Prism-1',
@@ -23,6 +24,8 @@ export default function SearchSidePanel({ isOpen, onClose, onNavigate, onAddToCa
     'Core v2',
     'Lab Update'
   ]);
+
+  const allProducts = products || fallbackProducts;
 
   const filteredProducts = searchQuery.trim() === ''
     ? []

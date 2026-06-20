@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { products } from '../data';
+import { products as fallbackProducts } from '../data';
 import { Product, TabType } from '../types';
 import { ArrowLeftRight, Activity, Cpu, Compass, ArrowRight, Check, Send } from 'lucide-react';
+import { subscribeNewsletter } from '../services/api';
 
 interface HomePageProps {
+  products?: Product[];
   onNavigate: (tab: TabType) => void;
   onAddToCart: (product: Product) => void;
 }
 
-export default function HomePage({ onNavigate, onAddToCart }: HomePageProps) {
+export default function HomePage({ products, onNavigate, onAddToCart }: HomePageProps) {
+  const allProducts = products || fallbackProducts;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [showSubscriptionSuccess, setShowSubscriptionSuccess] = useState(false);
+  const [isSubmittingSubscription, setIsSubmittingSubscription] = useState(false);
 
   const [images, setImages] = useState<string[]>([
     'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1200&q=80',
@@ -47,14 +51,24 @@ export default function HomePage({ onNavigate, onAddToCart }: HomePageProps) {
     return () => clearInterval(interval);
   }, [images.length]);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newsletterEmail.trim() === '') return;
-    setShowSubscriptionSuccess(true);
-    setNewsletterEmail('');
-    setTimeout(() => {
-      setShowSubscriptionSuccess(false);
-    }, 4000);
+    if (newsletterEmail.trim() === '' || isSubmittingSubscription) return;
+    setIsSubmittingSubscription(true);
+    try {
+      const res = await subscribeNewsletter(newsletterEmail);
+      if (res.success) {
+        setShowSubscriptionSuccess(true);
+        setNewsletterEmail('');
+        setTimeout(() => {
+          setShowSubscriptionSuccess(false);
+        }, 5000);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmittingSubscription(false);
+    }
   };
 
   return (
@@ -66,7 +80,7 @@ export default function HomePage({ onNavigate, onAddToCart }: HomePageProps) {
             <motion.img 
               key={currentSlide}
               src={images[currentSlide]} 
-              alt={`Slideshow ${currentSlide + 1}`}
+              alt={`Lumina Slideshow ${currentSlide + 1}`}
               referrerPolicy="no-referrer"
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -87,13 +101,13 @@ export default function HomePage({ onNavigate, onAddToCart }: HomePageProps) {
               className="max-w-2xl bg-white/45 backdrop-blur-[35px] p-8 md:p-14 rounded-3xl border border-white/60 shadow-[0_30px_70px_rgba(0,0,0,0.1)] relative"
             >
               <div className="absolute top-0 right-0 p-6 flex flex-col items-end opacity-35 text-[9px] font-mono tracking-widest text-gray-800">
-                {/* <span>MÃ LƯỚI: 48.85 / 2.35</span> */}
-                {/* <div className="w-12 h-px bg-gray-800 mt-1"></div> */}
+                <span>MÃ LƯỚI: 48.85 / 2.35</span>
+                <div className="w-12 h-px bg-gray-800 mt-1"></div>
               </div>
               
-              {/* <div className="absolute -left-px top-1/4 h-24 w-1 bg-gradient-to-b from-transparent via-secondary/40 to-transparent"></div> */}
+              <div className="absolute -left-px top-1/4 h-24 w-1 bg-gradient-to-b from-transparent via-secondary/40 to-transparent"></div>
               
-              <span className="text-xs uppercase tracking-[0.4em] text-secondary font-bold mb-6 block flex items-center">
+              <span className="text-xs uppercase tracking-[0.4em] text-secondary font-bold mb-6 block flex items-center gap-3">
                 <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
                 Hệ Sinh Thái Độc Bản v2.0
               </span>
@@ -185,7 +199,7 @@ export default function HomePage({ onNavigate, onAddToCart }: HomePageProps) {
 
         {/* 3 Core Products matching Vietnamese template cards layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {products.slice(0, 3).map((product) => (
+          {allProducts.slice(0, 3).map((product) => (
             <div 
               key={product.id}
               className="group bg-white/40 border border-gray-200 rounded-[2rem] p-8 flex flex-col justify-between transition-all duration-500 hover:shadow-xl hover:-translate-y-2 h-[520px] relative overflow-hidden"
@@ -314,14 +328,16 @@ export default function HomePage({ onNavigate, onAddToCart }: HomePageProps) {
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     required
-                    className="bg-white/50 backdrop-blur-md border border-gray-300 focus:border-black rounded-2xl px-6 py-4 outline-none font-sans text-base placeholder:text-gray-400 transition-colors"
+                    disabled={isSubmittingSubscription}
+                    className="bg-white/50 backdrop-blur-md border border-gray-300 focus:border-black rounded-2xl px-6 py-4 outline-none font-sans text-base placeholder:text-gray-400 transition-colors disabled:opacity-60"
                   />
                   <button 
                     type="submit"
-                    className="bg-black text-white hover:bg-gray-900 px-8 py-4 rounded-2xl font-sans text-xs uppercase tracking-[0.3em] font-black w-full flex items-center justify-center gap-2 transition-transform h-14"
+                    disabled={isSubmittingSubscription}
+                    className="bg-black text-white hover:bg-gray-900 disabled:bg-gray-700 disabled:cursor-not-allowed px-8 py-4 rounded-2xl font-sans text-xs uppercase tracking-[0.3em] font-black w-full flex items-center justify-center gap-2 transition-transform h-14"
                   >
-                    Tham Gia Đặc Quyền
-                    <Send size={14} />
+                    {isSubmittingSubscription ? 'ĐANG GỬI ĐĂNG KÝ...' : 'THAM GIA ĐẶC QUYỀN'}
+                    {!isSubmittingSubscription && <Send size={14} />}
                   </button>
                 </motion.form>
               ) : (

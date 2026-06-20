@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem } from '../types';
+import { submitCheckoutOrder } from '../services/api';
 import { 
   ArrowLeft, 
   CreditCard, 
@@ -91,40 +92,32 @@ export default function CheckoutPage({
     setApiError('');
     
     try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          fullName,
-          phone,
-          email,
-          address,
-          notes,
-          paymentMethod,
-          deliveryMethod,
-          cart,
-          finalTotal
-        })
+      const data = await submitCheckoutOrder({
+        fullName,
+        phone,
+        email,
+        address,
+        notes,
+        paymentMethod,
+        deliveryMethod,
+        cart,
+        finalTotal: finalTotal.toString()
       });
 
-      const data = await response.json();
-
-      // Maintain processing indicator styling for at least 1.5 seconds for pleasant visual feedback
+      // Trì hoãn xử lý màn hình 1.5 giây để hiệu ứng load động mượt mà, chân thực
       setTimeout(() => {
-        if (response.ok && data.success) {
+        if (data.success && data.orderId) {
           setServerOrderId(data.orderId);
           setStep('success');
         } else {
-          setApiError(data.message || 'Lỗi hệ thống khi khởi tạo đơn hàng.');
+          setApiError(data.message || 'Lỗi hệ thống khi khởi tạo bưu kiện đơn hàng.');
           setStep('form');
         }
       }, 1500);
 
     } catch (err: any) {
       setTimeout(() => {
-        setApiError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại đường truyền mạng.');
+        setApiError('Không thể kết nối đến máy chủ trực tuyến. Vui lòng kiểm tra lại đường truyền mạng.');
         setStep('form');
       }, 1500);
     }

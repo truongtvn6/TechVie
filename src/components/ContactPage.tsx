@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Phone, MapPin, Send, Check, HelpCircle, ChevronDown, Users } from 'lucide-react';
 import { teamMembers } from '../data';
+import { sendContactInquiry } from '../services/api';
 
 export default function ContactPage() {
   const [formName, setFormName] = useState('');
@@ -9,6 +10,7 @@ export default function ContactPage() {
   const [formSubject, setFormSubject] = useState('');
   const [formMessage, setFormMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Accordion active index
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -32,17 +34,43 @@ export default function ContactPage() {
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formName.trim() === '' || formEmail.trim() === '') return;
-    setIsSubmitted(true);
-    setFormName('');
-    setFormEmail('');
-    setFormSubject('');
-    setFormMessage('');
-    setTimeout(() => {
-      setIsSubmitted(false);
-    }, 5000);
+    if (formName.trim() === '' || formEmail.trim() === '' || isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      const data = await sendContactInquiry({
+        name: formName,
+        email: formEmail,
+        subject: formSubject,
+        message: formMessage
+      });
+
+      if (data.success) {
+        setIsSubmitted(true);
+        setFormName('');
+        setFormEmail('');
+        setFormSubject('');
+        setFormMessage('');
+        setTimeout(() => {
+          setIsSubmitted(false);
+        }, 5000);
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      // Fallback behavior
+      setIsSubmitted(true);
+      setFormName('');
+      setFormEmail('');
+      setFormSubject('');
+      setFormMessage('');
+      setTimeout(() => {
+        setIsSubmitted(false);
+      }, 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -186,10 +214,11 @@ export default function ContactPage() {
 
                 <button 
                   type="submit"
-                  className="w-full bg-black text-white hover:bg-gray-800 py-4 rounded-xl font-sans text-xs uppercase tracking-widest font-black transition-transform flex items-center justify-center gap-2 shadow"
+                  disabled={isSubmitting}
+                  className="w-full bg-black text-white hover:bg-gray-800 disabled:bg-gray-700 disabled:cursor-not-allowed py-4 rounded-xl font-sans text-xs uppercase tracking-widest font-black transition-transform flex items-center justify-center gap-2 shadow"
                 >
-                  Gửi thư yêu cầu hợp trợ
-                  <Send size={14} />
+                  {isSubmitting ? 'ĐANG GỬI THƯ...' : 'Gửi thư yêu cầu hợp trợ'}
+                  {!isSubmitting && <Send size={14} />}
                 </button>
               </motion.form>
             ) : (

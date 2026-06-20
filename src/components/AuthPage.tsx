@@ -568,22 +568,44 @@ export default function AuthPage({
                   </form>
 
                   {/* Demo Login Trigger */}
-                  <div className="mt-5 p-3.5 bg-white/20 border border-black/5 hover:bg-white/35 transition-all text-center rounded-xl backdrop-blur-md">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-black/55 block mb-1 font-jakarta">Thử nghiệm nhanh một chạm:</span>
-                    <button 
-                      onClick={() => {
-                        setLoginEmail('mintzinfinity898@gmail.com');
-                        setLoginPassword('123456');
-                        setIsLoggingIn(true);
-                        setTimeout(() => {
-                          setIsLoggingIn(false);
-                          onLoginSuccess('mintzinfinity898@gmail.com');
-                        }, 800);
-                      }}
-                      className="text-[10.5px] font-semibold font-mono tracking-wider text-black hover:opacity-75 transition-opacity underline decoration-black/30 underline-offset-3"
-                    >
-                      Demo: mintzinfinity898@gmail.com (123456)
-                    </button>
+                  <div className="mt-5 p-3.5 bg-white/20 border border-black/5 hover:bg-white/35 transition-all rounded-xl backdrop-blur-md flex flex-col gap-2.5">
+                    <div className="text-center">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-black/55 block mb-1 font-jakarta">Thử nghiệm nhanh một chạm:</span>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setLoginEmail('mintzinfinity898@gmail.com');
+                          setLoginPassword('123456');
+                          setIsLoggingIn(true);
+                          setTimeout(() => {
+                            setIsLoggingIn(false);
+                            onLoginSuccess('mintzinfinity898@gmail.com');
+                          }, 800);
+                        }}
+                        className="text-[10.5px] font-semibold font-mono tracking-wider text-black hover:opacity-75 transition-opacity underline decoration-black/30 underline-offset-3"
+                      >
+                        Demo: mintzinfinity898@gmail.com (123456)
+                      </button>
+                    </div>
+
+                    <div className="border-t border-black/5 pt-2.5 text-center">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 block mb-1 font-jakarta">⚡ Quyền Administrator (Người Quản Lý):</span>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setLoginEmail('admin@lumina.com');
+                          setLoginPassword('admin123');
+                          setIsLoggingIn(true);
+                          setTimeout(() => {
+                            setIsLoggingIn(false);
+                            onLoginSuccess('admin@lumina.com');
+                          }, 800);
+                        }}
+                        className="text-[10.5px] font-bold font-mono tracking-wider text-indigo-600 hover:opacity-75 transition-opacity underline decoration-indigo-400 underline-offset-3 block mx-auto cursor-pointer"
+                      >
+                        Gia vòm admin: admin@lumina.com (admin123)
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               ) : (

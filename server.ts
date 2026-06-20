@@ -48,6 +48,8 @@ async function startServer() {
       deliveryMethod,
       cart,
       finalTotal,
+      status: "Đang lắp ráp chuẩn bị gửi",
+      statusType: "processing",
       createdAt: new Date().toISOString()
     };
 
@@ -60,6 +62,70 @@ async function startServer() {
       orderId,
       order: newOrder
     });
+  });
+
+  // Keep a simple in-memory database of customer contacts for demonstration
+  const contacts: any[] = [
+    {
+      id: 1082,
+      name: "Trần Anh Tú",
+      email: "tuanhtu@gmail.com",
+      subject: "Hợp tác phân phối sỉ",
+      message: "Tôi có hệ thống cửa hàng điện máy cao cấp tại Đà Nẵng, muốn liên hệ làm đại lý chính thức để phân phối các dòng máy Lumina Book Pro X.",
+      createdAt: new Date(Date.now() - 3600000 * 4).toISOString() // 4 hours ago
+    },
+    {
+      id: 1094,
+      name: "Hoàng Vy",
+      email: "vyhoang99@hotmail.com",
+      subject: "Cấu hình custom khắc tên",
+      message: "Có chương trình hỗ trợ in ấn khắc laser tên riêng hoặc logo doanh nghiệp lên mặt sau điện thoại Titanium Lumina Ultra v1 không?",
+      createdAt: new Date(Date.now() - 3600000 * 1).toISOString() // 1 hour ago
+    }
+  ];
+
+  // API Route: Send user contact inquiries
+  app.post("/api/contacts", (req, res) => {
+    const { name, email, subject, message } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ success: false, message: "Họ tên và email là bắt buộc." });
+    }
+    const newInquiry = {
+      id: Math.floor(1000 + Math.random() * 9000),
+      name,
+      email,
+      subject: subject || "Yêu cầu tư vấn thiết bị",
+      message: message || "",
+      createdAt: new Date().toISOString()
+    };
+    contacts.push(newInquiry);
+    res.json({ success: true, message: "Gửi liên hệ thành công!", inquiry: newInquiry });
+  });
+
+  // API Route: Retrieve all registered contacts (admin)
+  app.get("/api/contacts", (req, res) => {
+    res.json({ success: true, count: contacts.length, contacts });
+  });
+
+  // API Route: Update an order status (admin)
+  app.post("/api/orders/:id/status", (req, res) => {
+    const { id } = req.params;
+    const { status, statusType } = req.body;
+    const order = orders.find(o => o.orderId === parseInt(id));
+    if (order) {
+      order.status = status;
+      if (statusType) {
+        order.statusType = statusType;
+      }
+      return res.json({ success: true, message: "Cập nhật trạng thái thành công!", order });
+    }
+    res.status(404).json({ success: false, message: "Không tìm thấy mã đơn hàng." });
+  });
+
+  // API Route: Delete all orders (admin helper)
+  app.delete("/api/orders", (req, res) => {
+    orders.length = 0;
+    res.json({ success: true, message: "Đã xoá toàn bộ sổ đặt hàng trên máy chủ." });
   });
 
   // API Route: Feed premium home slider hero images

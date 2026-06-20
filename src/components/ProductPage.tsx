@@ -1,14 +1,16 @@
 import { useState, MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { products } from '../data';
+import { products as fallbackProducts } from '../data';
 import { Product } from '../types';
 import { Plus, Minus, Check, SlidersHorizontal, Eye, ShieldCheck, Cpu, Search, ArrowUpDown, X, Laptop, Smartphone, Watch, Headphones, Keyboard, LayoutGrid } from 'lucide-react';
 
 interface ProductPageProps {
+  products?: Product[];
   onAddToCart: (product: Product) => void;
 }
 
-export default function ProductPage({ onAddToCart }: ProductPageProps) {
+export default function ProductPage({ products, onAddToCart }: ProductPageProps) {
+  const allProducts = products || fallbackProducts;
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [justAddedId, setJustAddedId] = useState<string | null>(null);
@@ -43,8 +45,8 @@ export default function ProductPage({ onAddToCart }: ProductPageProps) {
   };
 
   const getCategoryCount = (category: string) => {
-    if (category === 'Tất cả') return products.length;
-    return products.filter(p => p.category === category).length;
+    if (category === 'Tất cả') return allProducts.length;
+    return allProducts.filter(p => p.category === category).length;
   };
 
   const handleAddToCartWithSuccess = (product: Product, e?: MouseEvent<HTMLButtonElement>) => {
@@ -102,7 +104,7 @@ export default function ProductPage({ onAddToCart }: ProductPageProps) {
   };
 
   // Improved reactive filtering pipeline
-  let filteredProducts = products;
+  let filteredProducts = allProducts;
   if (selectedCategory !== 'Tất cả') {
     filteredProducts = filteredProducts.filter(p => p.category === selectedCategory);
   }
@@ -176,7 +178,7 @@ export default function ProductPage({ onAddToCart }: ProductPageProps) {
 
           <div className="hidden lg:flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest bg-gray-50 border border-gray-150 rounded-full px-4 py-2">
             <SlidersHorizontal size={13} className="text-gray-500" />
-            <span>Hiển thị: <strong>{filteredProducts.length}</strong> / {products.length} thiết bị</span>
+            <span>Hiển thị: <strong>{filteredProducts.length}</strong> / {allProducts.length} thiết bị</span>
           </div>
         </div>
 
