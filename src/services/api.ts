@@ -147,3 +147,129 @@ export async function submitCheckoutOrder(orderData: {
     return { success: false, message: 'Máy chủ bận hoặc gặp lỗi truyền kết nối.' };
   }
 }
+
+// Tải danh sách phân loại sản phẩm (Categories) từ backend
+export async function getCategories(): Promise<{ success: boolean; categories: string[] }> {
+  try {
+    const response = await fetch('http://localhost:5000/api/categories');
+    if (!response.ok) throw new Error('Không thể tải danh mục sản phẩm!');
+    const data = await response.json();
+    if (data && data.success && Array.isArray(data.categories)) {
+      const dbCategories = data.categories.map((cat: any) => cat.name);
+      const categories = dbCategories.includes('Tất cả')
+        ? dbCategories
+        : ['Tất cả', ...dbCategories];
+      return { success: true, categories };
+    }
+    throw new Error('Dữ liệu danh mục không đúng định dạng!');
+  } catch (error) {
+    console.error('Lỗi khi lấy danh mục sản phẩm:', error);
+    // Trả về fallback tĩnh nếu Backend gặp sự cố hoặc ngoại tuyến
+    return {
+      success: true,
+      categories: ['Tất cả', 'Điện thoại', 'Laptop', 'Đồng hồ', 'Âm thanh', 'Bàn phím']
+    };
+  }
+}
+
+// Tải danh sách sản phẩm (Products) từ backend
+export async function getProducts(): Promise<{ success: boolean; products: Product[] }> {
+  try {
+    console.log('[API getProducts] ➔ Bắt đầu gửi yêu cầu tải danh sách sản phẩm từ backend...');
+    const response = await fetch('http://localhost:5000/api/products');
+    if (!response.ok) throw new Error('Không thể tải danh sách sản phẩm!');
+    const data = await response.json();
+    
+    let productList: any[] = [];
+    if (Array.isArray(data)) {
+      productList = data;
+    } else if (data && Array.isArray(data.products)) {
+      productList = data.products;
+    } else if (data && Array.isArray(data.data)) {
+      productList = data.data;
+    }
+    
+    console.log(`[API getProducts] ✔ Tải thành công ${productList.length} sản phẩm từ backend.`);
+    return { success: true, products: productList };
+  } catch (error) {
+    console.error('[API getProducts] ❌ Lỗi khi tải danh sách sản phẩm:', error);
+    return { success: false, products: [] };
+  }
+}
+
+// Thêm sản phẩm mới (chỉ dành cho Admin)
+export async function createProduct(formData: FormData, token: string): Promise<{ success: boolean; message: string; product?: Product }> {
+  try {
+    console.log('[API createProduct] ➔ Bắt đầu gửi yêu cầu tạo sản phẩm mới:', formData.get('name'));
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch('http://localhost:5000/api/products', {
+      method: 'POST',
+      headers: {
+        'Authorization': cleanToken,
+      },
+      body: formData,
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || 'Không thể tạo sản phẩm mới!');
+    }
+    const data = await response.json();
+    console.log('[API createProduct] ✔ Phản hồi từ backend:', data);
+    return { success: true, message: data.message || 'Thêm sản phẩm thành công!', product: data.product };
+  } catch (error: any) {
+    console.error('[API createProduct] ❌ Lỗi thêm sản phẩm:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối khi thêm sản phẩm.' };
+  }
+}
+
+// Cập nhật sản phẩm (chỉ dành cho Admin)
+export async function updateProduct(id: string, formData: FormData, token: string): Promise<{ success: boolean; message: string; product?: Product }> {
+  try {
+    console.log(`[API updateProduct] ➔ Bắt đầu gửi yêu cầu cập nhật sản phẩm #${id}:`, formData.get('name'));
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': cleanToken,
+      },
+      body: formData,
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || 'Không thể cập nhật sản phẩm!');
+    }
+    const data = await response.json();
+    console.log(`[API updateProduct] ✔ Phản hồi cập nhật sản phẩm #${id}:`, data);
+    return { success: true, message: data.message || 'Cập nhật sản phẩm thành công!', product: data.product };
+  } catch (error: any) {
+    console.error(`[API updateProduct] ❌ Lỗi cập nhật sản phẩm #${id}:`, error);
+    return { success: false, message: error.message || 'Lỗi kết nối khi cập nhật sản phẩm.' };
+  }
+}
+
+// Xóa sản phẩm (chỉ dành cho Admin)
+export async function deleteProduct(id: string, token: string): Promise<{ success: boolean; message: string }> {
+  try {
+    console.log(`[API deleteProduct] ➔ Bắt đầu gửi yêu cầu xóa sản phẩm #${id}...`);
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || 'Không thể xóa sản phẩm!');
+    }
+    const data = await response.json();
+    console.log(`[API deleteProduct] ✔ Phản hồi xóa sản phẩm #${id}:`, data);
+    return { success: true, message: data.message || 'Xóa sản phẩm thành công!' };
+  } catch (error: any) {
+    console.error(`[API deleteProduct] ❌ Lỗi xóa sản phẩm #${id}:`, error);
+    return { success: false, message: error.message || 'Lỗi kết nối khi xóa sản phẩm.' };
+  }
+}
+
+

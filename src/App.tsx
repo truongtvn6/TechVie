@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TabType, CartItem, Product } from './types';
-import { products as initialProducts } from './data';
+import { createProduct, updateProduct, deleteProduct, getProducts } from './services/api';
 import HomePage from './components/HomePage';
 import BrandPage from './components/BrandPage';
 import ProductPage from './components/ProductPage';
@@ -18,29 +18,150 @@ import CartSidePanel from './components/CartSidePanel';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [token, setToken] = useState<string>(localStorage.getItem('techvie_token') || '');
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('techvie_token'));
   const [userProfile, setUserProfile] = useState({
-    name: 'Nguyễn Minh Tiến',
-    email: 'mintzinfinity898@gmail.com',
+    name: localStorage.getItem('techvie_token') ? 'ADMINISTRATOR' : 'Nguyễn Minh Tiến',
+    email: localStorage.getItem('techvie_token') ? 'admin@lumina.com' : 'mintzinfinity898@gmail.com',
     phone: '0912 345 678',
     address: '86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
     memberSince: '17-06-2026',
     luminaId: 'LM-992-88X',
     shieldStatus: 'Đang Kích Hoạt (Premium)',
-    role: 'user',
+    role: localStorage.getItem('techvie_token') ? 'admin' : 'user',
   });
 
-  const handleAddProduct = (newProduct: Product) => {
-    setProducts(prev => [newProduct, ...prev]);
+  useEffect(() => {
+    getProducts().then(res => {
+      if (res.success) {
+        setProducts(res.products);
+      }
+    });
+  }, []);
+
+  const handleSetIsLoggedIn = (val: boolean) => {
+    setIsLoggedIn(val);
+    if (!val) {
+      setToken('');
+      localStorage.removeItem('techvie_token');
+      setUserProfile({
+        name: 'Nguyễn Minh Tiến',
+        email: 'mintzinfinity898@gmail.com',
+        phone: '0912 345 678',
+        address: '86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
+        memberSince: '17-06-2026',
+        luminaId: 'LM-992-88X',
+        shieldStatus: 'Đang Kích Hoạt (Premium)',
+        role: 'user',
+      });
+    }
   };
 
-  const handleEditProduct = (editedProduct: Product) => {
-    setProducts(prev => prev.map(p => p.id === editedProduct.id ? editedProduct : p));
+  const handleAddProduct = async (newProduct: any, imageFile: File | null) => {
+    try {
+      console.log('=== BẮT ĐẦU THÊM SẢN PHẨM MỚI ===');
+      console.log('Dữ liệu thô:', newProduct);
+      if (imageFile) {
+        console.log('Tải kèm tệp ảnh:', imageFile.name, `(${imageFile.size} bytes)`);
+      }
+
+      const formData = new FormData();
+      formData.append('name', newProduct.name);
+      formData.append('price', String(newProduct.price));
+      formData.append('category', newProduct.category);
+      formData.append('description', newProduct.description || '');
+      formData.append('specs', JSON.stringify(newProduct.specs || []));
+      if (imageFile) {
+        formData.append('imageFile', imageFile);
+      } else if (newProduct.image) {
+        formData.append('image', newProduct.image);
+      }
+
+      const res = await createProduct(formData, token);
+      if (res.success && res.product) {
+        const added = {
+          id: res.product.id || (res.product as any)._id,
+          name: res.product.name,
+          price: res.product.price,
+          category: res.product.category,
+          image: res.product.image || newProduct.image,
+          description: res.product.description,
+          specs: res.product.specs || []
+        };
+        console.log('Thêm sản phẩm thành công vào state React! Sản phẩm:', added);
+        setProducts(prev => [added, ...prev]);
+        alert('Đăng bán sản phẩm thành công!');
+      } else {
+        console.error('Lỗi phản hồi từ backend khi thêm sản phẩm:', res.message);
+        alert(`Lỗi khi thêm sản phẩm: ${res.message}`);
+      }
+    } catch (error: any) {
+      console.error('Lỗi thêm sản phẩm:', error);
+      alert('Không thể thêm sản phẩm, vui lòng kiểm tra kết nối.');
+    }
   };
 
-  const handleDeleteProduct = (productId: string) => {
-    setProducts(prev => prev.filter(p => p.id !== productId));
+  const handleEditProduct = async (editedProduct: any, imageFile: File | null) => {
+    try {
+      console.log(`=== BẮT ĐẦU CẬP NHẬT SẢN PHẨM #${editedProduct.id} ===`);
+      console.log('Dữ liệu cập nhật mới:', editedProduct);
+      if (imageFile) {
+        console.log('Tải kèm tệp ảnh mới:', imageFile.name, `(${imageFile.size} bytes)`);
+      }
+
+      const formData = new FormData();
+      formData.append('name', editedProduct.name);
+      formData.append('price', String(editedProduct.price));
+      formData.append('category', editedProduct.category);
+      formData.append('description', editedProduct.description || '');
+      formData.append('specs', JSON.stringify(editedProduct.specs || []));
+      if (imageFile) {
+        formData.append('imageFile', imageFile);
+      } else if (editedProduct.image) {
+        formData.append('image', editedProduct.image);
+      }
+
+      const res = await updateProduct(editedProduct.id, formData, token);
+      if (res.success && res.product) {
+        const updated = {
+          id: res.product.id || (res.product as any)._id,
+          name: res.product.name,
+          price: res.product.price,
+          category: res.product.category,
+          image: res.product.image || editedProduct.image,
+          description: res.product.description,
+          specs: res.product.specs || []
+        };
+        console.log('Cập nhật sản phẩm thành công trong state React! Sản phẩm:', updated);
+        setProducts(prev => prev.map(p => p.id === updated.id ? updated : p));
+        alert('Cập nhật sản phẩm thành công!');
+      } else {
+        console.error('Lỗi phản hồi từ backend khi sửa sản phẩm:', res.message);
+        alert(`Lỗi khi cập nhật sản phẩm: ${res.message}`);
+      }
+    } catch (error: any) {
+      console.error('Lỗi sửa sản phẩm:', error);
+      alert('Không thể cập nhật sản phẩm, vui lòng kiểm tra kết nối.');
+    }
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      console.log(`=== BẮT ĐẦU XÓA SẢN PHẨM #${productId} ===`);
+      const res = await deleteProduct(productId, token);
+      if (res.success) {
+        console.log(`Xóa sản phẩm #${productId} thành công khỏi state React.`);
+        setProducts(prev => prev.filter(p => p.id !== productId));
+        alert('Xóa sản phẩm thành công!');
+      } else {
+        console.error('Lỗi phản hồi từ backend khi xóa sản phẩm:', res.message);
+        alert(`Lỗi khi xóa sản phẩm: ${res.message}`);
+      }
+    } catch (error: any) {
+      console.error('Lỗi xóa sản phẩm:', error);
+      alert('Không thể xóa sản phẩm, vui lòng kiểm tra kết nối.');
+    }
   };
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -238,8 +359,12 @@ export default function App() {
                   setActiveTab(tab);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                onLoginSuccess={(email) => {
+                onLoginSuccess={(email, userToken) => {
                   const isSystemAdmin = email === 'admin@lumina.com';
+                  if (userToken) {
+                    setToken(userToken);
+                    localStorage.setItem('techvie_token', userToken);
+                  }
                   setUserProfile(prev => ({
                     ...prev,
                     email: email,
@@ -284,8 +409,12 @@ export default function App() {
                   setActiveTab(tab);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                onLoginSuccess={(email) => {
+                onLoginSuccess={(email, userToken) => {
                   const isSystemAdmin = email === 'admin@lumina.com';
+                  if (userToken) {
+                    setToken(userToken);
+                    localStorage.setItem('techvie_token', userToken);
+                  }
                   setUserProfile(prev => ({
                     ...prev,
                     email: email,
@@ -330,7 +459,7 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
+                setIsLoggedIn={handleSetIsLoggedIn}
                 userProfile={userProfile}
                 setUserProfile={setUserProfile}
               />

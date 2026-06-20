@@ -1,8 +1,38 @@
-import { useState, MouseEvent } from 'react';
+import { useState, MouseEvent, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { products as fallbackProducts } from '../data';
 import { Product } from '../types';
 import { Plus, Minus, Check, SlidersHorizontal, Eye, ShieldCheck, Cpu, Search, ArrowUpDown, X, Laptop, Smartphone, Watch, Headphones, Keyboard, LayoutGrid } from 'lucide-react';
+import { getCategories, getProducts } from '../services/api';
+
+const normalizeProduct = (p: any): Product => {
+  // Safeguard specs to prevent index [0] and [1] access crash
+  let safeSpecs: { label: string; value: string }[] = [];
+  if (Array.isArray(p.specs)) {
+    safeSpecs = p.specs.map((s: any) => ({
+      label: s && typeof s.label === 'string' ? s.label : 'Thông số',
+      value: s && typeof s.value === 'string' ? s.value : (typeof s === 'string' ? s : 'Đang cập nhật')
+    }));
+  } else if (p.specs && typeof p.specs === 'object') {
+    safeSpecs = Object.entries(p.specs).map(([key, val]) => ({
+      label: key,
+      value: String(val)
+    }));
+  }
+  
+  while (safeSpecs.length < 2) {
+    safeSpecs.push({ label: 'Thông số', value: 'Đang cập nhật' });
+  }
+
+  return {
+    id: p.id || p._id || String(Math.random()),
+    name: p.name || 'Sản phẩm Lumina',
+    price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
+    image: p.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+    category: p.category || 'Thiết bị',
+    description: p.description || 'Mô tả đang được cập nhật.',
+    specs: safeSpecs
+  };
+};
 
 interface ProductPageProps {
   products?: Product[];
@@ -10,7 +40,8 @@ interface ProductPageProps {
 }
 
 export default function ProductPage({ products, onAddToCart }: ProductPageProps) {
-  const allProducts = products || fallbackProducts;
+  const [dbProducts, setDbProducts] = useState<Product[]>([]);
+  const allProducts = dbProducts.length > 0 ? dbProducts : (products || []).map(normalizeProduct);
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [justAddedId, setJustAddedId] = useState<string | null>(null);
@@ -31,7 +62,27 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
 
   const currentSortOption = sortOptions.find(o => o.value === sortBy) || sortOptions[0];
 
-  const categories = ['Tất cả', 'Điện thoại', 'Laptop', 'Đồng hồ', 'Âm thanh', 'Bàn phím'];
+  const [categories, setCategories] = useState<string[]>(['Tất cả', 'Điện thoại', 'Laptop', 'Đồng hồ', 'Âm thanh', 'Bàn phím']);
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    getCategories().then(data => {
+      if (isMounted && data.success && data.categories) {
+        setCategories(data.categories);
+      }
+    });
+
+    getProducts().then(res => {
+      if (isMounted && res.success && res.products && res.products.length > 0) {
+        setDbProducts(res.products.map(normalizeProduct));
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const getCategoryIcon = (category: string) => {
     switch (category) {

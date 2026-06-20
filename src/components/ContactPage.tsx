@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Phone, MapPin, Send, Check, HelpCircle, ChevronDown, Users } from 'lucide-react';
-import { teamMembers } from '../data';
+import { teamMembers } from '../data_mockdata';
 import { sendContactInquiry } from '../services/api';
 
 export default function ContactPage() {

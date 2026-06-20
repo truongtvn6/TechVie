@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, TabType } from '../types';
-import { products as fallbackProducts } from '../data';
 import { Search, X, History, Grid2X2 } from 'lucide-react';
 
 interface SearchSidePanelProps {
@@ -25,7 +24,7 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
     'Lab Update'
   ]);
 
-  const allProducts = products || fallbackProducts;
+  const allProducts = products || [];
 
   const filteredProducts = searchQuery.trim() === ''
     ? []

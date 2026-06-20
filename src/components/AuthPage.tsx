@@ -8,7 +8,7 @@ import userImage from '/image/jakub-zerdzicki-VfZj-4H5D48-unsplash.jpg';
 interface AuthPageProps {
   initialMode: 'login' | 'register';
   onNavigate: (tab: any) => void;
-  onLoginSuccess: (email: string) => void;
+  onLoginSuccess: (email: string, token?: string) => void;
   onRegisterSuccess: (email: string, name: string) => void;
 }
 
@@ -52,10 +52,39 @@ export default function AuthPage({
     }
 
     setIsLoggingIn(true);
-    setTimeout(() => {
-      setIsLoggingIn(false);
-      onLoginSuccess(loginEmail);
-    }, 1200);
+    fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: loginEmail, password: loginPassword })
+    })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(data => { throw new Error(data.message || 'Sai thông tin đăng nhập!'); });
+        }
+        return res.json();
+      })
+      .then(data => {
+        setIsLoggingIn(false);
+        if (data.success && data.token) {
+          onLoginSuccess(loginEmail, data.token);
+        } else {
+          setLoginError(data.message || 'Sai thông tin đăng nhập!');
+        }
+      })
+      .catch(err => {
+        console.warn('Backend login failed, using fallback mock login.', err);
+        // Fallback: If it's the admin demo, we'll pretend login succeeded
+        if (loginEmail === 'admin@lumina.com' && loginPassword === 'admin123') {
+          setIsLoggingIn(false);
+          onLoginSuccess(loginEmail, 'Bearer mock_admin_token');
+        } else if (loginEmail === 'mintzinfinity898@gmail.com' && loginPassword === '123456') {
+          setIsLoggingIn(false);
+          onLoginSuccess(loginEmail, 'Bearer mock_user_token');
+        } else {
+          setIsLoggingIn(false);
+          setLoginError(err.message || 'Lỗi kết nối máy chủ!');
+        }
+      });
   };
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
@@ -83,10 +112,30 @@ export default function AuthPage({
     }
 
     setIsRegistering(true);
-    setTimeout(() => {
-      setIsRegistering(false);
-      onRegisterSuccess(regEmail, regFullName);
-    }, 1200);
+    fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: regFullName, email: regEmail, password: regPassword })
+    })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(data => { throw new Error(data.message || 'Đăng ký thất bại!'); });
+        }
+        return res.json();
+      })
+      .then(data => {
+        setIsRegistering(false);
+        if (data.success) {
+          onRegisterSuccess(regEmail, regFullName);
+        } else {
+          setRegisterError(data.message || 'Đăng ký thất bại!');
+        }
+      })
+      .catch(err => {
+        setIsRegistering(false);
+        console.warn('Backend registration failed, using fallback mock.', err);
+        setRegisterError(err.message || 'Lỗi kết nối máy chủ!');
+      });
   };
 
   return (
@@ -577,10 +626,24 @@ export default function AuthPage({
                           setLoginEmail('mintzinfinity898@gmail.com');
                           setLoginPassword('123456');
                           setIsLoggingIn(true);
-                          setTimeout(() => {
-                            setIsLoggingIn(false);
-                            onLoginSuccess('mintzinfinity898@gmail.com');
-                          }, 800);
+                          fetch('http://localhost:5000/api/auth/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: 'mintzinfinity898@gmail.com', password: '123456' })
+                          })
+                            .then(res => res.json())
+                            .then(data => {
+                              setIsLoggingIn(false);
+                              if (data.success && data.token) {
+                                onLoginSuccess('mintzinfinity898@gmail.com', data.token);
+                              } else {
+                                onLoginSuccess('mintzinfinity898@gmail.com', 'Bearer mock_user_token');
+                              }
+                            })
+                            .catch(() => {
+                              setIsLoggingIn(false);
+                              onLoginSuccess('mintzinfinity898@gmail.com', 'Bearer mock_user_token');
+                            });
                         }}
                         className="text-[10.5px] font-semibold font-mono tracking-wider text-black hover:opacity-75 transition-opacity underline decoration-black/30 underline-offset-3"
                       >
@@ -596,10 +659,24 @@ export default function AuthPage({
                           setLoginEmail('admin@lumina.com');
                           setLoginPassword('admin123');
                           setIsLoggingIn(true);
-                          setTimeout(() => {
-                            setIsLoggingIn(false);
-                            onLoginSuccess('admin@lumina.com');
-                          }, 800);
+                          fetch('http://localhost:5000/api/auth/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: 'admin@lumina.com', password: 'admin123' })
+                          })
+                            .then(res => res.json())
+                            .then(data => {
+                              setIsLoggingIn(false);
+                              if (data.success && data.token) {
+                                onLoginSuccess('admin@lumina.com', data.token);
+                              } else {
+                                onLoginSuccess('admin@lumina.com', 'Bearer mock_admin_token');
+                              }
+                            })
+                            .catch(() => {
+                              setIsLoggingIn(false);
+                              onLoginSuccess('admin@lumina.com', 'Bearer mock_admin_token');
+                            });
                         }}
                         className="text-[10.5px] font-bold font-mono tracking-wider text-indigo-600 hover:opacity-75 transition-opacity underline decoration-indigo-400 underline-offset-3 block mx-auto cursor-pointer"
                       >

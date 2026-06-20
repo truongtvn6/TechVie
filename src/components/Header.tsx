@@ -32,7 +32,7 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.02)]">
-      <div className="flex justify-between items-center h-24 px-6 md:px-[60px] max-w-7xl mx-auto relative w-full">
+      <div className="flex justify-between items-center h-24 px-4 md:px-10 lg:px-16 max-w-none mx-auto relative w-full">
         {/* Brand Logo text */}
         <button 
           onClick={() => {
@@ -45,7 +45,7 @@ export default function Header({
         </button>
 
         {/* Desktop Nav menu items */}
-        <nav className="hidden md:flex items-center space-x-10">
+        <nav className="hidden md:flex items-center space-x-3 lg:space-x-8 xl:space-x-10">
           {navigationItems.map((item) => (
             <button
               key={item.id}
@@ -53,7 +53,7 @@ export default function Header({
                 setActiveTab(item.id);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`text-[13px] font-sans tracking-widest font-extrabold hover:text-black transition-colors ${
+              className={`text-[11px] lg:text-[13px] font-sans tracking-widest font-extrabold hover:text-black transition-colors ${
                 activeTab === item.id 
                   ? 'text-black border-b-2 border-black pb-1' 
                   : 'text-gray-500'

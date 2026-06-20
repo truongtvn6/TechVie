@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { products as fallbackProducts } from '../data';
 import { Product, TabType } from '../types';
 import { ArrowLeftRight, Activity, Cpu, Compass, ArrowRight, Check, Send } from 'lucide-react';
 import { subscribeNewsletter } from '../services/api';
@@ -12,7 +11,7 @@ interface HomePageProps {
 }
 
 export default function HomePage({ products, onNavigate, onAddToCart }: HomePageProps) {
-  const allProducts = products || fallbackProducts;
+  const allProducts = products || [];
   const [currentSlide, setCurrentSlide] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [showSubscriptionSuccess, setShowSubscriptionSuccess] = useState(false);

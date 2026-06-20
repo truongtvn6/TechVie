@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { newsArticles } from '../data';
+import { newsArticles } from '../data_mockdata';
 import { NewsArticle } from '../types';
 import { Calendar, ChevronRight, X, Heart } from 'lucide-react';
 

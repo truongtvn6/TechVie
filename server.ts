@@ -139,6 +139,14 @@ async function startServer() {
     ]);
   });
 
+  // API Route: Feed product categories
+  app.get("/api/categories", (req, res) => {
+    res.json({
+      success: true,
+      categories: ['Tất cả', 'Điện thoại', 'Laptop', 'Đồng hồ', 'Âm thanh', 'Bàn phím']
+    });
+  });
+
   // API Route: Retrieve all registered orders (optional/admin)
   app.get("/api/orders", (req, res) => {
     res.json({ success: true, count: orders.length, orders });
