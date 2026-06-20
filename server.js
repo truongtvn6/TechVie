@@ -7,6 +7,9 @@ const mongoose = require("mongoose");
 const connectDB = require("./config/db"); // Trỏ đúng đến file db.js trong thư mục config
 const User = require("./models/User");
 const authRoutes = require("./routes/authRoutes");
+const productRoutes = require("./routes/productRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const Category = require("./models/Category");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -77,57 +80,11 @@ app.get("/test-db", async (req, res) => {
 // 6. Định nghĩa API Authentication Routes
 app.use("/api/auth", authRoutes);
 
-// --- DỮ LIỆU MOCK VÀ API CHO HOMEPAGE ---
+// 7. Định nghĩa API Products Routes (kết nối MongoDB & Cloudinary)
+app.use("/api/products", productRoutes);
 
-const mockProducts = [
-  {
-    id: "lumina-phone-1",
-    name: "Điện Thoại Lumina Ultra v1 (Backend)",
-    price: 28990000,
-    image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=800&q=80",
-    category: "Điện thoại",
-    description: "Chiếc flagship siêu phẩm tích hợp màn hình Dynamic OLED dải màu vô hạn kết hợp Camera cảm biến ống kính Lumina Pro. Khung vỏ bằng chất liệu Titanium nguyên khối cho trọng lượng siêu nhẹ và chuẩn bền bỉ vượt trội.",
-    specs: [
-      { label: "Màn hình", value: "6.7\" Dynamic OLED 120Hz" },
-      { label: "Vi xử lý", value: "Lumina Core Pro Alpha" },
-      { label: "Dung lượng Pin", value: "5000 mAh (Sạc siêu tốc)" },
-      { label: "Hệ thống Camera", value: "50MP Tri-Lens v2" }
-    ]
-  },
-  {
-    id: "lumina-book-pro",
-    name: "Laptop Lumina Book Pro X (Backend)",
-    price: 42500000,
-    image: "/src/assets/images/regenerated_image_1781784768195.jpg",
-    category: "Laptop",
-    description: "Trạm làm việc di động tối thượng dành cho các nhà sáng tạo nội dung và kỹ sư lập trình. Thiết kế siêu mỏng nhẹ từ hợp kim nhôm tái chế cao cấp, âm thanh phòng thu 6 loa vòm và bàn phím hành trình sâu êm ái.",
-    specs: [
-      { label: "Bộ xử lý", value: "Lumina Silicon M1 Ultra" },
-      { label: "Bộ nhớ RAM", value: "32GB Unified RAM" },
-      { label: "Lưu trữ SSD", value: "1TB NVMe Gen 4" },
-      { label: "Thời lượng Pin", value: "Lên tới 20 giờ liên tục" }
-    ]
-  },
-  {
-    id: "lumina-watch-ultra",
-    name: "Đồng Hồ Lumina Watch Ultra (Backend)",
-    price: 19500000,
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
-    category: "Đồng hồ",
-    description: "Người đồng hành thầm lặng cho mọi cuộc phiêu lưu khắc nghiệt và bảo trợ sức khỏe toàn thời gian. Khung vỏ Titanium chống ăn mòn cấp độ vũ trụ, hệ thống định vị GPS băng kép độc lập và kính Sapphire chống xước tuyệt đối.",
-    specs: [
-      { label: "Kích thước mặt", value: "49mm Titanium Gasket" },
-      { label: "Định vị toàn cầu", value: "GPS Băng tần kép L1+L5" },
-      { label: "Chống nước", value: "WR100 (Sâu tới 100m)" },
-      { label: "Cảm biến sức khỏe", value: "Nhịp tim, ECG & SpO2 cấp phòng khám" }
-    ]
-  }
-];
-
-// Route 1: Lấy danh sách sản phẩm mẫu cho Homepage
-app.get("/api/products", (req, res) => {
-  res.status(200).json(mockProducts);
-});
+// 8. Định nghĩa API Categories Routes
+app.use("/api/categories", categoryRoutes);
 
 // Route 2: Nhận email đăng ký nhận tin từ Homepage
 app.post("/api/subscribe", (req, res) => {
@@ -144,12 +101,60 @@ app.post("/api/subscribe", (req, res) => {
   });
 });
 
+// Hàm tự động seed danh mục mặc định nếu trống
+async function seedDefaultCategories() {
+  try {
+    const count = await Category.countDocuments();
+    if (count === 0) {
+      const defaultCategories = [
+        { name: "Điện thoại" },
+        { name: "Laptop" },
+        { name: "Đồng hồ" },
+        { name: "Âm thanh" },
+        { name: "Bàn phím" }
+      ];
+      await Category.insertMany(defaultCategories);
+      console.log(chalk.green.bold("✔ [SEED] Đã tự động chèn các danh mục mặc định vào database!"));
+    } else {
+      console.log(chalk.blue("ℹ [SEED] Danh mục đã tồn tại trong database, không cần seed."));
+    }
+  } catch (error) {
+    console.error(chalk.red("✖ Lỗi tự động seed danh mục:"), error);
+  }
+}
+
 // 7. Khởi chạy Server (Kết nối MongoDB trước khi chạy)
-connectDB().then(() => {
+connectDB().then(async () => {
+  await seedDefaultCategories();
+
   app.listen(PORT, () => {
     console.log(
       chalk.green.bold(`✔ [SERVER] Server đang chạy tại http://localhost:${PORT}`)
     );
-    console.log(chalk.blue(`ℹ [DATABASE] Đang duy trì kết nối tới Database...`));
+    console.log(
+      chalk.blue.bold(`ℹ [DATABASE] Máy chủ Database: ${mongoose.connection.host}`)
+    );
+    console.log(
+      chalk.blue.bold(`ℹ [DATABASE] Tên Database đang sử dụng: ${mongoose.connection.name}`)
+    );
+    console.log(
+      chalk.blue(`ℹ [DATABASE] Trạng thái kết nối Mongoose: ${mongoose.connection.readyState} (Đã sẵn sàng)`)
+    );
+
+    // Báo cáo cấu hình Cloudinary
+    const cloudinary = require("cloudinary").v2;
+    const cloudConfig = cloudinary.config();
+    if (cloudConfig.cloud_name) {
+      console.log(
+        chalk.magenta.bold(`✔ [CLOUDINARY] Đã kết nối với Cloud Name: ${cloudConfig.cloud_name}`)
+      );
+      console.log(
+        chalk.magenta(`ℹ [CLOUDINARY] Trạng thái API Key: ${cloudConfig.api_key ? "Đã bật (Active)" : "N/A"}`)
+      );
+    } else {
+      console.log(
+        chalk.yellow.bold(`⚠ [CLOUDINARY] Chưa được cấu hình hoặc thiếu các biến môi trường!`)
+      );
+    }
   });
 });

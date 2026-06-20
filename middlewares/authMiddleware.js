@@ -25,4 +25,17 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
+const adminOnly = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Truy cập bị từ chối: Yêu cầu quyền quản trị viên!",
+    });
+  }
+  next();
+};
+
+authMiddleware.adminOnly = adminOnly;
+
 module.exports = authMiddleware;
+

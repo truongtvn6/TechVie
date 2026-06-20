@@ -84,7 +84,11 @@ const authController = {
 
       // Tạo mã JWT Token
       const token = jwt.sign(
-        { id: user.id, email: user.email },
+        { 
+          id: user.id, 
+          email: user.email, 
+          role: user.email === "admin@lumina.com" ? "admin" : "user" 
+        },
         process.env.JWT_SECRET || "techvie_jwt_secret_key_2026",
         { expiresIn: "24h" }
       );
@@ -98,6 +102,7 @@ const authController = {
           username: user.username,
           email: user.email,
           created_at: user.created_at,
+          role: user.email === "admin@lumina.com" ? "admin" : "user",
         },
       });
     } catch (error) {
