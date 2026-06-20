@@ -13,6 +13,9 @@ import SearchSidePanel from './components/SearchSidePanel';
 import CartSidePanel from './components/CartSidePanel';
 import { Search, ShoppingBag, Menu, X, ArrowUpRight, Globe, Layers, Brush, User } from 'lucide-react';
 
+// Logo
+import Logo from "./assets/images/logo-new-no-bg.png"
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -102,7 +105,7 @@ export default function App() {
             }}
             className="text-2xl md:text-3xl font-sans tracking-tighter text-black font-black hover:opacity-80 transition-opacity"
           >
-            LUMINA
+            <img src={Logo} alt="logo" width={150}/>
           </button>
 
           {/* Desktop Nav menu items */}
@@ -476,7 +479,8 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Description summary */}
           <div className="space-y-4">
-            <h3 className="text-xl font-black text-gray-900 tracking-tight">LUMINA</h3>
+            {/* <h3 className="text-xl font-black text-gray-900 tracking-tight">LUMINA</h3> */}
+            <img src={Logo} alt="logo" width={220}/>
             <p className="text-xs text-gray-500 font-sans leading-relaxed max-w-[260px]">
               Cung cấp các thiết bị điện tử đỉnh cao, laptop hiệu năng khủng, smartphone đột phá và các món phụ kiện hi-end chế tác tỉ mỉ dành cho tương lai.
             </p>
@@ -543,12 +547,12 @@ export default function App() {
         </div>
 
         {/* Rights bar */}
-        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-gray-150 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono uppercase tracking-widest text-gray-400 gap-4 text-center md:text-left">
-          <span>© 2026 LUMINA ELECTRONICS. ĐƯỢC CHẾ TÁC VÌ SỰ RÕ NÉT.</span>
-          <span className="flex items-center gap-1">
+        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-gray-150 flex flex-col md:flex-row justify-between items-center text-[13px] font-mono uppercase tracking-widest text-gray-400 gap-4 text-center md:text-left">
+          <span>© 2026 TECHVIE STORE</span>
+          {/* <span className="flex items-center gap-1">
             THẮP SÁNG BỞI LUMINA LAB SWITZERLAND & SEOUL CORP.
             <ArrowUpRight size={10} />
-          </span>
+          </span> */}
         </div>
       </footer>
       )}

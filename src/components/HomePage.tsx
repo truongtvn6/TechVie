@@ -66,7 +66,7 @@ export default function HomePage({ onNavigate, onAddToCart }: HomePageProps) {
             <motion.img 
               key={currentSlide}
               src={images[currentSlide]} 
-              alt={`Lumina Slideshow ${currentSlide + 1}`}
+              alt={`Slideshow ${currentSlide + 1}`}
               referrerPolicy="no-referrer"
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -87,13 +87,13 @@ export default function HomePage({ onNavigate, onAddToCart }: HomePageProps) {
               className="max-w-2xl bg-white/45 backdrop-blur-[35px] p-8 md:p-14 rounded-3xl border border-white/60 shadow-[0_30px_70px_rgba(0,0,0,0.1)] relative"
             >
               <div className="absolute top-0 right-0 p-6 flex flex-col items-end opacity-35 text-[9px] font-mono tracking-widest text-gray-800">
-                <span>MÃ LƯỚI: 48.85 / 2.35</span>
-                <div className="w-12 h-px bg-gray-800 mt-1"></div>
+                {/* <span>MÃ LƯỚI: 48.85 / 2.35</span> */}
+                {/* <div className="w-12 h-px bg-gray-800 mt-1"></div> */}
               </div>
               
-              <div className="absolute -left-px top-1/4 h-24 w-1 bg-gradient-to-b from-transparent via-secondary/40 to-transparent"></div>
+              {/* <div className="absolute -left-px top-1/4 h-24 w-1 bg-gradient-to-b from-transparent via-secondary/40 to-transparent"></div> */}
               
-              <span className="text-xs uppercase tracking-[0.4em] text-secondary font-bold mb-6 block flex items-center gap-3">
+              <span className="text-xs uppercase tracking-[0.4em] text-secondary font-bold mb-6 block flex items-center">
                 <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
                 Hệ Sinh Thái Độc Bản v2.0
               </span>
