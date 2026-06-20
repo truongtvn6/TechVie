@@ -1,0 +1,8 @@
+{
+  "name": "Lumina",
+  "description": "Trang thương hiệu và hệ sinh thái thấu kính chất lỏng và cảm biến tối tân LUMINA v2.0",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

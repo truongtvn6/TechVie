@@ -1,0 +1,227 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Product, TabType } from '../types';
+import { products as allProducts } from '../data';
+import { Search, X, History, Grid2X2 } from 'lucide-react';
+
+interface SearchSidePanelProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onNavigate: (tab: TabType) => void;
+  onAddToCart: (product: Product) => void;
+}
+
+export default function SearchSidePanel({ isOpen, onClose, onNavigate, onAddToCart }: SearchSidePanelProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [popularSearches] = useState([
+    'Giao diện Prism-1',
+    'Cảm biến Flux',
+    'Thủy tinh lỏng',
+    'Hệ thống v2.0'
+  ]);
+  const [searchHistory] = useState([
+    'Core v2',
+    'Lab Update'
+  ]);
+
+  const filteredProducts = searchQuery.trim() === ''
+    ? []
+    : allProducts.filter(p => 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Glass Overlay, clicking closes search */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/40 backdrop-blur-[12px] z-[60]"
+          />
+
+          {/* 70% Width Slide-out Panel from the left as described in Viet mockup */}
+          <motion.aside 
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="fixed top-0 left-0 bottom-0 z-[70] w-[85vw] md:w-[70vw] bg-white/30 backdrop-blur-[80px] saturate-[200%] border-r border-white/20 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.15)] overflow-hidden"
+          >
+            {/* Header */}
+            <div className="p-8 md:p-14 flex justify-between items-center border-b border-black/5">
+              <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black uppercase">
+                Tìm kiếm
+              </h2>
+              <button 
+                onClick={onClose}
+                className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-black/5 transition-all border border-black/10 group"
+              >
+                <X size={20} className="group-hover:rotate-90 transition-transform" />
+              </button>
+            </div>
+
+            {/* Content area */}
+            <div className="flex-grow overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden px-8 md:px-14 pb-20 pt-8 space-y-12">
+              {/* Search Box */}
+              <div className="relative group/search">
+                <input 
+                  type="text" 
+                  autoFocus
+                  placeholder="" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent border-b-2 border-black/10 focus:border-black outline-none font-sans text-lg md:text-2xl lg:text-3xl py-4 pb-2 pr-12 tracking-tight transition-colors relative z-10"
+                />
+                
+                {/* Sliding Matrix Ticker Placeholder */}
+                {searchQuery === '' && (
+                  <div className="absolute inset-x-0 bottom-0 top-0 pr-12 flex items-center pointer-events-none overflow-hidden select-none z-0">
+                    <div className="animate-marquee whitespace-nowrap flex gap-16 text-black/15 font-sans text-lg md:text-2xl lg:text-3xl tracking-tight uppercase font-extrabold">
+                      <span>• TÌM KIẾM LUMINA: ĐIỆN THOẠI LUMINA ULTRA S26 • LAPTOP LUMINA BOOK PRO X • TRẠM SẠC VÒM KHÔNG DÂY • LUMINA WATCH S • TAI NGHE AMBIENT BUDS PRO • HỆ SINH THÁI COLD-HARDWARE •</span>
+                      <span>• TÌM KIẾM LUMINA: ĐIỆN THOẠI LUMINA ULTRA S26 • LAPTOP LUMINA BOOK PRO X • TRẠM SẠC VÒM KHÔNG DÂY • LUMINA WATCH S • TAI NGHE AMBIENT BUDS PRO • HỆ SINH THÁI COLD-HARDWARE •</span>
+                    </div>
+                  </div>
+                )}
+                
+                <Search size={24} className="absolute right-2 top-5 text-black/20 pointer-events-none z-20" />
+              </div>
+
+              {/* Suggestions panels shown when search is empty */}
+              {searchQuery.trim() === '' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <section>
+                    <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-black/40 mb-4 border-b border-black/5 pb-2">
+                      Tìm kiếm phổ biến
+                    </h3>
+                    <ul className="space-y-3">
+                      {popularSearches.map((p, idx) => (
+                        <li key={idx}>
+                          <button 
+                            onClick={() => setSearchQuery(p)}
+                            className="font-sans text-base text-gray-700 hover:text-indigo-600 transition-colors block text-left font-semibold"
+                          >
+                            {p}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-black/40 mb-4 border-b border-black/5 pb-2">
+                      Lịch sử tìm kiếm
+                    </h3>
+                    <ul className="space-y-3">
+                      {searchHistory.map((h, idx) => (
+                        <li key={idx}>
+                          <button 
+                            onClick={() => setSearchQuery(h)}
+                            className="font-sans text-xs text-gray-500 hover:text-black flex items-center gap-2"
+                          >
+                            <History size={12} />
+                            {h}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                </div>
+              ) : (
+                /* Search Results display */
+                <section>
+                  <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-black/40 mb-6 border-b border-black/5 pb-2">
+                    Kết quả tìm thấy ({filteredProducts.length})
+                  </h3>
+
+                  {filteredProducts.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {filteredProducts.map((p) => (
+                        <div 
+                          key={p.id}
+                          className="bg-white/40 border border-black/5 hover:border-black/20 p-5 rounded-2xl flex gap-4 transition-all hover:bg-white"
+                        >
+                          <img 
+                            src={p.image} 
+                            alt={p.name} 
+                            referrerPolicy="no-referrer"
+                            className="w-16 h-16 object-contain mix-blend-multiply shrink-0"
+                          />
+                          <div className="flex-grow min-w-0">
+                            <h4 className="font-semibold text-sm text-gray-900 truncate">{p.name}</h4>
+                            <p className="text-xs text-gray-500 font-sans truncate">{p.description}</p>
+                            <div className="flex justify-between items-center mt-2">
+                              <span className="font-bold text-xs">{p.price.toLocaleString('vi-VN')}₫</span>
+                              <button 
+                                onClick={() => {
+                                  onAddToCart(p);
+                                  onClose();
+                                }}
+                                className="text-[10px] uppercase font-black text-indigo-600 hover:text-indigo-800"
+                              >
+                                Đặt mua
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-10">
+                      <p className="text-sm text-gray-500">Không tìm thấy thiết bị nào khớp với từ khoá.</p>
+                      <button 
+                        onClick={() => {
+                          setSearchQuery('');
+                          onNavigate('products');
+                          onClose();
+                        }}
+                        className="text-xs text-indigo-650 hover:underline font-bold uppercase tracking-wider mt-2"
+                      >
+                        Khám phá tất cả sản phẩm
+                      </button>
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {/* Recommended hardware item shortcut blocks */}
+              <section className="pt-6 border-t border-black/5">
+                <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-black/40 mb-6">
+                  Gợi ý thêm sản phẩm
+                </h3>
+
+                <div className="grid grid-cols-3 gap-4">
+                  {allProducts.slice(0, 3).map((p) => (
+                    <div 
+                      key={p.id}
+                      onClick={() => {
+                        onNavigate('products');
+                        onClose();
+                      }}
+                      className="cursor-pointer group bg-white/20 hover:bg-white p-4 rounded-2xl border border-black/5 hover:border-black/15 transition-all flex flex-col items-center text-center"
+                    >
+                      <div className="w-12 h-12 flex items-center justify-center mb-2">
+                        <img 
+                          src={p.image} 
+                          alt={p.name} 
+                          referrerPolicy="no-referrer"
+                          className="max-h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
+                        />
+                      </div>
+                      <h4 className="font-semibold text-[11px] text-gray-900 truncate w-full">{p.name}</h4>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
