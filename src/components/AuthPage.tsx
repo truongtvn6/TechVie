@@ -591,7 +591,7 @@ export default function AuthPage({
                         href="#forgot-password"
                         onClick={(e) => {
                           e.preventDefault();
-                          alert('Liên kết khôi phục mật khẩu đã được gửi đến email của bạn.');
+                          console.log('Liên kết khôi phục mật khẩu đã được gửi đến email của bạn.');
                         }}
                         className="font-jakarta text-[11px] font-semibold text-black hover:opacity-50 transition-opacity uppercase tracking-wider underline underline-offset-4"
                       >

@@ -72,13 +72,40 @@ export default function CheckoutPage({
     setPromoError('');
     setPromoSuccess('');
     const code = promoCode.trim().toUpperCase();
-    
-    if (code === 'LUMINA2026' || code === 'FUTURE') {
-      setAppliedDiscount(0.1); // 10% OFF
-      setPromoSuccess('Áp dụng mã giảm giá 10% thành công!');
-    } else if (code === 'VIPLAB') {
-      setAppliedDiscount(0.25); // 25% OFF
-      setPromoSuccess('Áp dụng siêu đặc quyền giảm giá 25% thành công!');
+
+    // Đọc mã giảm giá động từ localStorage để đồng bộ với trang Admin
+    let localPromos = [];
+    try {
+      const saved = localStorage.getItem('lumina_promos');
+      if (saved) {
+        localPromos = JSON.parse(saved);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    // Nếu localStorage trống, sử dụng các giá trị mặc định làm phương án dự phòng
+    if (!Array.isArray(localPromos) || localPromos.length === 0) {
+      localPromos = [
+        { code: 'LUMINA2026', discount: 0.1, description: 'Giảm giá ra mắt sản phẩm 10%', isActive: true },
+        { code: 'FUTURE', discount: 0.1, description: 'Đặc quyền tương lai 10%', isActive: true },
+        { code: 'VIPLAB', discount: 0.25, description: 'Siêu đặc quyền từ Lumina Lab 25%', isActive: true, minOrderVal: 30000000 }
+      ];
+    }
+
+    const foundPromo = localPromos.find((p: any) => p.code.toUpperCase() === code);
+
+    if (foundPromo) {
+      if (!foundPromo.isActive) {
+        setPromoError('Mã ưu đãi này hiện đã tạm dừng hoạt động.');
+        return;
+      }
+      if (foundPromo.minOrderVal && subtotal < foundPromo.minOrderVal) {
+        setPromoError(`Mã giảm giá này yêu cầu đơn hàng tối thiểu từ ${foundPromo.minOrderVal.toLocaleString('vi-VN')}₫`);
+        return;
+      }
+      setAppliedDiscount(foundPromo.discount);
+      setPromoSuccess(`Áp dụng thành công: ${foundPromo.description || `Giảm ${(foundPromo.discount * 100).toFixed(0)}%`}`);
     } else {
       setPromoError('Mã ưu đãi không chính xác hoặc đã hết hạn.');
     }

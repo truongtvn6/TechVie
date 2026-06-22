@@ -16,6 +16,7 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [showSubscriptionSuccess, setShowSubscriptionSuccess] = useState(false);
   const [isSubmittingSubscription, setIsSubmittingSubscription] = useState(false);
+  const [isLoadedFromApi, setIsLoadedFromApi] = useState(false);
 
   const [images, setImages] = useState<string[]>([
     'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1200&q=80',
@@ -25,22 +26,41 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
     'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80'
   ]);
 
-  // Fetch slider images dynamically from backend express API
+  // Fetch slider images dynamically from backend express API (port 5000)
   useEffect(() => {
-    fetch('/api/hero-images')
-      .then((res) => {
-        if (!res.ok) throw new Error('API server unreachable');
-        return res.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setImages(data);
-        }
-      })
-      .catch((error) => {
-        console.warn('Fallback to local slide images used safely. Detal:', error);
-      });
-  }, []);
+    let intervalId: NodeJS.Timeout;
+
+    const fetchImages = () => {
+      fetch('http://localhost:5000/api/hero-images')
+        .then((res) => {
+          if (!res.ok) throw new Error('API server unreachable');
+          return res.json();
+        })
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setImages(data);
+            setIsLoadedFromApi(true);
+            // Đảm bảo chỉ số slide hiện tại không vượt quá mảng dữ liệu mới từ backend
+            setCurrentSlide((prev) => (prev >= data.length ? 0 : prev));
+          } else {
+            throw new Error('Received empty image list');
+          }
+        })
+        .catch((error) => {
+          console.warn('Fallback to local slide images used safely. Detail:', error.message || error);
+          setIsLoadedFromApi(false);
+        });
+    };
+
+    // Chạy tải dữ liệu ngay lập tức
+    fetchImages();
+
+    // Nếu chưa tải được API, thử lại sau mỗi 5 giây. Nếu đã tải thành công, cập nhật định kỳ mỗi 30 giây.
+    const intervalTime = isLoadedFromApi ? 30000 : 5000;
+    intervalId = setInterval(fetchImages, intervalTime);
+
+    return () => clearInterval(intervalId);
+  }, [isLoadedFromApi]);
 
   // Rotating slider effect
   useEffect(() => {
@@ -77,7 +97,7 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
         <div className="absolute inset-0 w-full h-full">
           <AnimatePresence mode="popLayout">
             <motion.img 
-              key={currentSlide}
+              key={images[currentSlide] || currentSlide}
               src={images[currentSlide]} 
               alt={`Lumina Slideshow ${currentSlide + 1}`}
               referrerPolicy="no-referrer"

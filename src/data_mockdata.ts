@@ -1,6 +1,6 @@
 import { Product, NewsArticle, TimelineEvent, TeamMember } from './types';
-// @ts-ignore
-import laptopImg from './assets/images/regenerated_image_1781784768195.jpg';
+
+const laptopImg = 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=800&q=80';
 
 export const products: Product[] = [
   {

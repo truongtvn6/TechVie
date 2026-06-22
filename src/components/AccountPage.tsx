@@ -379,7 +379,7 @@ export default function AccountPage({
 
                       <div className="pt-2">
                         <button 
-                          onClick={() => alert('Cập nhật dữ liệu thông tin tài khoản thành công!')}
+                          onClick={() => console.log('Cập nhật dữ liệu thông tin tài khoản thành công!')}
                           className="px-6 py-3 bg-black hover:bg-gray-900 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all"
                         >
                           Lưu hồ sơ thông tin
@@ -462,7 +462,7 @@ export default function AccountPage({
                                 </div>
 
                                 <button 
-                                  onClick={() => alert(`Sản phẩm mã ${ord.id} đang nằm trong lộ trình bưu tá giao hàng tận nơi nguyên seal.`)}
+                                  onClick={() => console.log(`Sản phẩm mã ${ord.id} đang nằm trong lộ trình bưu tá giao hàng tận nơi nguyên seal.`)}
                                   className="text-[10px] font-sans font-black uppercase tracking-wider text-black bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all"
                                 >
                                   Xem Vị Trí Vận Chuyển
@@ -594,7 +594,7 @@ export default function AccountPage({
 
                       <div className="pt-2">
                         <button 
-                          onClick={() => alert('Mật khẩu của bạn đã được cấu định an toàn!')}
+                          onClick={() => console.log('Mật khẩu của bạn đã được cấu định an toàn!')}
                           className="px-6 py-3 bg-black hover:bg-gray-900 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all"
                         >
                           Cấu Định Mật Khẩu
