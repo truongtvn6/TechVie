@@ -86,6 +86,42 @@ app.use("/api/products", productRoutes);
 // 8. Định nghĩa API Categories Routes
 app.use("/api/categories", categoryRoutes);
 
+// Endpoint GET /api/hero-images truy xuất ảnh từ thư mục wallpaper-slideshow-for-homePage trên Cloudinary
+app.get("/api/hero-images", async (req, res) => {
+  const fallbackImages = [
+    'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1468436139062-f60a71c5c892?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80'
+  ];
+
+  try {
+    const cloudinary = require("cloudinary").v2;
+    // Kiểm tra cấu hình Cloudinary trước khi gọi
+    if (!cloudinary.config().cloud_name) {
+      console.warn("[CLOUDINARY] Chưa được cấu hình! Trả về danh sách ảnh dự phòng.");
+      return res.status(200).json(fallbackImages);
+    }
+
+    const result = await cloudinary.search
+      .expression("folder:wallpaper-slideshow-for-homePage")
+      .execute();
+    
+    if (result && result.resources && result.resources.length > 0) {
+      const urls = result.resources.map(r => r.secure_url);
+      console.log(`[CLOUDINARY] Lấy thành công ${urls.length} ảnh từ folder 'wallpaper-slideshow-for-homePage'`);
+      return res.status(200).json(urls);
+    } else {
+      console.log("[CLOUDINARY] Thư mục 'wallpaper-slideshow-for-homePage' trống hoặc không tìm thấy ảnh. Sử dụng ảnh dự phòng.");
+      return res.status(200).json(fallbackImages);
+    }
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách ảnh từ Cloudinary:", error);
+    return res.status(200).json(fallbackImages);
+  }
+});
+
 // Route 2: Nhận email đăng ký nhận tin từ Homepage
 app.post("/api/subscribe", (req, res) => {
   const { email } = req.body;
@@ -124,21 +160,31 @@ async function seedDefaultCategories() {
 }
 
 // 7. Khởi chạy Server (Kết nối MongoDB trước khi chạy)
-connectDB().then(async () => {
-  await seedDefaultCategories();
+connectDB().then(async (conn) => {
+  if (conn) {
+    await seedDefaultCategories();
+  } else {
+    console.log(chalk.red.bold("⚠ [DATABASE] Không có kết nối Database, bỏ qua seed danh mục mặc định."));
+  }
 
   app.listen(PORT, () => {
     console.log(
       chalk.green.bold(`✔ [SERVER] Server đang chạy tại http://localhost:${PORT}`)
     );
+    if (conn) {
+      console.log(
+        chalk.blue.bold(`ℹ [DATABASE] Máy chủ Database: ${mongoose.connection.host}`)
+      );
+      console.log(
+        chalk.blue.bold(`ℹ [DATABASE] Tên Database đang sử dụng: ${mongoose.connection.name}`)
+      );
+    } else {
+      console.log(
+        chalk.red.bold(`⚠ [DATABASE] Kết nối Database thất bại hoặc chưa sẵn sàng!`)
+      );
+    }
     console.log(
-      chalk.blue.bold(`ℹ [DATABASE] Máy chủ Database: ${mongoose.connection.host}`)
-    );
-    console.log(
-      chalk.blue.bold(`ℹ [DATABASE] Tên Database đang sử dụng: ${mongoose.connection.name}`)
-    );
-    console.log(
-      chalk.blue(`ℹ [DATABASE] Trạng thái kết nối Mongoose: ${mongoose.connection.readyState} (Đã sẵn sàng)`)
+      chalk.blue(`ℹ [DATABASE] Trạng thái kết nối Mongoose: ${mongoose.connection.readyState}`)
     );
 
     // Báo cáo cấu hình Cloudinary

@@ -7,8 +7,8 @@ const connectDB = async () => {
     console.log("Kết nối MongoDB thành công!");
     return conn;
   } catch (err) {
-    console.error("Lỗi kết nối database:", err.message);
-    process.exit(1);
+    console.log("⚠ [DATABASE] Không thể kết nối MongoDB Atlas (Đang hoạt động offline).");
+    return null;
   }
 };
 
