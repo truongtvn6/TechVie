@@ -31,7 +31,7 @@ export default function ContactPage() {
       a: "Tất cả các sản phẩm laptop, smartphone và phụ kiện hi-end của TechVie đều đi kèm bảo hành chính hãng một đổi một do lỗi nhà sản xuất trong vòng 12 tháng, bảo trì định kỳ và hỗ trợ phục hồi kỹ thuật trọn đời."
     },
     {
-      q: "Các dòng phụ kiện của TechVie có tương tương thích tốt với nền tảng khác không?",
+      q: "Các dòng phụ kiện của TechVie có tương thích tốt với nền tảng khác không?",
       a: "Các thiết bị ngoại vi của TechVie như tai nghe, bàn phím cơ và dock sạc thông minh được thiết kế theo chuẩn kết nối USB-C, Bluetooth 5.3 hiện đại nhất, bảo đảm tương thích hoàn toàn bứt phá trên iOS, Android, macOS và Windows."
     }
   ];
