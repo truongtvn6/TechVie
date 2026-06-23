@@ -383,7 +383,6 @@ export default function App() {
   const showHeaderFooter = activeTab !== 'dang-nhap' && activeTab !== 'dang-ky' && activeTab !== 'admin';
 
   const navigationItems: { id: TabType; label: string }[] = [
-    { id: 'home', label: 'TRANG CHỦ' },
     { id: 'products', label: 'SẢN PHẨM' },
     { id: 'brand', label: 'THƯƠNG HIỆU' }, // The requested brand page
     { id: 'news', label: 'TIN TỨC' },
