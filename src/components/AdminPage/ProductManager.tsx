@@ -26,7 +26,7 @@ export default function ProductManager({
 
         <button
           onClick={onOpenCreateForm}
-          className="px-5 py-3 bg-black hover:bg-gray-905 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+          className="px-5 py-2.5 bg-black hover:bg-gray-900 text-white font-sans text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
         >
           <Plus size={15} />
           Đăng sản phẩm mới

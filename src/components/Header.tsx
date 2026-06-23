@@ -32,6 +32,63 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.02)]">
+      <style>{`
+        .nav-btn {
+          position: relative;
+          transition: 0.5s ease;
+          cursor: pointer;
+          background: transparent;
+          border: none;
+          z-index: 1;
+        }
+
+        .nav-btn::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          height: 2px;
+          width: 0;
+          background-color: #000000;
+          transition: 0.5s ease;
+        }
+
+        .nav-btn::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          height: 0;
+          width: 100%;
+          background-color: #000000;
+          transition: 0.4s ease;
+          z-index: -1;
+        }
+
+        /* Hover states */
+        .nav-btn:hover {
+          color: #ffffff !important;
+          transition-delay: 0.5s;
+        }
+
+        .nav-btn:hover::before {
+          width: 100%;
+        }
+
+        .nav-btn:hover::after {
+          height: 100%;
+          transition-delay: 0.4s;
+        }
+
+        /* Active state */
+        .nav-btn-active {
+          color: #000000;
+        }
+
+        .nav-btn-active::before {
+          width: 100%;
+        }
+      `}</style>
       <div className="flex justify-between items-center h-24 px-4 md:px-10 lg:px-16 max-w-none mx-auto relative w-full">
         {/* Brand Logo text */}
         <button 
@@ -53,9 +110,9 @@ export default function Header({
                 setActiveTab(item.id);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`text-[11px] lg:text-[13px] font-sans tracking-widest font-extrabold hover:text-black transition-colors ${
+              className={`nav-btn px-4 py-2 text-[11px] lg:text-[13px] font-sans tracking-widest font-extrabold transition-all duration-300 rounded-sm ${
                 activeTab === item.id 
-                  ? 'text-black border-b-2 border-black pb-1' 
+                  ? 'nav-btn-active' 
                   : 'text-gray-500'
               }`}
             >

@@ -1,6 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Product } from '../../types';
-import { Trash2, Plus, UploadCloud } from 'lucide-react';
+import { Trash2, Plus, UploadCloud, Smartphone, Laptop, Watch, Volume2, Keyboard } from 'lucide-react';
+
+const categoriesList = [
+  {
+    name: "Điện thoại",
+    icon: <Smartphone className="w-4 h-4" strokeWidth={1.5} />
+  },
+  {
+    name: "Laptop",
+    icon: <Laptop className="w-4 h-4" strokeWidth={1.5} />
+  },
+  {
+    name: "Đồng hồ",
+    icon: <Watch className="w-4 h-4" strokeWidth={1.5} />
+  },
+  {
+    name: "Âm thanh",
+    icon: <Volume2 className="w-4 h-4" strokeWidth={1.5} />
+  },
+  {
+    name: "Bàn phím",
+    icon: <Keyboard className="w-4 h-4" strokeWidth={1.5} />
+  }
+];
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -23,8 +46,60 @@ export default function ProductFormModal({
   const [prodDesc, setProdDesc] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
 
+  // Helper functions for formatting price with dots (thousands separator) without cursor jumping
+  const formatPriceWithDots = (num: number): string => {
+    if (num === 0) return '';
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const selectionStart = input.selectionStart || 0;
+    const valueBeforeCursor = input.value.slice(0, selectionStart);
+    const digitsBefore = valueBeforeCursor.replace(/\D/g, '').length;
+    
+    const rawValue = input.value.replace(/\D/g, '');
+    const parsedValue = parseInt(rawValue, 10) || 0;
+    
+    setProdPrice(parsedValue);
+    
+    const formatted = formatPriceWithDots(parsedValue);
+    
+    setTimeout(() => {
+      let newCursorPos = 0;
+      let digitCount = 0;
+      for (let i = 0; i < formatted.length; i++) {
+        if (formatted[i] !== '.') {
+          digitCount++;
+        }
+        newCursorPos = i + 1;
+        if (digitCount === digitsBefore) {
+          break;
+        }
+      }
+      input.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
   // Dynamic Specifications representation matching user's dynamic specs requirement
   const [formSpecs, setFormSpecs] = useState<{ label: string; value: string }[]>([]);
+
+  // Custom Dropdown State & Ref
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Xử lý sự kiện click ra ngoài để tự động đóng menu
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Initialize fields on open or change in editingProduct
   useEffect(() => {
@@ -95,7 +170,7 @@ export default function ProductFormModal({
             form="product-form-modal-form"
             className="px-5 py-2.5 rounded-xl bg-black text-white hover:bg-gray-900 font-sans text-xs uppercase tracking-widest font-black transition-all shadow active:scale-95 cursor-pointer"
           >
-            {editingProduct ? 'Cấu định thay đổi' : 'Đăng bán độc bản'}
+            {editingProduct ? 'thay đổi sản phẩm' : 'đăng bán sản phẩm'}
           </button>
           <button
             type="button"
@@ -138,29 +213,82 @@ export default function ProductFormModal({
               <div className="lg:col-span-3 space-y-2">
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">Giá bán niêm yết (VND) *</label>
                 <input
-                  type="number"
+                  type="text"
                   required
-                  value={prodPrice}
-                  onChange={(e) => setProdPrice(parseInt(e.target.value) || 0)}
+                  value={formatPriceWithDots(prodPrice)}
+                  onChange={handlePriceChange}
                   placeholder="0"
                   className="w-full bg-white border border-gray-250 focus:border-black focus:outline-none focus:ring-1 focus:ring-black rounded-xl px-4 py-3 text-xs text-gray-900 transition-all font-mono font-bold placeholder-gray-400"
                 />
               </div>
 
               {/* Category selector */}
-              <div className="lg:col-span-3 space-y-2">
-                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">Phân loại thiết bị</label>
-                <select
-                  value={prodCategory}
-                  onChange={(e) => setProdCategory(e.target.value)}
-                  className="w-full bg-white border border-gray-250 focus:border-black focus:outline-none focus:ring-1 focus:ring-black rounded-xl px-4 py-3 text-xs text-gray-900 dropdown-custom cursor-pointer transition-all font-bold pr-10"
+              <div className="lg:col-span-3 relative" ref={dropdownRef}>
+                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Phân loại thiết bị</label>
+                
+                {/* Custom Trigger Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={`w-full flex items-center justify-between px-4 py-2 rounded-xl border text-left transition-all duration-200 bg-white cursor-pointer
+                    ${isDropdownOpen 
+                      ? 'border-black ring-1 ring-black shadow-sm' 
+                      : 'border-gray-250 hover:border-gray-300 hover:bg-gray-50/50'
+                    }
+                  `}
                 >
-                  <option value="Điện thoại">Điện thoại</option>
-                  <option value="Laptop">Laptop</option>
-                  <option value="Đồng hồ">Đồng hồ</option>
-                  <option value="Âm thanh">Âm thanh</option>
-                  <option value="Bàn phím">Bàn phím</option>
-                </select>
+                  <div className="flex items-center gap-3">
+                    <span className={`p-1 rounded-lg ${isDropdownOpen ? 'bg-slate-100 text-black' : 'bg-slate-50 text-slate-500'}`}>
+                      {(categoriesList.find(c => c.name === prodCategory) || categoriesList[0]).icon}
+                    </span>
+                    <span className="font-bold text-gray-900 text-xs">
+                      {prodCategory}
+                    </span>
+                  </div>
+                  
+                  {/* Chevron Arrow */}
+                  <svg 
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180 text-black' : ''}`} 
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div className="absolute top-full left-0 z-50 w-full mt-2 bg-white border border-gray-150 rounded-2xl shadow-xl py-2 animate-fade-in text-xs text-gray-900">
+                    <ul className="max-h-60 overflow-auto scrollbar-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                      {categoriesList.map((category) => (
+                        <li
+                          key={category.name}
+                          onClick={() => {
+                            setProdCategory(category.name);
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors mx-2 rounded-xl group
+                            ${prodCategory === category.name 
+                              ? 'bg-slate-100 text-black font-black hover:bg-black hover:text-white' 
+                              : 'text-gray-600 hover:bg-black hover:text-white font-bold'
+                            }
+                          `}
+                        >
+                          <span className={`${prodCategory === category.name ? 'text-black' : 'text-slate-400'} group-hover:text-white transition-colors`}>
+                            {category.icon}
+                          </span>
+                          <span className="flex-1 text-xs">{category.name}</span>
+                          
+                          {/* Checkmark indicator */}
+                          {prodCategory === category.name && (
+                            <svg className="w-4 h-4 text-black group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
             </div>

@@ -10,7 +10,7 @@ interface FooterProps {
 export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
   return (
     <footer className="w-full bg-white/40 border-t border-gray-200 py-16 mt-20">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+      <div className="max-w-none mx-auto px-4 md:px-10 lg:px-16 grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Description summary */}
         <div className="space-y-4">
           <h3 className="text-xl font-black text-gray-900 tracking-tight">
@@ -130,7 +130,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
       </div>
 
       {/* Rights bar */}
-      <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-gray-150 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono uppercase tracking-widest text-gray-400 gap-4 text-center md:text-left">
+      <div className="max-w-none mx-auto px-4 md:px-10 lg:px-16 mt-16 pt-8 border-t border-gray-150 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono uppercase tracking-widest text-gray-400 gap-4 text-center md:text-left">
         <span className="flex items-center gap-1">
           <Copyright  size={11} /> 2026 TECHVIE ELECTRONICS. ĐƯỢC CHẾ TÁC VÌ SỰ
           RÕ NÉT.
