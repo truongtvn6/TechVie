@@ -160,7 +160,7 @@ app.post('/api/products', upload.single('imageFile'), async (req, res) => {
 
     // 1. Kiểm tra và tải ảnh lên Cloudinary nếu có file được upload
     if (req.file) {
-      imageUrl = await uploadToCloudinary(req.file.buffer, "lumina_products");
+      imageUrl = await uploadToCloudinary(req.file.buffer, "techvie_products");
     } else {
       return res.status(400).json({ success: false, message: 'Vui lòng cung cấp hình ảnh sản phẩm.' });
     }

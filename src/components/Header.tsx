@@ -41,7 +41,7 @@ export default function Header({
           }}
           className="text-2xl md:text-3xl font-sans tracking-tighter text-black font-black hover:opacity-80 transition-opacity"
         >
-          LUMINA
+          TECHVIE
         </button>
 
         {/* Desktop Nav menu items */}
@@ -78,7 +78,7 @@ export default function Header({
           <button 
             onClick={() => setIsCartOpen(true)}
             className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/70 hover:backdrop-blur-sm transition-all duration-300 relative"
-            title="Giỏ hàng Lumina"
+            title="Giỏ hàng TechVie"
           >
             <ShoppingBag size={20} className="text-gray-900" />
             {totalCartCount > 0 && (
@@ -111,7 +111,7 @@ export default function Header({
                   ? 'bg-black text-white shadow-md' 
                   : 'hover:bg-white/70 hover:backdrop-blur-sm text-gray-950 border border-transparent/0'
               }`}
-              title="Tài khoản Lumina ID"
+              title="Tài khoản TechVie ID"
             >
               <User size={18} />
             </a>

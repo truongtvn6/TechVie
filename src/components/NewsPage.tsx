@@ -30,13 +30,13 @@ export default function NewsPage() {
       {/* Header */}
       <div className="mb-14 text-center">
         <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
-          LUMINA NEWS & JOURNAL
+          TECHVIE NEWS & JOURNAL
         </span>
         <h1 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
           Nhật Ký Đổi Mới
         </h1>
         <p className="text-sm text-gray-500 font-sans mt-3 max-w-lg mx-auto leading-relaxed">
-          Nơi cập nhật những công nghệ đột phá mới nhất, thông tin khai trương các showroom trải nghiệm và các chương trình ưu đãi độc quyền từ Lumina.
+          Nơi cập nhật những công nghệ đột phá mới nhất, thông tin khai trương các showroom trải nghiệm và các chương trình ưu đãi độc quyền từ TechVie.
         </p>
       </div>
 
@@ -132,7 +132,7 @@ export default function NewsPage() {
 
                 <div className="flex items-center gap-3 text-xs text-gray-500 font-mono mt-3">
                   <Calendar size={12} />
-                  Đăng ngày {selectedArticle.date} • Tác giả Lumina Press Room
+                  Đăng ngày {selectedArticle.date} • Tác giả TechVie Press Room
                 </div>
               </div>
 

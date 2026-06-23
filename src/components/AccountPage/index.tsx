@@ -5,23 +5,16 @@ import {
   Settings, 
   History, 
   Package, 
-  ShieldAlert, 
   CheckCircle2, 
   LogOut, 
-  Lock, 
-  Mail, 
-  KeyRound, 
-  BadgeCheck, 
-  MapPin, 
   Laptop, 
-  Camera, 
-  ArrowRight, 
-  QrCode, 
+  MapPin, 
   Cpu, 
-  Phone,
-  HelpCircle,
-  Clock
+  Clock,
+  QrCode,
+  BadgeCheck
 } from 'lucide-react';
+import FloatingAdminButton from './FloatingAdminButton';
 
 interface AccountPageProps {
   onNavigate: (tab: any) => void;
@@ -52,14 +45,14 @@ export default function AccountPage({
   // Active sub-tab inside dashboard
   const [accountTab, setAccountTab] = useState<'profile' | 'orders' | 'devices' | 'security'>('profile');
 
-  // Interactive user data state matching Premium Lumina standards
+  // Interactive user data state matching Premium TechVie standards
   const [localUserProfile, localSetUserProfile] = useState({
     name: 'Nguyễn Minh Tiến',
     email: 'mintzinfinity898@gmail.com',
     phone: '0912 345 678',
     address: '86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
     memberSince: '17-06-2026',
-    luminaId: 'LM-992-88X',
+    techvieId: 'TV-992-88X',
     shieldStatus: 'Đang Kích Hoạt (Premium)',
   });
   const userProfile = externalUserProfile !== undefined ? externalUserProfile : localUserProfile;
@@ -68,23 +61,23 @@ export default function AccountPage({
   // Mock Orders with vivid real-time phase updates
   const [orders] = useState([
     {
-      id: 'LMN-938294',
+      id: 'TV-938294',
       date: '17-06-2026',
       total: '49.800.000₫',
       status: 'Đang lắp ráp chuẩn bị gửi',
       statusType: 'processing',
       items: [
-        { name: 'Kính thực tế tăng cường Lumina One', qty: 1, type: 'Kính AR cao cấp' }
+        { name: 'Kính thực tế tăng cường TechVie One', qty: 1, type: 'Kính AR cao cấp' }
       ]
     },
     {
-      id: 'LMN-728103',
+      id: 'TV-728103',
       date: '02-05-2026',
       total: '8.500.000₫',
       status: 'Giao hàng thành công',
       statusType: 'success',
       items: [
-        { name: 'Bản sạc không dây 3-in-1 Lumina Dock', qty: 1, type: 'Phụ kiện cao cấp' }
+        { name: 'Bản sạc không dây 3-in-1 TechVie Dock', qty: 1, type: 'Phụ kiện cao cấp' }
       ]
     }
   ]);
@@ -101,7 +94,7 @@ export default function AccountPage({
 
     if (authMode === 'login') {
       if (password.length < 6) {
-        setAuthError('Mật khẩu của hệ thống Lumina ID tối thiểu phải dài 6 ký tự.');
+        setAuthError('Mật khẩu của hệ thống TechVie ID tối thiểu phải dài 6 ký tự.');
         return;
       }
       setIsSubmitting(true);
@@ -223,7 +216,7 @@ export default function AccountPage({
                       {/* Generative high-craft visual representation */}
                       <User size={38} className="text-gray-400" />
                     </div>
-                    <span className="absolute bottom-0 right-0 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center text-[8px] text-white font-bold" title="Lumina System Verified">
+                    <span className="absolute bottom-0 right-0 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center text-[8px] text-white font-bold" title="TechVie System Verified">
                       ✓
                     </span>
                   </div>
@@ -234,7 +227,7 @@ export default function AccountPage({
                       <BadgeCheck size={16} className="text-indigo-600" />
                     </div>
                     <span className="text-[10px] font-mono tracking-widest text-[#9d9ea5] uppercase">
-                      ID: {userProfile.luminaId}
+                      ID: {userProfile.techvieId}
                     </span>
                   </div>
 
@@ -242,7 +235,7 @@ export default function AccountPage({
                   <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl flex items-center gap-3 w-full text-left">
                     <QrCode size={36} className="text-gray-800 flex-shrink-0" />
                     <div className="min-w-0 flex-grow font-sans text-[10px]">
-                      <span className="block font-bold text-gray-800">Mã Số Showroom Lumina</span>
+                      <span className="block font-bold text-gray-800">Mã Số Showroom TechVie</span>
                       <p className="text-gray-400 truncate mt-0.5">Quét mã nhận diện thành viên ưu đãi tại showroom mua sắm</p>
                     </div>
                   </div>
@@ -504,7 +497,7 @@ export default function AccountPage({
                           <div className="flex justify-between items-start">
                             <div>
                               <span className="text-[8px] uppercase font-bold tracking-widest text-indigo-400 font-mono">BẢO HÀNH CHỦ CHỐT</span>
-                              <h4 className="font-sans font-black text-normal text-white uppercase tracking-tight mt-0.5">LUMINA INTEGRAL CHIP v1.2</h4>
+                              <h4 className="font-sans font-black text-normal text-white uppercase tracking-tight mt-0.5">TECHVIE INTEGRAL CHIP v1.2</h4>
                             </div>
                             <span className="bg-emerald-600 text-white text-[8px] font-black tracking-widest uppercase px-3 py-1 rounded-full border border-emerald-500">
                               CHẤT LƯỢNG CAO
@@ -540,7 +533,7 @@ export default function AccountPage({
                         <Clock size={16} className="text-indigo-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <strong>Bạn cần đặt mua thêm loại phụ kiện nào?</strong>
-                          <p className="text-indigo-600/90 mt-0.5">Mọi bộ phụ kiện cao cấp và củ sạc hi-end của Lumina đều đảm bảo truyền dẫn sạc mượt mà đồng bộ. Hãy duyệt sảnh để bổ sung mục giỏ hàng.</p>
+                          <p className="text-indigo-600/90 mt-0.5">Mọi bộ phụ kiện cao cấp và củ sạc hi-end của TechVie đều đảm bảo truyền dẫn sạc mượt mà đồng bộ. Hãy duyệt sảnh để bổ sung mục giỏ hàng.</p>
                         </div>
                       </div>
                     </div>
@@ -587,7 +580,7 @@ export default function AccountPage({
                         <div className="p-4 bg-gray-50 border border-gray-250/60 rounded-xl flex items-start gap-3">
                           <CheckCircle2 size={16} className="text-emerald-500 mt-0.5 flex-shrink-0" />
                           <p className="text-[11px] text-gray-650 leading-relaxed">
-                            Xác thực thành viên Lumina ID vĩnh viễn được tự động áp dụng ưu đãi giảm giá lên tới 10% tại tất cả các hệ thống showroom và trạm trải nghiệm Lumina chính hãng trên toàn cầu.
+                            Xác thực thành viên TechVie ID vĩnh viễn được tự động áp dụng ưu đãi giảm giá lên tới 10% tại tất cả các hệ thống showroom và trạm trải nghiệm TechVie chính hãng trên toàn cầu.
                           </p>
                         </div>
                       </div>
@@ -611,6 +604,11 @@ export default function AccountPage({
         )}
 
       </AnimatePresence>
+
+      {/* Floating Back to Admin panel button for logged-in Administrators - Draggable - ONLY on account/profile page */}
+      {isLoggedIn && userProfile?.role === 'admin' && (
+        <FloatingAdminButton onNavigate={onNavigate} />
+      )}
     </div>
   );
 }

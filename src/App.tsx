@@ -1,8 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TabType, CartItem, Product } from './types';
-import { ShieldAlert } from 'lucide-react';
-import { createProduct, updateProduct, deleteProduct, getProducts } from './services/api';
+import { 
+  createProduct, 
+  updateProduct, 
+  deleteProduct, 
+  getProducts,
+  getSystemUsers,
+  adminCreateUser,
+  toggleUserRole,
+  toggleUserVip,
+  toggleUserStatus,
+  adminDeleteUser
+} from './services/api';
 import HomePage from './components/HomePage';
 import BrandPage from './components/BrandPage';
 import ProductPage from './components/ProductPage';
@@ -18,33 +28,7 @@ import SearchSidePanel from './components/SearchSidePanel';
 import CartSidePanel from './components/CartSidePanel';
 
 export default function App() {
-  const isDraggingRef = useRef(false);
   const appRef = useRef<HTMLDivElement>(null);
-  const constraintsRef = useRef<HTMLDivElement>(null);
-
-  const [adminBtnPos, setAdminBtnPos] = useState(() => {
-    try {
-      const saved = localStorage.getItem('admin_btn_pos');
-      if (saved) {
-        const pos = JSON.parse(saved);
-        const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
-        const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
-        
-        const minX = -16;
-        const maxX = Math.max(0, screenWidth - 260);
-        const minY = -Math.max(0, screenHeight - 128);
-        const maxY = 16;
-        
-        return {
-          x: Math.min(Math.max(pos.x, minX), maxX),
-          y: Math.min(Math.max(pos.y, minY), maxY),
-        };
-      }
-      return { x: 0, y: 0 };
-    } catch (e) {
-      return { x: 0, y: 0 };
-    }
-  });
 
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     try {
@@ -56,15 +40,16 @@ export default function App() {
   });
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [token, setToken] = useState<string>(localStorage.getItem('techvie_token') || '');
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('techvie_token'));
   const [userProfile, setUserProfile] = useState({
     name: localStorage.getItem('techvie_token') ? 'ADMINISTRATOR' : 'Nguyễn Minh Tiến',
-    email: localStorage.getItem('techvie_token') ? 'admin@lumina.com' : 'mintzinfinity898@gmail.com',
+    email: localStorage.getItem('techvie_token') ? 'admin@techvie.com' : 'mintzinfinity898@gmail.com',
     phone: '0912 345 678',
     address: '86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
     memberSince: '17-06-2026',
-    luminaId: 'LM-992-88X',
+    techvieId: 'TV-992-88X',
     shieldStatus: 'Đang Kích Hoạt (Premium)',
     role: localStorage.getItem('techvie_token') ? 'admin' : 'user',
   });
@@ -76,6 +61,28 @@ export default function App() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn && userProfile.role === 'admin' && token) {
+      getSystemUsers(token).then(res => {
+        if (res.success && res.users) {
+          const mapped = res.users.map((u: any) => ({
+            id: u.id || u._id,
+            name: u.username,
+            email: u.email,
+            phone: u.phone,
+            role: u.role,
+            vipStatus: u.vipStatus,
+            status: u.status,
+            joinedDate: new Date(u.created_at).toLocaleDateString('vi-VN')
+          }));
+          setSystemUsers(mapped);
+        }
+      });
+    } else {
+      setSystemUsers([]);
+    }
+  }, [isLoggedIn, userProfile.role, token]);
 
   useEffect(() => {
     try {
@@ -96,7 +103,7 @@ export default function App() {
         phone: '0912 345 678',
         address: '86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
         memberSince: '17-06-2026',
-        luminaId: 'LM-992-88X',
+        techvieId: 'TV-992-88X',
         shieldStatus: 'Đang Kích Hoạt (Premium)',
         role: 'user',
       });
@@ -208,6 +215,125 @@ export default function App() {
       console.error('Không thể xóa sản phẩm, vui lòng kiểm tra kết nối.');
     }
   };
+
+  // User Management Admin Handlers
+  const handleAddUser = async (newUser: any) => {
+    try {
+      const payload = {
+        username: newUser.name,
+        email: newUser.email,
+        phone: newUser.phone,
+        role: newUser.role,
+        vipStatus: newUser.vipStatus
+      };
+      const res = await adminCreateUser(payload, token);
+      if (res.success && res.user) {
+        const mappedUser = {
+          id: res.user.id || res.user._id,
+          name: res.user.username,
+          email: res.user.email,
+          phone: res.user.phone,
+          role: res.user.role,
+          vipStatus: res.user.vipStatus,
+          status: res.user.status,
+          joinedDate: new Date(res.user.created_at).toLocaleDateString('vi-VN')
+        };
+        setSystemUsers(prev => [mappedUser, ...prev]);
+        return { success: true, message: res.message, user: mappedUser };
+      }
+      return { success: false, message: res.message || 'Lỗi từ máy chủ.' };
+    } catch (error: any) {
+      console.error('Lỗi thêm thành viên:', error);
+      return { success: false, message: 'Lỗi kết nối khi thêm thành viên.' };
+    }
+  };
+
+  const handleToggleUserRole = async (id: string) => {
+    try {
+      const res = await toggleUserRole(id, token);
+      if (res.success && res.user) {
+        const mappedUser = {
+          id: res.user.id || res.user._id,
+          name: res.user.username,
+          email: res.user.email,
+          phone: res.user.phone,
+          role: res.user.role,
+          vipStatus: res.user.vipStatus,
+          status: res.user.status,
+          joinedDate: new Date(res.user.created_at).toLocaleDateString('vi-VN')
+        };
+        setSystemUsers(prev => prev.map(u => u.id === id ? mappedUser : u));
+        return { success: true, message: res.message, user: mappedUser };
+      }
+      return { success: false, message: res.message || 'Lỗi kết nối.' };
+    } catch (error: any) {
+      console.error('Lỗi đổi quyền thành viên:', error);
+      return { success: false, message: 'Lỗi kết nối mạng.' };
+    }
+  };
+
+  const handleToggleUserVip = async (id: string) => {
+    try {
+      const res = await toggleUserVip(id, token);
+      if (res.success && res.user) {
+        const mappedUser = {
+          id: res.user.id || res.user._id,
+          name: res.user.username,
+          email: res.user.email,
+          phone: res.user.phone,
+          role: res.user.role,
+          vipStatus: res.user.vipStatus,
+          status: res.user.status,
+          joinedDate: new Date(res.user.created_at).toLocaleDateString('vi-VN')
+        };
+        setSystemUsers(prev => prev.map(u => u.id === id ? mappedUser : u));
+        return { success: true, message: res.message, user: mappedUser };
+      }
+      return { success: false, message: res.message || 'Lỗi kết nối.' };
+    } catch (error: any) {
+      console.error('Lỗi đổi VIP thành viên:', error);
+      return { success: false, message: 'Lỗi kết nối mạng.' };
+    }
+  };
+
+  const handleToggleUserStatus = async (id: string) => {
+    try {
+      const res = await toggleUserStatus(id, token);
+      if (res.success && res.user) {
+        const mappedUser = {
+          id: res.user.id || res.user._id,
+          name: res.user.username,
+          email: res.user.email,
+          phone: res.user.phone,
+          role: res.user.role,
+          vipStatus: res.user.vipStatus,
+          status: res.user.status,
+          joinedDate: new Date(res.user.created_at).toLocaleDateString('vi-VN')
+        };
+        setSystemUsers(prev => prev.map(u => u.id === id ? mappedUser : u));
+        return { success: true, message: res.message, user: mappedUser };
+      }
+      return { success: false, message: res.message || 'Lỗi kết nối.' };
+    } catch (error: any) {
+      console.error('Lỗi đổi trạng thái thành viên:', error);
+      return { success: false, message: 'Lỗi kết nối mạng.' };
+    }
+  };
+
+  const handleDeleteUser = async (id: string) => {
+    try {
+      const res = await adminDeleteUser(id, token);
+      if (res.success) {
+        setSystemUsers(prev => prev.filter(u => u.id !== id));
+        return { success: true, message: res.message };
+      }
+      return { success: false, message: res.message || 'Lỗi kết nối.' };
+    } catch (error: any) {
+      console.error('Lỗi xóa thành viên:', error);
+      return { success: false, message: 'Lỗi kết nối mạng.' };
+    }
+  };
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -404,7 +530,7 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 onLoginSuccess={(email, userToken) => {
-                  const isSystemAdmin = email === 'admin@lumina.com';
+                  const isSystemAdmin = email === 'admin@techvie.com';
                   if (userToken) {
                     setToken(userToken);
                     localStorage.setItem('techvie_token', userToken);
@@ -454,7 +580,7 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 onLoginSuccess={(email, userToken) => {
-                  const isSystemAdmin = email === 'admin@lumina.com';
+                  const isSystemAdmin = email === 'admin@techvie.com';
                   if (userToken) {
                     setToken(userToken);
                     localStorage.setItem('techvie_token', userToken);
@@ -528,6 +654,12 @@ export default function App() {
                   setActiveTab(tab);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
+                systemUsers={systemUsers}
+                onAddUser={handleAddUser}
+                onToggleUserRole={handleToggleUserRole}
+                onToggleUserVip={handleToggleUserVip}
+                onToggleUserStatus={handleToggleUserStatus}
+                onDeleteUser={handleDeleteUser}
               />
             </motion.div>
           )}
@@ -568,70 +700,6 @@ export default function App() {
         }}
       />
 
-      {/* Floating Back to Admin panel button for logged-in Administrators - Draggable - ONLY on account/profile page */}
-      {isLoggedIn && userProfile.role === 'admin' && activeTab === 'account' && (
-        <div 
-          ref={constraintsRef} 
-          className="fixed inset-8 border-2 border-dashed border-indigo-400/25 bg-indigo-500/[0.01] rounded-3xl pointer-events-none z-50 flex items-end justify-center pb-2 select-none"
-        >
-          {/* Subtle label showing drag limit zone boundaries */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-white/90 border border-indigo-150/80 backdrop-blur-md text-[9px] font-extrabold text-indigo-600 uppercase tracking-widest pointer-events-none shadow-[0_2px_12px_rgba(99,102,241,0.06)] flex items-center gap-1.5 animate-pulse">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-            VÙNG GIỚI HẠN DI CHUYỂN NÚT ADMIN
-          </div>
-
-          <motion.button
-            drag
-            dragConstraints={constraintsRef}
-            dragMomentum={true}
-            dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-            dragElastic={0.05}
-            style={{ x: adminBtnPos.x, y: adminBtnPos.y }}
-            whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
-            onDragStart={() => {
-              isDraggingRef.current = true;
-            }}
-            onDragEnd={(event, info) => {
-              const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
-              const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
-              
-              const minX = -16;
-              const maxX = Math.max(0, screenWidth - 260);
-              const minY = -Math.max(0, screenHeight - 128);
-              const maxY = 16;
-
-              const rawX = adminBtnPos.x + info.offset.x;
-              const rawY = adminBtnPos.y + info.offset.y;
-
-              const clampedX = Math.min(Math.max(rawX, minX), maxX);
-              const clampedY = Math.min(Math.max(rawY, minY), maxY);
-
-              setAdminBtnPos({ x: clampedX, y: clampedY });
-              try {
-                localStorage.setItem('admin_btn_pos', JSON.stringify({ x: clampedX, y: clampedY }));
-              } catch (e) {
-                console.error('Failed to save admin button position:', e);
-              }
-              // Tiny buffer to prevent click handler from firing right after letting go of drag
-              setTimeout(() => {
-                isDraggingRef.current = false;
-              }, 100);
-            }}
-            onClick={() => {
-              if (isDraggingRef.current) return;
-              setActiveTab('admin');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="group absolute bottom-4 left-4 pointer-events-auto flex items-center gap-2 px-5 py-3 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-500/20 text-[11px] font-bold tracking-wider cursor-grab active:cursor-grabbing shadow-[0_8px_32px_rgba(99,102,241,0.25)] hover:shadow-[0_12px_44px_rgba(99,102,241,0.4)] uppercase font-sans overflow-hidden select-none touch-none"
-          >
-            {/* Shimmer sweep glass effect */}
-            <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:glass-shimmer-sweep pointer-events-none" />
-            
-            <ShieldAlert size={14} className="text-white group-hover:rotate-12 transition-transform duration-200 pointer-events-none" />
-            <span className="relative z-10 text-white pointer-events-none">Quản trị Hệ thống</span>
-          </motion.button>
-        </div>
-      )}
     </div>
   );
 }

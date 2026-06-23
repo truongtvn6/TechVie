@@ -68,7 +68,7 @@ export default function UserManager({
       
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-white border border-gray-200 p-5 rounded-[2rem] shadow-sm">
         <div className="flex-1 min-w-0 text-left">
-          <h3 className="font-extrabold text-gray-950 text-sm uppercase">Sổ thành viên Lumina ID</h3>
+          <h3 className="font-extrabold text-gray-950 text-sm uppercase">Sổ thành viên TechVie ID</h3>
           <p className="text-xs text-gray-400">Quản trị phân quyền cán bộ nhân viên, theo dõi trạng thái VIP tài khoản hoặc chặn truy cập.</p>
         </div>
 
@@ -205,7 +205,7 @@ export default function UserManager({
                       <button
                         type="button"
                         onClick={() => onDeleteUser(usr.id)}
-                        disabled={usr.email === 'admin@lumina.com'}
+                        disabled={usr.email === 'admin@techvie.com'}
                         className="px-3 py-1.5 bg-rose-50 border border-rose-100 text-rose-600 disabled:opacity-40 rounded-lg text-[9px] font-bold uppercase hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer"
                       >
                         Gỡ bỏ
@@ -233,7 +233,7 @@ export default function UserManager({
             </button>
 
             <h3 className="text-lg font-black text-gray-950 uppercase tracking-tight mb-4">
-              Cấp tài khoản Lumina ID mới
+              Cấp tài khoản TechVie ID mới
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -256,7 +256,7 @@ export default function UserManager({
                   required
                   value={newUsrEmail}
                   onChange={(e) => setNewUsrEmail(e.target.value)}
-                  placeholder="mail@lumina.com"
+                  placeholder="mail@techvie.com"
                   className="w-full bg-slate-50 border border-gray-200 focus:border-black focus:bg-white rounded-xl px-4 py-2.5 outline-none text-xs font-semibold"
                 />
               </div>

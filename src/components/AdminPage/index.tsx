@@ -36,6 +36,12 @@ interface AdminPageProps {
   onEditProduct: (product: any, imageFile: File | null) => void;
   onDeleteProduct: (id: string) => void;
   onNavigate: (tab: any) => void;
+  systemUsers: any[];
+  onAddUser: (user: any) => Promise<{ success: boolean; message: string; user?: any }>;
+  onToggleUserRole: (id: string) => Promise<{ success: boolean; message: string; user?: any }>;
+  onToggleUserVip: (id: string) => Promise<{ success: boolean; message: string; user?: any }>;
+  onToggleUserStatus: (id: string) => Promise<{ success: boolean; message: string; user?: any }>;
+  onDeleteUser: (id: string) => Promise<{ success: boolean; message: string }>;
 }
 
 export default function AdminPage({ 
@@ -43,7 +49,13 @@ export default function AdminPage({
   onAddProduct, 
   onEditProduct, 
   onDeleteProduct,
-  onNavigate 
+  onNavigate,
+  systemUsers,
+  onAddUser,
+  onToggleUserRole,
+  onToggleUserVip,
+  onToggleUserStatus,
+  onDeleteUser
 }: AdminPageProps) {
   // Admin active sub tab
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'products' | 'orders' | 'messages' | 'promos' | 'users'>('overview');
@@ -51,52 +63,30 @@ export default function AdminPage({
   // Dynamic Promo Campaigns local state with localStorage persistence
   const [promos, setPromos] = useState<any[]>(() => {
     try {
-      const saved = localStorage.getItem('lumina_promos');
+      const saved = localStorage.getItem('techvie_promos');
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.error(e);
     }
     return [
-      { code: 'LUMINA2026', discount: 0.1, description: 'Giảm giá ra mắt sản phẩm 10%', usedCount: 34, isActive: true },
+      { code: 'TECHVIE2026', discount: 0.1, description: 'Giảm giá ra mắt sản phẩm 10%', usedCount: 34, isActive: true },
       { code: 'FUTURE', discount: 0.1, description: 'Đặc quyền tương lai 10%', usedCount: 12, isActive: true },
-      { code: 'VIPLAB', discount: 0.25, description: 'Siêu đặc quyền từ Lumina Lab 25%', usedCount: 7, isActive: true, minOrderVal: 30000000 }
+      { code: 'VIPLAB', discount: 0.25, description: 'Siêu đặc quyền từ TechVie Lab 25%', usedCount: 7, isActive: true, minOrderVal: 30000000 }
     ];
   });
 
-  // Dynamic system Users local state with localStorage persistence
-  const [systemUsers, setSystemUsers] = useState<any[]>(() => {
-    try {
-      const saved = localStorage.getItem('lumina_system_users');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error(e);
-    }
-    return [
-      { id: 'usr-1', name: 'Nguyễn Minh Tiến', email: 'mintzinfinity898@gmail.com', role: 'admin', phone: '0912 345 678', vipStatus: 'Premium', status: 'active', joinedDate: '17-06-2026' },
-      { id: 'usr-2', name: 'Trần Thế Hoàng', email: 'hoang.tran99@gmail.com', role: 'user', phone: '0981 222 333', vipStatus: 'Premium', status: 'active', joinedDate: '18-06-2026' },
-      { id: 'usr-3', name: 'Admin Lab Lumina', email: 'admin@lumina.com', role: 'admin', phone: '0901 000 999', vipStatus: 'Premium', status: 'active', joinedDate: '15-06-2026' },
-      { id: 'usr-4', name: 'Lê Thuỳ Trang', email: 'trangle98@gmail.com', role: 'user', phone: '0934 555 666', vipStatus: 'Normal', status: 'active', joinedDate: '20-06-2026' },
-      { id: 'usr-5', name: 'Phạm Minh Đức', email: 'ducminh@sales.lumina.vn', role: 'user', phone: '0914 888 777', vipStatus: 'Normal', status: 'blocked', joinedDate: '21-06-2026' }
-    ];
-  });
+
 
   // Sync promos to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('lumina_promos', JSON.stringify(promos));
+      localStorage.setItem('techvie_promos', JSON.stringify(promos));
     } catch (e) {
       console.error(e);
     }
   }, [promos]);
 
-  // Sync systemUsers to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('lumina_system_users', JSON.stringify(systemUsers));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [systemUsers]);
+
 
   // Real-time fetched datasets from backend
   const [orders, setOrders] = useState<any[]>([]);
@@ -109,7 +99,7 @@ export default function AdminPage({
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   // System logs feedback messages
-  const [logs, setLogs] = useState<string[]>(['Chào mừng Người quản lý. Hệ quản trị LUMINA ID đã sẵn sàng.']);
+  const [logs, setLogs] = useState<string[]>(['Chào mừng Người quản lý. Hệ quản trị TECHVIE ID đã sẵn sàng.']);
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString('vi-VN');
@@ -140,59 +130,66 @@ export default function AdminPage({
     addLog(`Đã gỡ bỏ mã khuyến mãi khỏi hệ thống: ${code}`);
   };
 
-  // User Handlers
+  // User Handlers (Calling parent API callbacks with dynamic logging)
   const handleAddUser = (newUser: any) => {
     if (systemUsers.some(u => u.email.toLowerCase() === newUser.email.toLowerCase())) {
       addLog(`Lỗi: Email ${newUser.email} đã được đăng ký tài khoản!`);
       console.warn(`Email ${newUser.email} đã được đăng ký tài khoản!`);
       return;
     }
-    setSystemUsers(prev => [newUser, ...prev]);
-    addLog(`Khai sinh tài khoản thành viên mới: ${newUser.email}`);
+    onAddUser(newUser).then(res => {
+      if (res.success && res.user) {
+        addLog(`Khai sinh tài khoản thành viên mới thành công: ${res.user.email}`);
+      } else {
+        addLog(`Lỗi cấp tài khoản: ${res.message}`);
+      }
+    });
   };
 
   const handleToggleUserRole = (id: string) => {
-    setSystemUsers(prev => prev.map(u => {
-      if (u.id === id) {
-        const nextRole = u.role === 'admin' ? 'user' : 'admin';
-        addLog(`Đã chuyển đổi quyền hạn tài khoản ${u.email} thành: ${nextRole.toUpperCase()}`);
-        return { ...u, role: nextRole };
+    onToggleUserRole(id).then(res => {
+      if (res.success && res.user) {
+        addLog(`Đã chuyển đổi quyền hạn tài khoản ${res.user.email} thành: ${res.user.role.toUpperCase()}`);
+      } else {
+        addLog(`Lỗi chuyển đổi quyền hạn: ${res.message}`);
       }
-      return u;
-    }));
+    });
   };
 
   const handleToggleUserVip = (id: string) => {
-    setSystemUsers(prev => prev.map(u => {
-      if (u.id === id) {
-        const nextVip = u.vipStatus === 'Premium' ? 'Normal' : 'Premium';
-        addLog(`Đồng bộ hạn VIP cho ${u.email}: thành viên ${nextVip}`);
-        return { ...u, vipStatus: nextVip };
+    onToggleUserVip(id).then(res => {
+      if (res.success && res.user) {
+        addLog(`Đồng bộ hạn VIP cho ${res.user.email}: thành viên ${res.user.vipStatus}`);
+      } else {
+        addLog(`Lỗi đồng bộ hạn VIP: ${res.message}`);
       }
-      return u;
-    }));
+    });
   };
 
   const handleToggleUserStatus = (id: string) => {
-    setSystemUsers(prev => prev.map(u => {
-      if (u.id === id) {
-        const nextStatus = u.status === 'blocked' ? 'active' : 'blocked';
-        addLog(`Cập nhật trạng thái ${u.email}: ${nextStatus === 'blocked' ? 'KHOÁ BANNED' : 'HOẠT ĐỘNG'}`);
-        return { ...u, status: nextStatus };
+    onToggleUserStatus(id).then(res => {
+      if (res.success && res.user) {
+        addLog(`Cập nhật trạng thái ${res.user.email}: ${res.user.status === 'blocked' ? 'KHOÁ BANNED' : 'HOẠT ĐỘNG'}`);
+      } else {
+        addLog(`Lỗi cập nhật trạng thái: ${res.message}`);
       }
-      return u;
-    }));
+    });
   };
 
   const handleDeleteUser = (id: string) => {
     const usr = systemUsers.find(u => u.id === id);
     if (usr) {
-      if (usr.email === 'admin@lumina.com') {
+      if (usr.email === 'admin@techvie.com') {
         addLog('Lỗi nghiêm trọng: Không thể xoá tài khoản sáng lập Gốc của hệ thống.');
         return;
       }
-      setSystemUsers(prev => prev.filter(u => u.id !== id));
-      addLog(`Đã gỡ bỏ tài khoản ${usr.email} vĩnh viễn khỏi sổ đăng ký`);
+      onDeleteUser(id).then(res => {
+        if (res.success) {
+          addLog(`Đã gỡ bỏ tài khoản ${usr.email} vĩnh viễn khỏi sổ đăng ký`);
+        } else {
+          addLog(`Lỗi gỡ bỏ tài khoản: ${res.message}`);
+        }
+      });
     }
   };
 
@@ -372,7 +369,7 @@ export default function AdminPage({
       {/* Left Sidebar */}
       <aside className="w-full md:w-64 lg:w-72 xl:w-80 bg-white border-b md:border-b-0 md:border-r border-gray-200 flex flex-col justify-between md:sticky md:top-0 md:h-screen p-6 md:p-8 shrink-0 z-40">
         <div className="space-y-8">
-          {/* Brand/Lumina admin identity */}
+          {/* Brand/TechVie admin identity */}
           <div>
             <span className="text-[10px] uppercase tracking-[0.3em] text-[#6366f1] font-extrabold mb-1.5 block">
               SYSTEM CONSOLE
@@ -380,7 +377,7 @@ export default function AdminPage({
             <div className="flex items-center gap-2">
               <BarChart3 className="text-black shrink-0" size={24} />
               <h1 className="text-xl font-black text-gray-950 uppercase tracking-tighter">
-                LUMINA ADMIN
+                TECHVIE ADMIN
               </h1>
             </div>
             <div className="mt-3 flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 rounded-full px-3 py-1 w-fit">
@@ -505,7 +502,7 @@ export default function AdminPage({
             className="group w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-black/5 hover:bg-black text-gray-900 hover:text-white border border-black/10 hover:border-black transition-all text-[11px] font-black uppercase tracking-wider active:scale-95 cursor-pointer shadow-sm font-sans"
           >
             <ArrowLeft size={13} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
-            <span>Trang chủ Lumina</span>
+            <span>Trang chủ TechVie</span>
           </button>
 
           <div className="text-[10px] text-center text-gray-400 font-mono">

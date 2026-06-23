@@ -21,7 +21,7 @@ export default function BrandPage() {
           Chế Tác Vượt Giới Hạn
         </h1>
         <p className="text-lg text-gray-650 max-w-2xl mx-auto leading-relaxed">
-          Chúng tôi không chỉ lắp ráp phần cứng kỹ thuật; chúng tôi kiến tạo các dòng sản phẩm tối tân, hoàn mỹ bứt phá, kết nối đời sống người dùng với thế giới thông minh. Chào mừng tới LUMINA.
+          Chúng tôi không chỉ lắp ráp phần cứng kỹ thuật; chúng tôi kiến tạo các dòng sản phẩm tối tân, hoàn mỹ bứt phá, kết nối đời sống người dùng với thế giới thông minh. Chào mừng tới TECHVIE.
         </p>
       </div>
 
@@ -33,7 +33,7 @@ export default function BrandPage() {
           </div>
           <h3 className="text-xl font-bold mb-3 tracking-tight text-gray-900">Triết lý Thiết Kế</h3>
           <p className="text-gray-650 leading-relaxed font-sans text-sm">
-            Mọi sản phẩm của LUMINA đều tôn trọng trải nghiệm nguyên bản. Chúng tôi cắt giảm sự rườm rà để tập trung hoàn toàn vào tính năng tối ưu, dải màu hiển thị chân thực và thiết kế công thái học.
+            Mọi sản phẩm của TECHVIE đều tôn trọng trải nghiệm nguyên bản. Chúng tôi cắt giảm sự rườm rà để tập trung hoàn toàn vào tính năng tối ưu, dải màu hiển thị chân thực và thiết kế công thái học.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export default function BrandPage() {
           </div>
           <h3 className="text-xl font-bold mb-3 tracking-tight text-gray-900">Hệ Sinh Thái Đồng Bộ</h3>
           <p className="text-gray-650 leading-relaxed font-sans text-sm">
-            Hệ điều hành tích hợp LuminaOS v2 tối ưu hóa việc truyền phát tín hiệu, đồng bộ hóa tai nghe hi-fi, bàn phím và điện thoại mượt mà chỉ trong một nút chạm thân thiện và tự nhiên.
+            Hệ điều hành tích hợp TechVieOS v2 tối ưu hóa việc truyền phát tín hiệu, đồng bộ hóa tai nghe hi-fi, bàn phím và điện thoại mượt mà chỉ trong một nút chạm thân thiện và tự nhiên.
           </p>
         </div>
       </div>
@@ -112,7 +112,7 @@ export default function BrandPage() {
           </div>
           
           <p className="text-gray-400 font-sans text-xs mt-8 max-w-2xl mx-auto leading-relaxed">
-            Các dòng thiết bị LuminaBook Silicon, sạc nhanh không dây Lumina Dock và tai nghe cao cấp đạt tiêu chuẩn chứng nhận tương thích nghiêm ngặt, bảo đảm truyền tải mượt mà bứt phá cùng các thương hiệu công nghệ đỉnh phong toàn cầu.
+            Các dòng thiết bị TechVieBook Silicon, sạc nhanh không dây TechVie Dock và tai nghe cao cấp đạt tiêu chuẩn chứng nhận tương thích nghiêm ngặt, bảo đảm truyền tải mượt mà bứt phá cùng các thương hiệu công nghệ đỉnh phong toàn cầu.
           </p>
         </div>
       </div>

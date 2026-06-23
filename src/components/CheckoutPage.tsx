@@ -76,7 +76,7 @@ export default function CheckoutPage({
     // Đọc mã giảm giá động từ localStorage để đồng bộ với trang Admin
     let localPromos = [];
     try {
-      const saved = localStorage.getItem('lumina_promos');
+      const saved = localStorage.getItem('techvie_promos');
       if (saved) {
         localPromos = JSON.parse(saved);
       }
@@ -87,9 +87,9 @@ export default function CheckoutPage({
     // Nếu localStorage trống, sử dụng các giá trị mặc định làm phương án dự phòng
     if (!Array.isArray(localPromos) || localPromos.length === 0) {
       localPromos = [
-        { code: 'LUMINA2026', discount: 0.1, description: 'Giảm giá ra mắt sản phẩm 10%', isActive: true },
+        { code: 'TECHVIE2026', discount: 0.1, description: 'Giảm giá ra mắt sản phẩm 10%', isActive: true },
         { code: 'FUTURE', discount: 0.1, description: 'Đặc quyền tương lai 10%', isActive: true },
-        { code: 'VIPLAB', discount: 0.25, description: 'Siêu đặc quyền từ Lumina Lab 25%', isActive: true, minOrderVal: 30000000 }
+        { code: 'VIPLAB', discount: 0.25, description: 'Siêu đặc quyền từ TechVie Lab 25%', isActive: true, minOrderVal: 30000000 }
       ];
     }
 
@@ -210,7 +210,7 @@ export default function CheckoutPage({
                 </div>
                 <div className="grid grid-cols-3 gap-x-2">
                   <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Tên chủ TK:</span>
-                  <span className="col-span-2 text-gray-900 font-bold">CÔNG TY LUMINA VIETNAM</span>
+                  <span className="col-span-2 text-gray-900 font-bold">CÔNG TY TECHVIE VIETNAM</span>
                 </div>
                 <div className="grid grid-cols-3 gap-x-2">
                   <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Số tiền:</span>
@@ -219,7 +219,7 @@ export default function CheckoutPage({
                 <div className="grid grid-cols-3 gap-x-2">
                   <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Nội dung CK:</span>
                   <span className="col-span-2 text-gray-900 font-mono font-bold bg-gray-100 p-1 rounded-sm text-center">
-                    LUMINA {phone || 'ORDER'}
+                    TECHVIE {phone || 'ORDER'}
                   </span>
                 </div>
               </div>
@@ -242,7 +242,7 @@ export default function CheckoutPage({
             <div className="w-full max-w-[320px] mx-auto h-[180px] bg-gradient-to-tr from-slate-900 to-indigo-950 rounded-2xl p-5 text-white flex flex-col justify-between shadow-lg relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-xl -mr-10 -mt-10" />
               <div className="flex justify-between items-start">
-                <span className="font-extrabold tracking-widest text-[11px] text-indigo-400">LUMINA PREMIUM CARD</span>
+                <span className="font-extrabold tracking-widest text-[11px] text-indigo-400">TECHVIE PREMIUM CARD</span>
                 <Building size={20} className="text-indigo-300" />
               </div>
               <div className="mt-4">
@@ -338,7 +338,7 @@ export default function CheckoutPage({
           >
             <Truck className="text-gray-400 flex-shrink-0 mt-0.5" size={16} />
             <p className="leading-relaxed">
-              Bạn sẽ thanh toán trực tiếp số tiền <strong className="text-black font-semibold">{finalTotal.toLocaleString('vi-VN')}₫</strong> bằng tiền mặt hoặc chuyển khoản với bưu tá khi nhận sản phẩm tại nhà. Lumina khuyên bạn nên đồng kiểm hàng nguyên seal trước khi đồng thuận nhận hàng.
+              Bạn sẽ thanh toán trực tiếp số tiền <strong className="text-black font-semibold">{finalTotal.toLocaleString('vi-VN')}₫</strong> bằng tiền mặt hoặc chuyển khoản với bưu tá khi nhận sản phẩm tại nhà. TechVie khuyên bạn nên đồng kiểm hàng nguyên seal trước khi đồng thuận nhận hàng.
             </p>
           </motion.div>
         );
@@ -358,7 +358,7 @@ export default function CheckoutPage({
           </div>
           <h2 className="text-2xl font-black text-gray-900 tracking-tight uppercase">Giỏ hàng của bạn đang trống</h2>
           <p className="text-sm text-gray-500 font-sans leading-relaxed max-w-md mx-auto">
-            Bạn chưa chọn mẫu laptop, điện thoại hay phụ kiện Lumina nào vào giỏ. Hãy tham khảo và mua sắm sản phẩm trước.
+            Bạn chưa chọn mẫu laptop, điện thoại hay phụ kiện TechVie nào vào giỏ. Hãy tham khảo và mua sắm sản phẩm trước.
           </p>
           <button 
             onClick={() => onNavigate('products')}
@@ -496,7 +496,7 @@ export default function CheckoutPage({
                   <div className="flex items-center gap-2 border-b border-gray-100 pb-3 mb-2">
                     <span className="w-1.5 h-3.5 bg-black rounded-full" />
                     <h3 className="text-xs uppercase tracking-widest font-black text-gray-800">
-                      II. Phương Thức Vận Chuyển Lumina
+                      II. Phương Thức Vận Chuyển TechVie
                     </h3>
                   </div>
 
@@ -674,7 +674,7 @@ export default function CheckoutPage({
                   <div className="flex gap-2">
                     <input 
                       type="text" 
-                      placeholder="LUMINA2026, VIPLAB..."
+                      placeholder="TECHVIE2026, VIPLAB..."
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
                       className="flex-grow bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:bg-white outline-none focus:border-black uppercase font-mono font-bold"
@@ -727,9 +727,9 @@ export default function CheckoutPage({
                 <div className="p-4 bg-gray-50/80 border border-gray-100 rounded-2xl flex items-start gap-3 text-gray-500 font-sans text-[10px] leading-relaxed">
                   <ShieldCheck size={20} className="text-emerald-500 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-bold text-gray-800">Cam Kết Lumina Guard</h5>
+                    <h5 className="font-bold text-gray-800">Cam Kết TechVie Guard</h5>
                     <p>
-                      Mọi sản phẩm thiết bị điện tử chính hãng mua trực tiếp tại website của Lumina được hưởng chế độ bảo hành vàng 1 đổi 1 trong 12 tháng bứt phá, hỗ trợ kỹ thuật và cài đặt cấu hình hoàn toàn miễn phí.
+                      Mọi sản phẩm thiết bị điện tử chính hãng mua trực tiếp tại website của TechVie được hưởng chế độ bảo hành vàng 1 đổi 1 trong 12 tháng bứt phá, hỗ trợ kỹ thuật và cài đặt cấu hình hoàn toàn miễn phí.
                     </p>
                   </div>
                 </div>
@@ -737,7 +737,7 @@ export default function CheckoutPage({
                 {/* Coupon helper for the user to try out! */}
                 <div className="flex items-center gap-2 border border-indigo-100 bg-indigo-50/50 p-2.5 rounded-lg text-indigo-700 font-sans text-[10px]">
                   <Sparkles size={14} className="animate-spin" style={{ animationDuration: '3s' }} />
-                  <span>Mẹo: Hãy nhập mã <strong className="font-extrabold font-mono text-indigo-900 shadow-none">LUMINA2026</strong> hoặc <strong className="font-extrabold font-mono text-indigo-900 shadow-none">VIPLAB</strong> để nhận chiết khấu!</span>
+                  <span>Mẹo: Hãy nhập mã <strong className="font-extrabold font-mono text-indigo-900 shadow-none">TECHVIE2026</strong> hoặc <strong className="font-extrabold font-mono text-indigo-900 shadow-none">VIPLAB</strong> để nhận chiết khấu!</span>
                 </div>
               </div>
 
@@ -777,7 +777,7 @@ export default function CheckoutPage({
             </div>
 
             <p className="text-[10px] font-mono uppercase tracking-widest text-indigo-600 animate-bounce">
-              LUMINA SECURE SEC TRANSACTIONS RUNNING...
+              TECHVIE SECURE SEC TRANSACTIONS RUNNING...
             </p>
           </motion.div>
         )}
@@ -799,7 +799,7 @@ export default function CheckoutPage({
                 XÁC NHẬN ĐƠN HÀNG THÀNH CÔNG!
               </h1>
               <p className="text-xs text-gray-505 font-sans leading-relaxed max-w-md mx-auto">
-                Yêu cầu đặt mua sản phẩm của bạn đã lưu trữ thành công vào cổng dữ liệu hành trình Lumina. Mã vận đơn cùng chính sách bảo hành điện tử sẽ được chuyển giao thẳng tới email của bạn: <strong className="text-black font-semibold shadow-none">{email || 'khachhang@lumina.com'}</strong>.
+                Yêu cầu đặt mua sản phẩm của bạn đã lưu trữ thành công vào cổng dữ liệu hành trình TechVie. Mã vận đơn cùng chính sách bảo hành điện tử sẽ được chuyển giao thẳng tới email của bạn: <strong className="text-black font-semibold shadow-none">{email || 'khachhang@techvie.com'}</strong>.
               </p>
             </div>
 
@@ -810,7 +810,7 @@ export default function CheckoutPage({
 
               <div className="flex justify-between items-start border-b border-gray-150 pb-5">
                 <div>
-                  <h4 className="font-extrabold text-base text-gray-900">LUMINA CORP. RECEIPT</h4>
+                  <h4 className="font-extrabold text-base text-gray-900">TECHVIE CORP. RECEIPT</h4>
                   <p className="text-[9px] text-gray-400 font-mono uppercase tracking-wider mt-0.5">ORDER #{serverOrderId || Math.floor(100000 + Math.random() * 900000)}</p>
                 </div>
                 <div className="text-right">
@@ -882,7 +882,7 @@ export default function CheckoutPage({
               <div className="border-t border-gray-100 pt-5 flex flex-col items-center justify-center gap-2">
                 <div className="h-10 w-full max-w-[280px] bg-[repeating-linear-gradient(90deg,black,black_2px,transparent_2px,transparent_6px)] opacity-85" />
                 <span className="text-[8px] font-mono tracking-[0.4em] uppercase text-gray-400">
-                  *LUMINA-SECURE-HARDWARE-REGISTRATION-VERIFIED*
+                  *TECHVIE-SECURE-HARDWARE-REGISTRATION-VERIFIED*
                 </span>
               </div>
             </div>

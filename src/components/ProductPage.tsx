@@ -25,7 +25,7 @@ const normalizeProduct = (p: any): Product => {
 
   return {
     id: p.id || p._id || String(Math.random()),
-    name: p.name || 'Sản phẩm Lumina',
+    name: p.name || 'Sản phẩm TechVie',
     price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
     image: p.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
     category: p.category || 'Thiết bị',
@@ -184,7 +184,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
       {/* Page Header */}
       <div className="mb-14">
         <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
-          LUMINA HARDWARE CATALOG
+          TECHVIE HARDWARE CATALOG
         </span>
         <h1 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
           Hệ Sinh Thái Thiết Bị
@@ -240,7 +240,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <input
               type="text"
-              placeholder="Tìm kiếm thiết bị Lumina, thông số hoặc hiệu năng..."
+              placeholder="Tìm kiếm thiết bị TechVie, thông số hoặc hiệu năng..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full text-xs font-sans pl-11 pr-10 py-3.5 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:border-black/50 focus:ring-1 focus:ring-black/10 placeholder-gray-400 transition-all text-gray-800 font-medium"
@@ -511,7 +511,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                 {/* Info side */}
                 <div>
                   <span className="text-xs uppercase tracking-[0.2em] text-secondary font-bold block mb-1">
-                    {selectedProduct.category} • LUMINA REFINERY
+                    {selectedProduct.category} • TECHVIE REFINERY
                   </span>
                   <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-950 mb-3">
                     {selectedProduct.name}

@@ -1,8 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Product, TabType } from '../types';
-import { ArrowLeftRight, Activity, Cpu, Compass, ArrowRight, Check, Send } from 'lucide-react';
-import { subscribeNewsletter } from '../services/api';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Product, TabType } from "../types";
+import {
+  ArrowLeftRight,
+  Activity,
+  Cpu,
+  Compass,
+  ArrowRight,
+  Check,
+  Send,
+} from "lucide-react";
+import { subscribeNewsletter } from "../services/api";
 
 interface HomePageProps {
   products?: Product[];
@@ -10,20 +18,25 @@ interface HomePageProps {
   onAddToCart: (product: Product) => void;
 }
 
-export default function HomePage({ products, onNavigate, onAddToCart }: HomePageProps) {
+export default function HomePage({
+  products,
+  onNavigate,
+  onAddToCart,
+}: HomePageProps) {
   const allProducts = products || [];
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState("");
   const [showSubscriptionSuccess, setShowSubscriptionSuccess] = useState(false);
-  const [isSubmittingSubscription, setIsSubmittingSubscription] = useState(false);
+  const [isSubmittingSubscription, setIsSubmittingSubscription] =
+    useState(false);
   const [isLoadedFromApi, setIsLoadedFromApi] = useState(false);
 
   const [images, setImages] = useState<string[]>([
-    'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1468436139062-f60a71c5c892?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80'
+    "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1468436139062-f60a71c5c892?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
   ]);
 
   // Fetch slider images dynamically from backend express API (port 5000)
@@ -31,9 +44,9 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
     let intervalId: NodeJS.Timeout;
 
     const fetchImages = () => {
-      fetch('http://localhost:5000/api/hero-images')
+      fetch("http://localhost:5000/api/hero-images")
         .then((res) => {
-          if (!res.ok) throw new Error('API server unreachable');
+          if (!res.ok) throw new Error("API server unreachable");
           return res.json();
         })
         .then((data) => {
@@ -43,11 +56,14 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
             // Đảm bảo chỉ số slide hiện tại không vượt quá mảng dữ liệu mới từ backend
             setCurrentSlide((prev) => (prev >= data.length ? 0 : prev));
           } else {
-            throw new Error('Received empty image list');
+            throw new Error("Received empty image list");
           }
         })
         .catch((error) => {
-          console.warn('Fallback to local slide images used safely. Detail:', error.message || error);
+          console.warn(
+            "Fallback to local slide images used safely. Detail:",
+            error.message || error,
+          );
           setIsLoadedFromApi(false);
         });
     };
@@ -72,13 +88,13 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newsletterEmail.trim() === '' || isSubmittingSubscription) return;
+    if (newsletterEmail.trim() === "" || isSubmittingSubscription) return;
     setIsSubmittingSubscription(true);
     try {
       const res = await subscribeNewsletter(newsletterEmail);
       if (res.success) {
         setShowSubscriptionSuccess(true);
-        setNewsletterEmail('');
+        setNewsletterEmail("");
         setTimeout(() => {
           setShowSubscriptionSuccess(false);
         }, 5000);
@@ -96,10 +112,10 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
       <section className="relative h-[85vh] md:h-[90vh] w-full overflow-hidden bg-gray-150">
         <div className="absolute inset-0 w-full h-full">
           <AnimatePresence mode="popLayout">
-            <motion.img 
+            <motion.img
               key={images[currentSlide] || currentSlide}
-              src={images[currentSlide]} 
-              alt={`Lumina Slideshow ${currentSlide + 1}`}
+              src={images[currentSlide]}
+              alt={`TechVie Slideshow ${currentSlide + 1}`}
               referrerPolicy="no-referrer"
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -108,12 +124,14 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
               className="w-full h-full object-cover"
             />
           </AnimatePresence>
+          {/* Lớp phủ màu đen mờ giúp tăng độ tương phản cho slideshow */}
+          <div className="absolute inset-0 bg-black/35" />
         </div>
 
-        {/* Ambient Overlay & Radial highlight, matching Vietnamese Lumina presentation card */}
+        {/* Ambient Overlay & Radial highlight, matching Vietnamese TechVie presentation card */}
         <div className="absolute inset-0 bg-gradient-to-r from-white/35 via-transparent to-black/10 backdrop-brightness-95 flex items-center justify-start px-6 md:px-margin-desktop z-10">
           <div className="max-w-7xl mx-auto w-full flex">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -123,20 +141,23 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
                 <span>MÃ LƯỚI: 48.85 / 2.35</span>
                 <div className="w-12 h-px bg-gray-800 mt-1"></div>
               </div>
-              
+
               <div className="absolute -left-px top-1/4 h-24 w-1 bg-gradient-to-b from-transparent via-secondary/40 to-transparent"></div>
-              
+
               <span className="text-xs uppercase tracking-[0.4em] text-secondary font-bold mb-6 block flex items-center gap-3">
                 <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
                 Hệ Sinh Thái Độc Bản v2.0
               </span>
 
               <h1 className="text-5xl md:text-6xl font-sans font-black tracking-tighter text-gray-900 mb-6 leading-[1.05]">
-                Công Nghệ <br />Hiện Đại.
+                Công Nghệ <br />
+                Hiện Đại.
               </h1>
 
               <p className="font-sans text-gray-650 text-sm leading-relaxed mb-8 max-w-sm">
-                Kiến tạo phong cách số tối giản, nâng tầm hiệu suất làm việc và giải trí hàng ngày với hệ sinh thái thiết bị điện tử đỉnh cao từ Lumina.
+                Kiến tạo phong cách số tối giản, nâng tầm hiệu suất làm việc và
+                giải trí hàng ngày với hệ sinh thái thiết bị điện tử đỉnh cao từ
+                TechVie.
               </p>
 
               {/* Specification stats box in vietnamese template */}
@@ -147,7 +168,9 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
                   </div>
                   <div className="text-3xl font-extrabold tracking-tight text-gray-900 flex items-baseline gap-1">
                     3.6
-                    <span className="text-xs font-normal text-gray-600 font-mono">GHz</span>
+                    <span className="text-xs font-normal text-gray-600 font-mono">
+                      GHz
+                    </span>
                   </div>
                 </div>
                 <div>
@@ -156,21 +179,23 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
                   </div>
                   <div className="text-3xl font-extrabold tracking-tight text-gray-900 flex items-baseline gap-1">
                     4K
-                    <span className="text-xs font-normal text-gray-600 font-mono">UHD</span>
+                    <span className="text-xs font-normal text-gray-600 font-mono">
+                      UHD
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button 
-                  onClick={() => onNavigate('brand')}
+                <button
+                  onClick={() => onNavigate("brand")}
                   className="bg-black text-white hover:bg-gray-800 px-10 py-4 rounded-full font-sans font-black uppercase tracking-widest text-[13px] hover:scale-102 transition-all shadow-md flex items-center justify-center gap-2"
                 >
                   Khám Phá Thương Hiệu
                   <ArrowRight size={16} />
                 </button>
-                <button 
-                  onClick={() => onNavigate('products')}
+                <button
+                  onClick={() => onNavigate("products")}
                   className="bg-white/80 hover:bg-white text-gray-900 border border-gray-300 px-8 py-4 rounded-full font-sans font-extrabold uppercase tracking-wider text-[13px] transition-all flex items-center justify-center"
                 >
                   Bộ Sưu Tập
@@ -187,9 +212,9 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
               key={idx}
               onClick={() => setCurrentSlide(idx)}
               className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                currentSlide === idx 
-                  ? 'bg-black w-6 scale-110' 
-                  : 'bg-black/25 hover:bg-black/50'
+                currentSlide === idx
+                  ? "bg-black w-6 scale-110"
+                  : "bg-black/25 hover:bg-black/50"
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
@@ -205,11 +230,11 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
               SẢN PHẨM NỔI BẬT
             </span>
             <h2 className="text-3xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
-              Thiết Bị Lumina Premium
+              Thiết Bị TechVie Premium
             </h2>
           </div>
-          <button 
-            onClick={() => onNavigate('products')}
+          <button
+            onClick={() => onNavigate("products")}
             className="mt-4 md:mt-0 text-[13px] uppercase tracking-[0.3em] font-black border-b-2 border-primary pb-1.5 hover:opacity-75 transition-opacity"
           >
             Đến Cửa Hàng
@@ -219,7 +244,7 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
         {/* 3 Core Products matching Vietnamese template cards layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {allProducts.slice(0, 3).map((product) => (
-            <div 
+            <div
               key={product.id}
               className="group bg-white/40 border border-gray-200 rounded-[2rem] p-8 flex flex-col justify-between transition-all duration-500 hover:shadow-xl hover:-translate-y-2 h-[520px] relative overflow-hidden"
             >
@@ -235,8 +260,8 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
 
               {/* Large Product image centered and scaled on hover */}
               <div className="h-60 mt-4 flex items-center justify-center">
-                <img 
-                  src={product.image} 
+                <img
+                  src={product.image}
                   alt={product.name}
                   referrerPolicy="no-referrer"
                   className="max-h-52 object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700"
@@ -249,10 +274,10 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
                   {product.name}
                 </h3>
                 <p className="text-lg font-black text-gray-800 mt-1 mb-6">
-                  {product.price.toLocaleString('vi-VN')}₫
+                  {product.price.toLocaleString("vi-VN")}₫
                 </p>
 
-                <button 
+                <button
                   onClick={() => onAddToCart(product)}
                   className="w-full bg-black text-white hover:bg-gray-900 font-sans text-xs uppercase tracking-widest font-black py-4 rounded-full flex items-center justify-center gap-2 shadow transition-all duration-300"
                 >
@@ -272,10 +297,13 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
               CHẾ TÁC PHẦN CỨNG TIÊN PHONG
             </span>
             <h2 className="text-3xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-tight">
-              Bật Sáng Hiệu Năng Cùng Lumina Lab.
+              Bật Sáng Hiệu Năng Cùng TechVie Lab.
             </h2>
             <p className="text-gray-650 font-sans text-sm leading-relaxed mt-6 mb-8">
-              Mỗi bảng mạch vi xử lý, mỗi góc bo góc nẹp hợp kim trên các dòng Laptop, điện thoại và phụ kiện của Lumina đều tuân thủ các quy tắc thiết kế công thái học khắt khe nhất. Đảm bảo độ bền cơ học ấn tượng và hiệu năng xử lý vi mạch hoàn hảo.
+              Mỗi bảng mạch vi xử lý, mỗi góc bo góc nẹp hợp kim trên các dòng
+              Laptop, điện thoại và phụ kiện của TechVie đều tuân thủ các quy
+              tắc thiết kế công thái học khắt khe nhất. Đảm bảo độ bền cơ học ấn
+              tượng và hiệu năng xử lý vi mạch hoàn hảo.
             </p>
             <div className="flex flex-wrap gap-8 mb-8 border-t border-gray-200 pt-8">
               <div className="flex items-center gap-3">
@@ -283,8 +311,12 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
                   <Activity size={20} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-gray-900">Chuẩn Âu Thụy Sĩ</h4>
-                  <p className="text-xs text-gray-500">Gia công sắc sảo đến từng góc cạnh</p>
+                  <h4 className="font-bold text-sm text-gray-900">
+                    Chuẩn Âu Thụy Sĩ
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    Gia công sắc sảo đến từng góc cạnh
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -292,13 +324,17 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
                   <Cpu size={20} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-gray-900">Hệ Sinh Thái Silicon</h4>
-                  <p className="text-xs text-gray-500">Vi mạch đồng bộ, tối ưu năng lượng</p>
+                  <h4 className="font-bold text-sm text-gray-900">
+                    Hệ Sinh Thái Silicon
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    Vi mạch đồng bộ, tối ưu năng lượng
+                  </p>
                 </div>
               </div>
             </div>
-            <button 
-              onClick={() => onNavigate('brand')}
+            <button
+              onClick={() => onNavigate("brand")}
               className="bg-black text-white hover:bg-gray-800 font-sans text-xs uppercase tracking-widest font-black px-8 py-3.5 rounded-full flex items-center gap-2"
             >
               Xem Qui Trình Chế Tác Lab
@@ -306,9 +342,9 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
             </button>
           </div>
           <div className="aspect-video lg:aspect-square overflow-hidden rounded-[2rem] bg-gray-200 border border-gray-300 shadow relative">
-            <img 
-              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80" 
-              alt="Lumina Laboratory equipment" 
+            <img
+              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80"
+              alt="TechVie Laboratory equipment"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
             />
@@ -321,17 +357,19 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-none uppercase mb-6">
-              Đón Đầu <br />Công Nghệ.
+              Đón Đầu <br />
+              Công Nghệ.
             </h2>
             <p className="text-gray-650 font-sans text-sm leading-relaxed max-w-sm">
-              Đăng ký để nhận quyền truy cập sớm vào các đợt phát hành sản phẩm mới, chương trình ưu đãi đặc quyền và cập nhật phần mềm sớm nhất.
+              Đăng ký để nhận quyền truy cập sớm vào các đợt phát hành sản phẩm
+              mới, chương trình ưu đãi đặc quyền và cập nhật phần mềm sớm nhất.
             </p>
           </div>
 
           <div>
             <AnimatePresence mode="wait">
               {!showSubscriptionSuccess ? (
-                <motion.form 
+                <motion.form
                   key="subscribe-form"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -339,28 +377,32 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
                   onSubmit={handleSubscribe}
                   className="flex flex-col gap-4 max-w-md w-full"
                 >
-                  <label htmlFor="newsletter-email" className="sr-only">Địa chỉ Email</label>
-                  <input 
+                  <label htmlFor="newsletter-email" className="sr-only">
+                    Địa chỉ Email
+                  </label>
+                  <input
                     id="newsletter-email"
-                    type="email" 
-                    placeholder="email@lumina.com"
+                    type="email"
+                    placeholder="email@techvie.com"
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     required
                     disabled={isSubmittingSubscription}
                     className="bg-white/50 backdrop-blur-md border border-gray-300 focus:border-black rounded-2xl px-6 py-4 outline-none font-sans text-base placeholder:text-gray-400 transition-colors disabled:opacity-60"
                   />
-                  <button 
+                  <button
                     type="submit"
                     disabled={isSubmittingSubscription}
                     className="bg-black text-white hover:bg-gray-900 disabled:bg-gray-700 disabled:cursor-not-allowed px-8 py-4 rounded-2xl font-sans text-xs uppercase tracking-[0.3em] font-black w-full flex items-center justify-center gap-2 transition-transform h-14"
                   >
-                    {isSubmittingSubscription ? 'ĐANG GỬI ĐĂNG KÝ...' : 'THAM GIA ĐẶC QUYỀN'}
+                    {isSubmittingSubscription
+                      ? "ĐANG GỬI ĐĂNG KÝ..."
+                      : "THAM GIA ĐẶC QUYỀN"}
                     {!isSubmittingSubscription && <Send size={14} />}
                   </button>
                 </motion.form>
               ) : (
-                <motion.div 
+                <motion.div
                   key="subscribe-success"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -370,9 +412,13 @@ export default function HomePage({ products, onNavigate, onAddToCart }: HomePage
                   <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mx-auto mb-4">
                     <Check size={24} />
                   </div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-2">Đăng Ký Thành Công!</h4>
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">
+                    Đăng Ký Thành Công!
+                  </h4>
                   <p className="text-xs text-gray-600 font-sans leading-relaxed">
-                    Chào mừng bạn đến với hệ sinh thái Lumina. Thư mời đặc quyền dành cho thành viên VIP và các thông số ưu đãi sẽ sớm gửi tới hòm thư của bạn.
+                    Chào mừng bạn đến với hệ sinh thái TechVie. Thư mời đặc
+                    quyền dành cho thành viên VIP và các thông số ưu đãi sẽ sớm
+                    gửi tới hòm thư của bạn.
                   </p>
                 </motion.div>
               )}

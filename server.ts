@@ -71,7 +71,7 @@ async function startServer() {
       name: "Trần Anh Tú",
       email: "tuanhtu@gmail.com",
       subject: "Hợp tác phân phối sỉ",
-      message: "Tôi có hệ thống cửa hàng điện máy cao cấp tại Đà Nẵng, muốn liên hệ làm đại lý chính thức để phân phối các dòng máy Lumina Book Pro X.",
+      message: "Tôi có hệ thống cửa hàng điện máy cao cấp tại Đà Nẵng, muốn liên hệ làm đại lý chính thức để phân phối các dòng máy TechVie Book Pro X.",
       createdAt: new Date(Date.now() - 3600000 * 4).toISOString() // 4 hours ago
     },
     {
@@ -79,7 +79,7 @@ async function startServer() {
       name: "Hoàng Vy",
       email: "vyhoang99@hotmail.com",
       subject: "Cấu hình custom khắc tên",
-      message: "Có chương trình hỗ trợ in ấn khắc laser tên riêng hoặc logo doanh nghiệp lên mặt sau điện thoại Titanium Lumina Ultra v1 không?",
+      message: "Có chương trình hỗ trợ in ấn khắc laser tên riêng hoặc logo doanh nghiệp lên mặt sau điện thoại Titanium TechVie Ultra v1 không?",
       createdAt: new Date(Date.now() - 3600000 * 1).toISOString() // 1 hour ago
     }
   ];
@@ -168,7 +168,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[LUMINA EXPRESS SERVER] online at http://localhost:${PORT}`);
+    console.log(`[TECHVIE EXPRESS SERVER] online at http://localhost:${PORT}`);
   });
 }
 

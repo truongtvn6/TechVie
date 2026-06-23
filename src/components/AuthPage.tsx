@@ -47,7 +47,7 @@ export default function AuthPage({
     }
 
     if (loginPassword.length < 6) {
-      setLoginError('Mật khẩu hệ thống Lumina ID yêu cầu tối thiểu từ 6 ký tự.');
+      setLoginError('Mật khẩu hệ thống TechVie ID yêu cầu tối thiểu từ 6 ký tự.');
       return;
     }
 
@@ -74,7 +74,7 @@ export default function AuthPage({
       .catch(err => {
         console.warn('Backend login failed, using fallback mock login.', err);
         // Fallback: If it's the admin demo, we'll pretend login succeeded
-        if (loginEmail === 'admin@lumina.com' && loginPassword === 'admin123') {
+        if (loginEmail === 'admin@techvie.com' && loginPassword === 'admin123') {
           setIsLoggingIn(false);
           onLoginSuccess(loginEmail, 'Bearer mock_admin_token');
         } else if (loginEmail === 'mintzinfinity898@gmail.com' && loginPassword === '123456') {
@@ -97,7 +97,7 @@ export default function AuthPage({
     }
 
     if (regPassword.length < 6) {
-      setRegisterError('Mật khẩu bảo mật Lumina ID yêu cầu tối thiểu từ 6 ký tự.');
+      setRegisterError('Mật khẩu bảo mật TechVie ID yêu cầu tối thiểu từ 6 ký tự.');
       return;
     }
 
@@ -376,7 +376,7 @@ export default function AuthPage({
           initial={{ scale: 1.05 }}
           animate={{ scale: [1, 1.04, 1] }}
           transition={{ duration: 40, repeat: Infinity, ease: 'easeInOut' }}
-          alt="Lumina Architectural Tech Backdrop" 
+          alt="TechVie Architectural Tech Backdrop" 
           className="w-full h-full object-cover opacity-85 ease-in-out" 
           src={userImage} 
         />
@@ -405,7 +405,7 @@ export default function AuthPage({
         {/* Branding Overlay */}
         <div className="absolute bottom-16 left-16 z-30">
           <h1 className="text-white font-playfair text-6xl leading-tight font-black tracking-tighter mix-blend-difference select-none">
-            LUMINA
+            TECHVIE
           </h1>
           <p className="text-white/60 font-jakarta text-[11px] tracking-[0.4em] uppercase mt-4 font-semibold select-none small-caps">
             Refractive Excellence
@@ -482,7 +482,7 @@ export default function AuthPage({
           {/* Header Section */}
           <div className="mb-7 mt-3 relative z-10">
             <h2 className="font-playfair text-3xl sm:text-4xl text-black font-semibold tracking-tight mb-7">
-              {mode === 'login' ? 'Chào mừng trở lại' : 'Tham gia Lumina'}
+              {mode === 'login' ? 'Chào mừng trở lại' : 'Tham gia TechVie'}
             </h2>
 
             {/* Tab Switcher with Sleek Glassy Styling */}
@@ -656,31 +656,31 @@ export default function AuthPage({
                       <button 
                         type="button"
                         onClick={() => {
-                          setLoginEmail('admin@lumina.com');
+                          setLoginEmail('admin@techvie.com');
                           setLoginPassword('admin123');
                           setIsLoggingIn(true);
                           fetch('http://localhost:5000/api/auth/login', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: 'admin@lumina.com', password: 'admin123' })
+                            body: JSON.stringify({ email: 'admin@techvie.com', password: 'admin123' })
                           })
                             .then(res => res.json())
                             .then(data => {
                               setIsLoggingIn(false);
                               if (data.success && data.token) {
-                                onLoginSuccess('admin@lumina.com', data.token);
+                                onLoginSuccess('admin@techvie.com', data.token);
                               } else {
-                                onLoginSuccess('admin@lumina.com', 'Bearer mock_admin_token');
+                                onLoginSuccess('admin@techvie.com', 'Bearer mock_admin_token');
                               }
                             })
                             .catch(() => {
                               setIsLoggingIn(false);
-                              onLoginSuccess('admin@lumina.com', 'Bearer mock_admin_token');
+                              onLoginSuccess('admin@techvie.com', 'Bearer mock_admin_token');
                             });
                         }}
                         className="text-[10.5px] font-bold font-mono tracking-wider text-indigo-600 hover:opacity-75 transition-opacity underline decoration-indigo-400 underline-offset-3 block mx-auto cursor-pointer"
                       >
-                        Gia vòm admin: admin@lumina.com (admin123)
+                        Gia vòm admin: admin@techvie.com (admin123)
                       </button>
                     </div>
                   </div>
@@ -727,7 +727,7 @@ export default function AuthPage({
                       <input 
                         type="email"
                         required
-                        placeholder="example@lumina.com"
+                        placeholder="example@techvie.com"
                         value={regEmail}
                         onChange={(e) => setRegEmail(e.target.value)}
                         className="w-full glass-input px-4 py-2.5 rounded-xl text-sm outline-none placeholder-black/35"
@@ -800,7 +800,7 @@ export default function AuthPage({
                           <span>ĐANG ĐĂNG KÝ...</span>
                         </div>
                       ) : (
-                        'THAM GIA LUMINA'
+                        'THAM GIA TECHVIE'
                       )}
                     </button>
                   </form>

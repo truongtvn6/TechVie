@@ -85,8 +85,8 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
                 {searchQuery === '' && (
                   <div className="absolute inset-x-0 bottom-0 top-0 pr-12 flex items-center pointer-events-none overflow-hidden select-none z-0">
                     <div className="animate-marquee whitespace-nowrap flex gap-16 text-black/15 font-sans text-lg md:text-2xl lg:text-3xl tracking-tight uppercase font-extrabold">
-                      <span>• TÌM KIẾM LUMINA: ĐIỆN THOẠI LUMINA ULTRA S26 • LAPTOP LUMINA BOOK PRO X • TRẠM SẠC VÒM KHÔNG DÂY • LUMINA WATCH S • TAI NGHE AMBIENT BUDS PRO • HỆ SINH THÁI COLD-HARDWARE •</span>
-                      <span>• TÌM KIẾM LUMINA: ĐIỆN THOẠI LUMINA ULTRA S26 • LAPTOP LUMINA BOOK PRO X • TRẠM SẠC VÒM KHÔNG DÂY • LUMINA WATCH S • TAI NGHE AMBIENT BUDS PRO • HỆ SINH THÁI COLD-HARDWARE •</span>
+                      <span>• TÌM KIẾM TECHVIE: ĐIỆN THOẠI TECHVIE ULTRA S26 • LAPTOP TECHVIE BOOK PRO X • TRẠM SẠC VÒM KHÔNG DÂY • TECHVIE WATCH S • TAI NGHE AMBIENT BUDS PRO • HỆ SINH THÁI COLD-HARDWARE •</span>
+                      <span>• TÌM KIẾM TECHVIE: ĐIỆN THOẠI TECHVIE ULTRA S26 • LAPTOP TECHVIE BOOK PRO X • TRẠM SẠC VÒM KHÔNG DÂY • TECHVIE WATCH S • TAI NGHE AMBIENT BUDS PRO • HỆ SINH THÁI COLD-HARDWARE •</span>
                     </div>
                   </div>
                 )}

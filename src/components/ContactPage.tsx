@@ -17,20 +17,20 @@ export default function ContactPage() {
 
   const faqs = [
     {
-      q: "LUMINA có cung cấp giải pháp gia công thiết kế thiết bị tùy chỉnh cho doanh nghiệp không?",
+      q: "TECHVIE có cung cấp giải pháp gia công thiết kế thiết bị tùy chỉnh cho doanh nghiệp không?",
       a: "Có, chúng tôi chuyên thiết kế tinh chỉnh phần cứng tùy chọn, in khắc logo thương hiệu riêng và cấu hình bo mạch cá nhân hóa cho các đối tác doanh nghiệp quy mô toàn cầu. Quý khách hàng doanh nghiệp có thể liên hệ trực tiếp qua form đối tác để nhận báo giá chi tiết."
     },
     {
-      q: "Tôi có thể trải nghiệm trực tiếp các sản phẩm Lumina ở đâu?",
+      q: "Tôi có thể trải nghiệm trực tiếp các sản phẩm TechVie ở đâu?",
       a: "Bạn có thể ghé thăm trực tiếp Phòng trưng bày và Trạm Trải Nghiệm Premium của chúng tôi tại trung tâm Hà Nội và TP. Hồ Chí Minh hoặc liên hệ tổng đài để đăng ký cuộc gọi tư vấn cấu hình trực quan cùng đội ngũ kỹ thuật viên."
     },
     {
-      q: "Chính sách bảo hành dòng sản phẩm Lumina như thế nào?",
-      a: "Tất cả các sản phẩm laptop, smartphone và phụ kiện hi-end của Lumina đều đi kèm bảo hành chính hãng một đổi một do lỗi nhà sản xuất trong vòng 12 tháng, bảo trì định kỳ và hỗ trợ phục hồi kỹ thuật trọn đời."
+      q: "Chính sách bảo hành dòng sản phẩm TechVie như thế nào?",
+      a: "Tất cả các sản phẩm laptop, smartphone và phụ kiện hi-end của TechVie đều đi kèm bảo hành chính hãng một đổi một do lỗi nhà sản xuất trong vòng 12 tháng, bảo trì định kỳ và hỗ trợ phục hồi kỹ thuật trọn đời."
     },
     {
-      q: "Các dòng phụ kiện của Lumina có tương tương thích tốt với nền tảng khác không?",
-      a: "Các thiết bị ngoại vi của Lumina như tai nghe, bàn phím cơ và dock sạc thông minh được thiết kế theo chuẩn kết nối USB-C, Bluetooth 5.3 hiện đại nhất, bảo đảm tương thích hoàn toàn bứt phá trên iOS, Android, macOS và Windows."
+      q: "Các dòng phụ kiện của TechVie có tương tương thích tốt với nền tảng khác không?",
+      a: "Các thiết bị ngoại vi của TechVie như tai nghe, bàn phím cơ và dock sạc thông minh được thiết kế theo chuẩn kết nối USB-C, Bluetooth 5.3 hiện đại nhất, bảo đảm tương thích hoàn toàn bứt phá trên iOS, Android, macOS và Windows."
     }
   ];
 
@@ -83,7 +83,7 @@ export default function ContactPage() {
       {/* Header */}
       <div className="mb-14">
         <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
-          LUMINA REPRESENTATIVE CONTACT
+          TECHVIE REPRESENTATIVE CONTACT
         </span>
         <h1 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
           Liên Hệ Hợp Tác
@@ -106,7 +106,7 @@ export default function ContactPage() {
               <div className="flex items-start gap-3">
                 <MapPin size={16} className="text-secondary shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-gray-900">Lumina Lab Switzerland</h4>
+                  <h4 className="font-bold text-gray-900">TechVie Lab Switzerland</h4>
                   <p>Lausanne Innovative Hub, 1015 Lausanne, Thụy Sĩ</p>
                 </div>
               </div>
@@ -114,19 +114,19 @@ export default function ContactPage() {
               <div className="flex items-start gap-3">
                 <MapPin size={16} className="text-secondary shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-gray-900">Lumina Seoul Lab & Factory</h4>
+                  <h4 className="font-bold text-gray-900">TechVie Seoul Lab & Factory</h4>
                   <p>Innovation Tower, Gangnam-daero, Seoul, Hàn Quốc</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 <Phone size={16} className="text-secondary" />
-                <span>+41 (21) 500-LUMI (Thụy Sĩ)</span>
+                <span>+41 (21) 500-TECH (Thụy Sĩ)</span>
               </div>
 
               <div className="flex items-center gap-3">
                 <Mail size={16} className="text-secondary" />
-                <span>contact@lumina-lab.com</span>
+                <span>contact@techvie-lab.com</span>
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function ContactPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_right_bottom,rgba(70,72,212,0.30),transparent_70%)] pointer-events-none" />
             <h4 className="text-xl font-bold tracking-tight mb-2">Trở Thành Trọng Tâm</h4>
             <p className="text-xs text-gray-400 font-sans leading-relaxed">
-              &ldquo;Khoảng cách giữa giấc mơ thiết bị tối tân và một sản phẩm công nghệ thực tiễn là khoảng thời gian Lumina tinh tế thiết lập chuẩn mực độ bền cơ học hi-end.&rdquo;
+              &ldquo;Khoảng cách giữa giấc mơ thiết bị tối tân và một sản phẩm công nghệ thực tiễn là khoảng thời gian TechVie tinh tế thiết lập chuẩn mực độ bền cơ học hi-end.&rdquo;
             </p>
             <span className="block text-[10px] uppercase font-mono tracking-widest text-indigo-400 mt-4">— KỸ SƯ TRƯỞNG MINH TRÍ</span>
           </div>
@@ -234,7 +234,7 @@ export default function ContactPage() {
                 </div>
                 <h4 className="text-xl font-bold text-gray-905 mb-2">Thư Yêu Cầu Đã Gửi!</h4>
                 <p className="text-sm text-gray-600 font-sans leading-relaxed max-w-md mx-auto">
-                  Cảm ơn tin nhắn của bạn. Yêu cầu hỗ trợ đã được gửi thành công đến bộ phận chăm sóc khách hàng của Lumina. Đội ngũ tư vấn viên sẽ liên hệ lại với bạn trong vòng 24 đến 48 giờ làm việc.
+                  Cảm ơn tin nhắn của bạn. Yêu cầu hỗ trợ đã được gửi thành công đến bộ phận chăm sóc khách hàng của TechVie. Đội ngũ tư vấn viên sẽ liên hệ lại với bạn trong vòng 24 đến 48 giờ làm việc.
                 </p>
               </motion.div>
             )}
@@ -250,7 +250,7 @@ export default function ContactPage() {
           </span>
           <h2 className="text-3xl font-sans tracking-tighter text-gray-950 font-extrabold flex items-center justify-center gap-2">
             <Users size={28} className="text-secondary animate-pulse" />
-            Đội Ngũ Sáng Tạo Lumina
+            Đội Ngũ Sáng Tạo TechVie
           </h2>
           <p className="text-xs md:text-sm text-gray-400 font-sans mt-2 max-w-2xl mx-auto leading-relaxed">
             Hội tụ những chuyên gia công nghệ, kỹ sư đầu ngành và nhà thiết kế xuất sắc cùng chung lý tưởng định hình tương lai các thiết bị cá nhân cao cấp.

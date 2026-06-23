@@ -42,9 +42,9 @@ export default function ProductFormModal({
         setProdPrice(9900000);
         setProdCategory('Điện thoại');
         setProdImage('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80');
-        setProdDesc('Sản phẩm công nghệ tinh tế bứt phá hiệu năng, chế tác cao cấp từ Lumina Lab Thụy Sĩ.');
+        setProdDesc('Sản phẩm công nghệ tinh tế bứt phá hiệu năng, chế tác cao cấp từ TechVie Lab Thụy Sĩ.');
         setFormSpecs([
-          { label: 'Hộp chip', value: 'Silicon Lumina Standard' },
+          { label: 'Hộp chip', value: 'Silicon TechVie Standard' },
           { label: 'Màn hình', value: '6.1" OLED Retina' },
           { label: 'Dung lượng Pin', value: '4000 mAh' },
           { label: 'Chuẩn kháng nước', value: 'IP68 chuẩn hãng' }
@@ -129,7 +129,7 @@ export default function ProductFormModal({
                   required
                   value={prodName}
                   onChange={(e) => setProdName(e.target.value)}
-                  placeholder="Ví dụ: Lumina Ultra Book X"
+                  placeholder="Ví dụ: TechVie Ultra Book X"
                   className="w-full bg-white border border-gray-250 focus:border-black focus:outline-none focus:ring-1 focus:ring-black rounded-xl px-4 py-3 text-xs text-gray-900 transition-all placeholder-gray-400 font-semibold"
                 />
               </div>

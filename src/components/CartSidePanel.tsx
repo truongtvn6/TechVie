@@ -210,7 +210,7 @@ export default function CartSidePanel({
                   </div>
 
                   <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-[11px] text-gray-500 font-sans">
-                    * Đơn hàng thiết bị sẽ được Lumina đóng gói chống sốc an toàn nghiêm ngặt và bàn giao nguyên seal bưu tá.
+                    * Đơn hàng thiết bị sẽ được TechVie đóng gói chống sốc an toàn nghiêm ngặt và bàn giao nguyên seal bưu tá.
                   </div>
                 </form>
               )}
@@ -226,7 +226,7 @@ export default function CartSidePanel({
                   </div>
                   <h3 className="text-xl font-bold text-gray-900">Đặt hàng thành công!</h3>
                   <p className="text-xs text-gray-600 font-sans mt-3 leading-relaxed max-w-[280px] mx-auto">
-                    Kính chúc mừng! Đơn đặt mua thiết bị điện tử cao cấp của bạn đã được ghi nhận trên hệ thống Lumina. Đội ngũ CSKH sẽ sớm gọi điện liên hệ xác nhận đơn giao hàng.
+                    Kính chúc mừng! Đơn đặt mua thiết bị điện tử cao cấp của bạn đã được ghi nhận trên hệ thống TechVie. Đội ngũ CSKH sẽ sớm gọi điện liên hệ xác nhận đơn giao hàng.
                   </p>
                 </motion.div>
               )}
@@ -236,7 +236,7 @@ export default function CartSidePanel({
             {cart.length > 0 && (
               <div className="p-6 md:p-8 bg-gray-50 border-t border-gray-200 space-y-4">
                 <div className="flex justify-between text-xs text-gray-500 font-sans">
-                  <span>Vận chuyển (Lumina Express)</span>
+                  <span>Vận chuyển (TechVie Express)</span>
                   <span className="font-mono text-emerald-600 font-bold">Miễn phí</span>
                 </div>
                 <div className="flex justify-between items-baseline">

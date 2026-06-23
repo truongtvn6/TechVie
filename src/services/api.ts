@@ -1,15 +1,28 @@
 import { Product } from '../types';
 
 /**
- * Lumina E-Commerce API Service
+ * TechVie E-Commerce API Service
  * Tập trung toàn bộ các yêu cầu HTTP/gửi nhận dữ liệu với Express Backend Server.
  * Thiết kế tinh giản, tối thiểu hoá độ trễ và hỗ trợ TypeScript chặt chẽ.
  */
 
+// Helper to load token and headers for Admin APIs
+function getAuthHeaders() {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('techvie_token') : '';
+  const cleanToken = token ? (token.startsWith('Bearer ') ? token : `Bearer ${token}`) : '';
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (cleanToken) {
+    headers['Authorization'] = cleanToken;
+  }
+  return headers;
+}
+
 // Đăng ký nhận bản tin khuyến mãi (Newsletter Subscription)
 export async function subscribeNewsletter(email: string): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch('/api/contacts', {
+    const response = await fetch('http://localhost:5000/api/contacts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -39,7 +52,7 @@ export async function sendContactInquiry(payload: {
   message: string;
 }): Promise<{ success: boolean; message: string; inquiry?: any }> {
   try {
-    const response = await fetch('/api/contacts', {
+    const response = await fetch('http://localhost:5000/api/contacts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -57,7 +70,9 @@ export async function sendContactInquiry(payload: {
 // Tải danh sách thư góp ý khách hàng (Chỉ dành cho Administrator)
 export async function getContactMessages(): Promise<{ success: boolean; contacts: any[] }> {
   try {
-    const response = await fetch('/api/contacts');
+    const response = await fetch('http://localhost:5000/api/contacts', {
+      headers: getAuthHeaders()
+    });
     if (!response.ok) throw new Error('Không thể tải hòm thư!');
     return await response.json();
   } catch (error) {
@@ -69,7 +84,9 @@ export async function getContactMessages(): Promise<{ success: boolean; contacts
 // Tải danh sách đơn đặt hàng từ Server (Chỉ dành cho Administrator)
 export async function getAdminOrders(): Promise<{ success: boolean; orders: any[] }> {
   try {
-    const response = await fetch('/api/orders');
+    const response = await fetch('http://localhost:5000/api/orders', {
+      headers: getAuthHeaders()
+    });
     if (!response.ok) throw new Error('Không thể tải sổ đơn hàng!');
     return await response.json();
   } catch (error) {
@@ -79,11 +96,11 @@ export async function getAdminOrders(): Promise<{ success: boolean; orders: any[
 }
 
 // Cập nhật trạng thái bưu kiện đơn hàng (Chỉ dành cho Administrator)
-export async function updateOrderStatus(orderId: number, status: string, statusType: string): Promise<{ success: boolean; order?: any }> {
+export async function updateOrderStatus(orderId: number | string, status: string, statusType: string): Promise<{ success: boolean; order?: any }> {
   try {
-    const response = await fetch(`/api/orders/${orderId}/status`, {
+    const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ status, statusType })
     });
     if (!response.ok) throw new Error('Cập nhật trạng thái thất bại!');
@@ -95,9 +112,9 @@ export async function updateOrderStatus(orderId: number, status: string, statusT
 }
 
 // Khởi tạo một đơn hàng mẫu ngẫu nhiên (Dashboard Helper)
-export async function seedDummyOrder(payload: any): Promise<{ success: boolean; orderId?: number }> {
+export async function seedDummyOrder(payload: any): Promise<{ success: boolean; orderId?: number | string }> {
   try {
-    const response = await fetch('/api/checkout', {
+    const response = await fetch('http://localhost:5000/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -113,7 +130,10 @@ export async function seedDummyOrder(payload: any): Promise<{ success: boolean; 
 // Xoá sạch toàn bộ nhật ký đơn hàng trên Server (Chỉ dành cho Administrator)
 export async function clearAllOrdersFromServer(): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch('/api/orders', { method: 'DELETE' });
+    const response = await fetch('http://localhost:5000/api/orders', {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
     if (!response.ok) throw new Error('Dọn dẹp bưu kiện thất bại!');
     return await response.json();
   } catch (error) {
@@ -133,9 +153,9 @@ export async function submitCheckoutOrder(orderData: {
   deliveryMethod: string;
   cart: Array<{ product: Product; quantity: number }>;
   finalTotal: string;
-}): Promise<{ success: boolean; orderId?: number; message?: string }> {
+}): Promise<{ success: boolean; orderId?: number | string; message?: string }> {
   try {
-    const response = await fetch('/api/checkout', {
+    const response = await fetch('http://localhost:5000/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderData)
@@ -269,6 +289,135 @@ export async function deleteProduct(id: string, token: string): Promise<{ succes
   } catch (error: any) {
     console.error(`[API deleteProduct] ❌ Lỗi xóa sản phẩm #${id}:`, error);
     return { success: false, message: error.message || 'Lỗi kết nối khi xóa sản phẩm.' };
+  }
+}
+
+// Tải danh sách thành viên hệ thống (Chỉ dành cho Admin)
+export async function getSystemUsers(token: string): Promise<{ success: boolean; users: any[] }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch('http://localhost:5000/api/users', {
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) throw new Error('Không thể tải danh sách thành viên!');
+    return await response.json();
+  } catch (error) {
+    console.error('Lỗi lấy danh sách thành viên:', error);
+    return { success: false, users: [] };
+  }
+}
+
+// Cấp tài khoản thành viên mới (Chỉ dành cho Admin)
+export async function adminCreateUser(userData: any, token: string): Promise<{ success: boolean; message: string; user?: any }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch('http://localhost:5000/api/users', {
+      method: 'POST',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || 'Cấp tài khoản thất bại!');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi admin cấp tài khoản:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối khi cấp tài khoản.' };
+  }
+}
+
+// Thay đổi phân quyền thành viên (Chỉ dành cho Admin)
+export async function toggleUserRole(id: string, token: string): Promise<{ success: boolean; message: string; user?: any }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/users/${id}/role`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || 'Không thể đổi phân quyền!');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi đổi phân quyền thành viên:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối.' };
+  }
+}
+
+// Thay đổi trạng thái VIP thành viên (Chỉ dành cho Admin)
+export async function toggleUserVip(id: string, token: string): Promise<{ success: boolean; message: string; user?: any }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/users/${id}/vip`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || 'Không thể đổi trạng thái VIP!');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi thay đổi trạng thái VIP thành viên:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối.' };
+  }
+}
+
+// Khóa / Mở khóa tài khoản thành viên (Chỉ dành cho Admin)
+export async function toggleUserStatus(id: string, token: string): Promise<{ success: boolean; message: string; user?: any }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/users/${id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || 'Không thể thay đổi trạng thái tài khoản!');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi đổi trạng thái tài khoản thành viên:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối.' };
+  }
+}
+
+// Gỡ bỏ tài khoản thành viên khỏi database (Chỉ dành cho Admin)
+export async function adminDeleteUser(id: string, token: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || 'Không thể gỡ bỏ tài khoản thành viên!');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi gỡ bỏ tài khoản thành viên:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối.' };
   }
 }
 

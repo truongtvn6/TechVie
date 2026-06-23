@@ -13,7 +13,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Description summary */}
         <div className="space-y-4">
-          <h3 className="text-xl font-black text-gray-900 tracking-tight">LUMINA</h3>
+          <h3 className="text-xl font-black text-gray-900 tracking-tight">TECHVIE</h3>
           <p className="text-xs text-gray-500 font-sans leading-relaxed max-w-[260px]">
             Cung cấp các thiết bị điện tử đỉnh cao, laptop hiệu năng khủng, smartphone đột phá và các món phụ kiện hi-end chế tác tỉ mỉ dành cho tương lai.
           </p>
@@ -45,7 +45,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
           <ul className="space-y-3 text-xs text-gray-600 font-sans">
             <li>
               <button onClick={() => { setActiveTab('brand'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline text-left">
-                Lumina Book Silicon specs
+                TechVie Book Silicon specs
               </button>
             </li>
             <li>
@@ -73,21 +73,21 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
             <a 
               href="#" 
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:border-black transition-all"
-              title="Lumina Global Network"
+              title="TechVie Global Network"
             >
               <Globe size={16} />
             </a>
             <a 
               href="#" 
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:border-black transition-all"
-              title="Lumina Micro-Animations"
+              title="TechVie Micro-Animations"
             >
               <Layers size={16} />
             </a>
             <a 
               href="#" 
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:border-black transition-all"
-              title="Lumina Crafts"
+              title="TechVie Crafts"
             >
               <Brush size={16} />
             </a>
@@ -97,9 +97,9 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
 
       {/* Rights bar */}
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-gray-150 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono uppercase tracking-widest text-gray-400 gap-4 text-center md:text-left">
-        <span>© 2026 LUMINA ELECTRONICS. ĐƯỢC CHẾ TÁC VÌ SỰ RÕ NÉT.</span>
+        <span>© 2026 TECHVIE ELECTRONICS. ĐƯỢC CHẾ TÁC VÌ SỰ RÕ NÉT.</span>
         <span className="flex items-center gap-1">
-          THẮP SÁNG BỞI LUMINA LAB SWITZERLAND & SEOUL CORP.
+          THẮP SÁNG BỞI TECHVIE LAB SWITZERLAND & SEOUL CORP.
           <ArrowUpRight size={10} />
         </span>
       </div>
