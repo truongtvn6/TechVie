@@ -1,9 +1,9 @@
 // =====================================================================
-// HỆ THỐNG CƠ SỞ DỮ LIỆU ĐỒNG BỘ LUMINA (ECOMMERCE ARCHITECTURE)
+// HỆ THỐNG CƠ SỞ DỮ LIỆU ĐỒNG BỘ TECHVIE (ECOMMERCE ARCHITECTURE)
 // =====================================================================
 
 Table products {
-  id varchar(100) [pk, note: 'Mã chuỗi thiết bị duy nhất. Ví dụ: lumina-book-pro-x']
+  id varchar(100) [pk, note: 'Mã chuỗi thiết bị duy nhất. Ví dụ: techvie-book-pro-x']
   name varchar(255) [not null, note: 'Tên hiển thị sản phẩm']
   price bigint [not null, note: 'Giá niêm yết (VND) >= 0']
   category varchar(100) [not null, note: 'Phân loại: Điện thoại, Laptop, Đồng hồ...']
@@ -23,11 +23,11 @@ Table products {
     -------------------------
     Mẫu bản ghi JSON thực tế:
     {
-      "id": "lumina-book-pro-x",
-      "name": "Lumina Book Pro X",
+      "id": "techvie-book-pro-x",
+      "name": "TechVie Book Pro X",
       "price": 28500000,
       "category": "Laptop",
-      "specs": [{"label": "Vi xử lý", "value": "Lumina Core S2 Ultra"}]
+      "specs": [{"label": "Vi xử lý", "value": "TechVie Core S2 Ultra"}]
     }
   '''
 }

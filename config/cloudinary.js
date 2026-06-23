@@ -13,7 +13,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Helper để upload file buffer lên Cloudinary
-const uploadToCloudinary = (fileBuffer, folder = "lumina_products") => {
+const uploadToCloudinary = (fileBuffer, folder = "techvie_products") => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       { folder: folder },

@@ -9,6 +9,10 @@ const User = require("./models/User");
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
+const userRoutes = require("./routes/userRoutes");
+const contactRoutes = require("./routes/contactRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const checkoutRoutes = require("./routes/checkoutRoutes");
 const Category = require("./models/Category");
 
 const app = express();
@@ -85,6 +89,18 @@ app.use("/api/products", productRoutes);
 
 // 8. Định nghĩa API Categories Routes
 app.use("/api/categories", categoryRoutes);
+
+// 9. Định nghĩa API Users Routes (Quản lý thành viên dành cho Admin)
+app.use("/api/users", userRoutes);
+
+// 10. Định nghĩa API Contacts / Inquiries Routes
+app.use("/api/contacts", contactRoutes);
+
+// 11. Định nghĩa API Orders Routes
+app.use("/api/orders", orderRoutes);
+
+// 12. Định nghĩa API Checkout Routes
+app.use("/api/checkout", checkoutRoutes);
 
 // Endpoint GET /api/hero-images truy xuất ảnh từ thư mục wallpaper-slideshow-for-homePage trên Cloudinary
 app.get("/api/hero-images", async (req, res) => {

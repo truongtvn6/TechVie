@@ -60,7 +60,7 @@ const productController = {
       // Upload ảnh lên Cloudinary nếu có file được gửi lên
       let imageUrl = req.body.image || "";
       if (req.file) {
-        imageUrl = await uploadToCloudinary(req.file.buffer, "lumina_products");
+        imageUrl = await uploadToCloudinary(req.file.buffer, "techvie_products");
       }
 
       // Parse specs từ JSON string (nếu gửi bằng form-data)
@@ -139,7 +139,7 @@ const productController = {
             );
           }
         }
-        product.image = await uploadToCloudinary(req.file.buffer, "lumina_products");
+        product.image = await uploadToCloudinary(req.file.buffer, "techvie_products");
       } else if (req.body.image !== undefined) {
         product.image = req.body.image;
       }

@@ -5,7 +5,7 @@ const productSchema = new mongoose.Schema({
   _id: {
     type: String,
     required: true,
-    description: "Mã chuỗi thiết bị duy nhất. Ví dụ: lumina-book-pro-x",
+    description: "Mã chuỗi thiết bị duy nhất. Ví dụ: techvie-book-pro-x",
   },
   name: {
     type: String,

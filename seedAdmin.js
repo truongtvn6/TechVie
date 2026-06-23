@@ -13,7 +13,7 @@ async function seedAdmin() {
     await mongoose.connect(uri);
     console.log("✔ Kết nối MongoDB thành công!");
 
-    const adminEmail = "admin@lumina.com";
+    const adminEmail = "admin@techvie.com";
     const adminPassword = "admin123";
 
     // Tìm xem đã có admin chưa
@@ -25,8 +25,10 @@ async function seedAdmin() {
     if (existingAdmin) {
       console.log(`ℹ Tài khoản Admin (${adminEmail}) đã tồn tại. Đang cập nhật lại mật khẩu chuẩn...`);
       existingAdmin.password = hashedPassword;
+      existingAdmin.role = "admin";
+      existingAdmin.vipStatus = "Premium";
       await existingAdmin.save();
-      console.log(`✔ Cập nhật mật khẩu Admin thành công!`);
+      console.log(`✔ Cập nhật thông số tài khoản Admin thành công!`);
     } else {
       console.log(`➔ Đang khởi tạo tài khoản Admin (${adminEmail})...`);
       
@@ -34,6 +36,8 @@ async function seedAdmin() {
         username: "Administrator",
         email: adminEmail,
         password: hashedPassword,
+        role: "admin",
+        vipStatus: "Premium",
       });
 
       console.log(`✔ Khởi tạo tài khoản Admin thành công!`);
