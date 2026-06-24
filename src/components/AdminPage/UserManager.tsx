@@ -19,6 +19,7 @@ interface UserManagerProps {
   onToggleUserVip: (id: string) => void;
   onToggleUserStatus: (id: string) => void;
   onDeleteUser: (id: string) => void;
+  isDarkMode?: boolean;
 }
 
 export default function UserManager({
@@ -27,7 +28,8 @@ export default function UserManager({
   onToggleUserRole,
   onToggleUserVip,
   onToggleUserStatus,
-  onDeleteUser
+  onDeleteUser,
+  isDarkMode = false,
 }: UserManagerProps) {
   const [userQuery, setUserQuery] = useState('');
   const [isNewUsrFormOpen, setIsNewUsrFormOpen] = useState(false);
@@ -38,6 +40,8 @@ export default function UserManager({
   const [newUsrPhone, setNewUsrPhone] = useState('');
   const [newUsrRole, setNewUsrRole] = useState<'user' | 'admin'>('user');
   const [newUsrVip, setNewUsrVip] = useState<'Normal' | 'Premium'>('Normal');
+
+  const d = isDarkMode;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,9 +70,11 @@ export default function UserManager({
   return (
     <div className="space-y-6 animate-fade-in font-sans">
       
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-white border border-gray-200 p-5 rounded-[2rem] shadow-sm">
+      <div className={`flex flex-col sm:flex-row justify-between sm:items-center gap-4 border p-5 rounded-[2rem] shadow-sm transition-all duration-300 ${
+        d ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-gray-200'
+      }`}>
         <div className="flex-1 min-w-0 text-left">
-          <h3 className="font-extrabold text-gray-950 text-sm uppercase">Sổ thành viên TechVie ID</h3>
+          <h3 className={`font-extrabold text-sm uppercase ${d ? 'text-white' : 'text-gray-955'}`}>Sổ thành viên TechVie ID</h3>
           <p className="text-xs text-gray-400">Quản trị phân quyền cán bộ nhân viên, theo dõi trạng thái VIP tài khoản hoặc chặn truy cập.</p>
         </div>
 
@@ -79,13 +85,19 @@ export default function UserManager({
             placeholder="Tìm tên, email thành viên..."
             value={userQuery}
             onChange={(e) => setUserQuery(e.target.value)}
-            className="bg-slate-50 border border-slate-200 hover:bg-slate-100/50 focus:bg-white rounded-xl px-4 py-2 text-xs outline-none focus:border-black font-semibold shadow-sm w-full sm:w-60 text-left"
+            className={`rounded-xl px-4 py-2 text-xs outline-none font-semibold shadow-sm w-full sm:w-60 text-left transition-all border ${
+              d 
+                ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:border-indigo-500 placeholder-gray-500' 
+                : 'bg-slate-50 border-slate-200 hover:bg-slate-100/50 focus:bg-white focus:border-black text-gray-905 placeholder-gray-400'
+            }`}
           />
 
           <button
             type="button"
             onClick={() => setIsNewUsrFormOpen(true)}
-            className="px-4 py-2.5 bg-black hover:bg-slate-900 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow flex items-center justify-center gap-1 cursor-pointer"
+            className={`px-4 py-2.5 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow flex items-center justify-center gap-1 cursor-pointer ${
+              d ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-black hover:bg-slate-900'
+            }`}
           >
             <Plus size={14} />
             Thêm tài khoản
@@ -94,11 +106,15 @@ export default function UserManager({
       </div>
 
       {/* Users Table */}
-      <div className="bg-white border border-slate-200/80 rounded-[2rem] overflow-hidden shadow-sm">
+      <div className={`rounded-[2.5rem] overflow-hidden shadow-sm border transition-colors duration-300 ${
+        d ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-slate-200/80'
+      }`}>
         <div className="overflow-x-auto font-sans">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-150 text-slate-400 uppercase font-extrabold text-[10px] tracking-wider">
+              <tr className={`uppercase font-extrabold text-[9px] tracking-wider border-b transition-colors duration-300 ${
+                d ? 'bg-[#0d1117]/60 border-[#30363d] text-gray-500' : 'bg-slate-50 border-slate-150 text-slate-400'
+              }`}>
                 <th className="py-4.5 px-6 whitespace-nowrap font-extrabold text-left">Thành viên</th>
                 <th className="py-4.5 px-6 whitespace-nowrap font-extrabold text-left">Liên hệ</th>
                 <th className="py-4.5 px-6 whitespace-nowrap font-extrabold text-left">Phân quyền</th>
@@ -108,7 +124,7 @@ export default function UserManager({
                 <th className="py-4.5 px-6 whitespace-nowrap font-extrabold text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-150">
+            <tbody className={`divide-y transition-colors duration-300 ${d ? 'divide-[#30363d]' : 'divide-slate-150'}`}>
               {systemUsers
                 .filter(u => 
                   u.name.toLowerCase().includes(userQuery.toLowerCase()) || 
@@ -117,8 +133,10 @@ export default function UserManager({
                 .map((usr) => (
                   <tr 
                     key={usr.id} 
-                    className={`hover:bg-slate-50/40 transition-colors ${
-                      usr.status === 'blocked' ? 'bg-rose-50/10' : ''
+                    className={`transition-colors duration-200 ${
+                      d 
+                        ? `hover:bg-[#21262d]/50 ${usr.status === 'blocked' ? 'bg-rose-955/10' : ''}` 
+                        : `hover:bg-slate-50/40 ${usr.status === 'blocked' ? 'bg-rose-50/10' : ''}`
                     }`}
                   >
                     {/* Member identity */}
@@ -127,20 +145,20 @@ export default function UserManager({
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs uppercase shrink-0 ${
                           usr.role === 'admin' 
                             ? 'bg-indigo-600 text-white shadow-sm' 
-                            : 'bg-slate-100 text-slate-600'
+                            : d ? 'bg-gray-800 text-white border border-gray-600' : 'bg-slate-100 text-slate-600'
                         }`}>
                           {usr.name.charAt(0)}
                         </div>
                         <div className="text-left">
-                          <span className="font-extrabold text-slate-900 text-sm block tracking-tight">{usr.name}</span>
-                          <span className="text-[10px] font-mono text-slate-400 block mt-0.5">{usr.email}</span>
+                            <span className="font-extrabold text-sm block tracking-tight text-black dark:text-white">{usr.name}</span>
+                            <span className="text-[10px] font-mono text-slate-400 block mt-0.5">{usr.email}</span>
                         </div>
                       </div>
                     </td>
 
                     {/* Contacts phone */}
                     <td className="py-5 px-6 text-left">
-                      <span className="font-mono text-slate-600 font-medium">{usr.phone}</span>
+                      <span className="font-mono font-medium text-black dark:text-white">{usr.phone}</span>
                     </td>
 
                     {/* Role selection toggle */}
@@ -150,8 +168,12 @@ export default function UserManager({
                         onClick={() => onToggleUserRole(usr.id)}
                         className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
                           usr.role === 'admin'
-                            ? 'bg-indigo-50 text-indigo-700 border border-indigo-100/60 font-black shadow-sm'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                            ? d
+                              ? 'bg-indigo-950/40 text-indigo-400 border border-indigo-900/40 font-black shadow-sm'
+                              : 'bg-indigo-50 text-indigo-700 border border-indigo-100/60 font-black shadow-sm'
+                            : d
+                              ? 'bg-[#21262d] text-gray-300 hover:bg-[#30363d] hover:text-white border border-transparent'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'
                         }`}
                       >
                         {usr.role === 'admin' ? 'Administrator' : 'Standard User'}
@@ -160,29 +182,43 @@ export default function UserManager({
 
                     {/* Vip premium level */}
                     <td className="py-5 px-6 text-left">
-                      <button
-                        type="button"
-                        onClick={() => onToggleUserVip(usr.id)}
-                        className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
-                          usr.vipStatus === 'Premium'
-                            ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-700 border border-amber-500/15 font-black shadow-sm'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                        }`}
-                      >
-                        {usr.vipStatus === 'Premium' && <Sparkles size={11} className="text-amber-500 animate-pulse" />}
-                        {usr.vipStatus}
-                      </button>
+                      {usr.role === 'admin' ? (
+                          <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1 border ${d ? 'bg-indigo-950/30 text-indigo-400 border-indigo-900/40' : 'bg-indigo-50 text-indigo-700 border-indigo-100'}`}>Admin</span>
+                        ) : (
+                        <button
+                          type="button"
+                          onClick={() => onToggleUserVip(usr.id)}
+                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
+                            usr.vipStatus === 'Premium'
+                              ? d
+                                ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-400 border border-amber-500/20 font-black shadow-sm'
+                                : 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-700 border border-amber-500/15 font-black shadow-sm'
+                              : d
+                                ? 'bg-[#21262d] text-gray-300 hover:bg-[#30363d] hover:text-white border border-transparent'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                          }`}
+                        >
+                          {usr.vipStatus === 'Premium' && <Sparkles size={11} className="text-amber-500 animate-pulse" />}
+                          {usr.vipStatus}
+                        </button>
+                      )}
                     </td>
 
                     {/* Join date */}
                     <td className="py-5 px-6 text-left">
-                      <span className="font-mono text-slate-500 font-medium">{usr.joinedDate}</span>
+                            <span className="font-extrabold text-sm block tracking-tight text-black dark:text-white">{usr.joinedDate}</span>
                     </td>
 
                     {/* Status tag */}
                     <td className="py-5 px-6 text-left">
                       <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-extrabold ${
-                        usr.status === 'active' ? 'text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg' : 'text-rose-700 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-lg'
+                        usr.status === 'active'
+                          ? d
+                            ? 'text-emerald-400 bg-emerald-950/30 border border-emerald-900/40 px-2 py-0.5 rounded-lg'
+                            : 'text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg'
+                          : d
+                            ? 'text-rose-400 bg-rose-955/20 border border-rose-900/40 px-2 py-0.5 rounded-lg'
+                            : 'text-rose-700 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-lg'
                       }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${usr.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
                         {usr.status === 'active' ? 'Hoạt động' : 'Đã Khóa'}
@@ -196,8 +232,12 @@ export default function UserManager({
                         onClick={() => onToggleUserStatus(usr.id)}
                         className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider border transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
                           usr.status === 'active' 
-                            ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
-                            : 'border-emerald-250 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                            ? d
+                              ? 'border-amber-900/30 bg-amber-950/20 text-amber-455 hover:bg-amber-900/35'
+                              : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
+                            : d
+                              ? 'border-emerald-900/30 bg-emerald-950/20 text-emerald-400 hover:bg-emerald-900/35'
+                              : 'border-emerald-250 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
                         }`}
                       >
                         {usr.status === 'active' ? 'Khóa' : 'Mở khóa'}
@@ -206,7 +246,11 @@ export default function UserManager({
                         type="button"
                         onClick={() => onDeleteUser(usr.id)}
                         disabled={usr.email === 'admin@techvie.com'}
-                        className="px-3 py-1.5 bg-rose-50 border border-rose-100 text-rose-600 disabled:opacity-40 rounded-lg text-[9px] font-bold uppercase hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer"
+                        className={`px-3 py-1.5 disabled:opacity-40 rounded-lg text-[9px] font-bold uppercase transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
+                          d 
+                            ? 'bg-rose-955/20 border border-rose-900/30 text-rose-400 hover:bg-rose-600 hover:text-white hover:border-rose-600' 
+                            : 'bg-rose-50 border border-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500'
+                        }`}
                       >
                         Gỡ bỏ
                       </button>
@@ -221,8 +265,10 @@ export default function UserManager({
 
       {/* New account registration Modal overlay */}
       {isNewUsrFormOpen && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-[6px] z-[120] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2rem] border border-gray-200 p-8 max-w-md w-full relative shadow-2xl font-sans text-left">
+        <div className="fixed inset-0 bg-slate-955/40 backdrop-blur-[6px] z-[120] flex items-center justify-center p-4">
+          <div className={`rounded-[2rem] p-8 max-w-md w-full relative shadow-2xl font-sans text-left border transition-all duration-300 ${
+            d ? 'bg-[#161b22] border-[#30363d] text-white shadow-black/40' : 'bg-white border-gray-200 shadow-2xl'
+          }`}>
             
             <button
               type="button"
@@ -232,7 +278,7 @@ export default function UserManager({
               <X size={14} />
             </button>
 
-            <h3 className="text-lg font-black text-gray-950 uppercase tracking-tight mb-4">
+            <h3 className={`text-lg font-black uppercase tracking-tight mb-4 ${d ? 'text-white' : 'text-gray-955'}`}>
               Cấp tài khoản TechVie ID mới
             </h3>
 
@@ -245,7 +291,11 @@ export default function UserManager({
                   value={newUsrName}
                   onChange={(e) => setNewUsrName(e.target.value)}
                   placeholder="Nguyễn Văn A"
-                  className="w-full bg-slate-50 border border-gray-200 focus:border-black focus:bg-white rounded-xl px-4 py-2.5 outline-none text-xs font-semibold"
+                  className={`w-full rounded-xl px-4 py-2.5 outline-none text-xs font-semibold transition-all border ${
+                    d 
+                      ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:border-indigo-500 placeholder-gray-500' 
+                      : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905 placeholder-gray-400'
+                  }`}
                 />
               </div>
 
@@ -257,7 +307,11 @@ export default function UserManager({
                   value={newUsrEmail}
                   onChange={(e) => setNewUsrEmail(e.target.value)}
                   placeholder="mail@techvie.com"
-                  className="w-full bg-slate-50 border border-gray-200 focus:border-black focus:bg-white rounded-xl px-4 py-2.5 outline-none text-xs font-semibold"
+                  className={`w-full rounded-xl px-4 py-2.5 outline-none text-xs font-semibold transition-all border ${
+                    d 
+                      ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:border-indigo-500 placeholder-gray-500' 
+                      : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905 placeholder-gray-400'
+                  }`}
                 />
               </div>
 
@@ -268,7 +322,11 @@ export default function UserManager({
                   value={newUsrPhone}
                   onChange={(e) => setNewUsrPhone(e.target.value)}
                   placeholder="0912 345 678"
-                  className="w-full bg-slate-50 border border-gray-200 focus:border-black focus:bg-white rounded-xl px-4 py-2.5 outline-none text-xs font-semibold"
+                  className={`w-full rounded-xl px-4 py-2.5 outline-none text-xs font-semibold transition-all border ${
+                    d 
+                      ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:border-indigo-500 placeholder-gray-500' 
+                      : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905 placeholder-gray-400'
+                  }`}
                 />
               </div>
 
@@ -278,7 +336,11 @@ export default function UserManager({
                   <select
                     value={newUsrRole}
                     onChange={(e) => setNewUsrRole(e.target.value as 'user' | 'admin')}
-                    className="w-full bg-slate-50 border border-gray-200 focus:border-black focus:bg-white rounded-xl px-3 py-2 outline-none text-xs font-semibold"
+                    className={`w-full rounded-xl px-3 py-2 outline-none text-xs font-semibold transition-all border ${
+                      d 
+                        ? 'bg-[#161b22] border-[#30363d] text-white focus:border-indigo-500' 
+                        : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905'
+                    }`}
                   >
                     <option value="user">Standard User</option>
                     <option value="admin">Administrator</option>
@@ -290,7 +352,11 @@ export default function UserManager({
                   <select
                     value={newUsrVip}
                     onChange={(e) => setNewUsrVip(e.target.value as 'Normal' | 'Premium')}
-                    className="w-full bg-slate-50 border border-gray-200 focus:border-black focus:bg-white rounded-xl px-3 py-2 outline-none text-xs font-semibold"
+                    className={`w-full rounded-xl px-3 py-2 outline-none text-xs font-semibold transition-all border ${
+                      d 
+                        ? 'bg-[#161b22] border-[#30363d] text-white focus:border-indigo-500' 
+                        : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905'
+                    }`}
                   >
                     <option value="Normal">Normal</option>
                     <option value="Premium">Premium VIP</option>
@@ -300,7 +366,9 @@ export default function UserManager({
 
               <button
                 type="submit"
-                className="w-full mt-4 py-3.5 bg-black hover:bg-slate-900 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow active:scale-95 cursor-pointer text-center"
+                className={`w-full mt-4 py-3.5 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow active:scale-95 cursor-pointer text-center ${
+                  d ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-black hover:bg-slate-900'
+                }`}
               >
                 Cấp tài khoản
               </button>

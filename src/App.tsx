@@ -571,6 +571,7 @@ export default function App() {
                 onRemoveItem={handleRemoveItem}
                 onClearCart={handleClearCart}
                 isLoggedIn={isLoggedIn}
+                userProfile={userProfile}
                 onNavigate={(tab) => {
                   setActiveTab(tab);
                   window.scrollTo({ top: 0, behavior: "smooth" });

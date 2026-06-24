@@ -484,6 +484,7 @@ export default function AdminPage({
               onOpenCreateForm={openCreateForm}
               onOpenEditForm={openEditForm}
               onDelete={handleDelete}
+              isDarkMode={isDarkMode}
             />
           )}
 
@@ -504,6 +505,7 @@ export default function AdminPage({
               messages={messages}
               isLoadingMessages={isLoadingMessages}
               onRefreshMessages={fetchMessages}
+              isDarkMode={isDarkMode}
             />
           )}
 
@@ -533,6 +535,7 @@ export default function AdminPage({
             onClose={() => { setIsFormOpen(false); setEditingProduct(null); }}
             editingProduct={editingProduct}
             onSave={handleSaveProduct}
+            isDarkMode={isDarkMode}
           />
         </div>
       </main>

@@ -456,5 +456,24 @@ export async function getSearchHistory(): Promise<{ success: boolean; history: s
   }
 }
 
+// Đổi mật khẩu thành viên (Change Password)
+export async function changePassword(payload: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/change-password', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    return { success: data.success, message: data.message || 'Thao tác hoàn tất!' };
+  } catch (error) {
+    console.error('Lỗi khi đổi mật khẩu:', error);
+    return { success: false, message: 'Không thể kết nối đến máy chủ trực tuyến.' };
+  }
+}
+
 
 

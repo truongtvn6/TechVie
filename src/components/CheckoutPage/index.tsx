@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem } from '../../types';
 import { submitCheckoutOrder } from '../../services/api';
@@ -15,6 +15,7 @@ interface CheckoutPageProps {
   onClearCart: () => void;
   onNavigate: (tab: any) => void;
   isLoggedIn?: boolean;
+  userProfile?: any;
 }
 
 type PaymentMethodType = 'bank' | 'card' | 'cod';
@@ -24,7 +25,8 @@ export default function CheckoutPage({
   cart,
   onClearCart,
   onNavigate,
-  isLoggedIn = false
+  isLoggedIn = false,
+  userProfile
 }: CheckoutPageProps) {
   const [showGuestNotice, setShowGuestNotice] = useState(!isLoggedIn);
   // Steps: 'form' | 'processing' | 'success'
@@ -34,12 +36,22 @@ export default function CheckoutPage({
   const [serverOrderId, setServerOrderId] = useState<number | null>(null);
   const [apiError, setApiError] = useState<string>('');
   
-  // Checkout Input States
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [address, setAddress] = useState('');
+  // Checkout Input States initialized from userProfile if available
+  const [fullName, setFullName] = useState(userProfile?.name || '');
+  const [phone, setPhone] = useState(userProfile?.phone || '');
+  const [email, setEmail] = useState(userProfile?.email || '');
+  const [address, setAddress] = useState(userProfile?.address || '');
   const [notes, setNotes] = useState('');
+
+  // Keep the inputs in sync with user profile changes (e.g. after editing in TabProfile)
+  useEffect(() => {
+    if (userProfile) {
+      if (userProfile.name) setFullName(userProfile.name);
+      if (userProfile.phone) setPhone(userProfile.phone);
+      if (userProfile.email) setEmail(userProfile.email);
+      if (userProfile.address) setAddress(userProfile.address);
+    }
+  }, [userProfile]);
   
   // Promo code
   const [promoCode, setPromoCode] = useState('');
