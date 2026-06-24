@@ -44,7 +44,7 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/40 backdrop-blur-[12px] z-[60]"
+            className="fixed inset-0 bg-white/20 backdrop-blur-[12px] z-[60]"
           />
 
           {/* 70% Width Slide-out Panel from the left as described in Viet mockup */}
@@ -53,7 +53,7 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="fixed top-0 left-0 bottom-0 z-[70] w-[85vw] md:w-[70vw] bg-white/30 backdrop-blur-[80px] saturate-[200%] border-r border-white/20 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.15)] overflow-hidden"
+            className="fixed top-0 left-0 bottom-0 z-[70] w-[85vw] md:w-[70vw] bg-white/50 backdrop-blur-[90px] saturate-[200%] border-r border-white/20 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.15)] overflow-hidden"
           >
             {/* Header */}
             <div className="p-8 md:p-14 flex justify-between items-center border-b border-black/5">
@@ -98,7 +98,7 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
               {searchQuery.trim() === '' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <section>
-                    <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-black/40 mb-4 border-b border-black/5 pb-2">
+                    <h3 className="text-[16px] uppercase font-bold tracking-[0.2em] text-black/40 mb-4 border-b border-black/5 pb-2">
                       Tìm kiếm phổ biến
                     </h3>
                     <ul className="space-y-3">
@@ -106,7 +106,7 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
                         <li key={idx}>
                           <button 
                             onClick={() => setSearchQuery(p)}
-                            className="font-sans text-base text-gray-700 hover:text-indigo-600 transition-colors block text-left font-semibold"
+                            className="font-sans text-sm text-black/60 hover:text-black transition-colors block text-left hover:font-bold font-medium cursor-pointer"
                           >
                             {p}
                           </button>
@@ -116,7 +116,7 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
                   </section>
 
                   <section>
-                    <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-black/40 mb-4 border-b border-black/5 pb-2">
+                    <h3 className="text-[16px] uppercase font-bold tracking-[0.2em] text-black/40 mb-4 border-b border-black/5 pb-2">
                       Lịch sử tìm kiếm
                     </h3>
                     <ul className="space-y-3">
@@ -124,9 +124,9 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
                         <li key={idx}>
                           <button 
                             onClick={() => setSearchQuery(h)}
-                            className="font-sans text-xs text-gray-500 hover:text-black flex items-center gap-2"
+                            className="font-sans text-sm text-black/60 hover:text-black flex items-center gap-2 hover:font-bold font-medium cursor-pointer"
                           >
-                            <History size={12} />
+                            <History size={16} />
                             {h}
                           </button>
                         </li>
@@ -137,7 +137,7 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
               ) : (
                 /* Search Results display */
                 <section>
-                  <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-black/40 mb-6 border-b border-black/5 pb-2">
+                  <h3 className="text-[16px] uppercase font-bold tracking-[0.2em] text-black/40 mb-6 border-b border-black/5 pb-2">
                     Kết quả tìm thấy ({filteredProducts.length})
                   </h3>
 
@@ -193,7 +193,7 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
 
               {/* Recommended hardware item shortcut blocks */}
               <section className="pt-6 border-t border-black/5">
-                <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-black/40 mb-6">
+                <h3 className="text-[16px] uppercase font-bold tracking-[0.2em] text-black/40 mb-6">
                   Gợi ý thêm sản phẩm
                 </h3>
 
