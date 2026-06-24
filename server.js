@@ -13,6 +13,7 @@ const userRoutes = require("./routes/userRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
+const searchRoutes = require("./routes/searchRoutes");
 const Category = require("./models/Category");
 
 const app = express();
@@ -101,6 +102,9 @@ app.use("/api/orders", orderRoutes);
 
 // 12. Định nghĩa API Checkout Routes
 app.use("/api/checkout", checkoutRoutes);
+
+// 13. Định nghĩa API Search Logs (Phổ biến & Lịch sử)
+app.use("/api/search", searchRoutes);
 
 // Endpoint GET /api/hero-images truy xuất ảnh từ thư mục wallpaper-slideshow-for-homePage trên Cloudinary
 app.get("/api/hero-images", async (req, res) => {

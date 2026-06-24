@@ -17,10 +17,45 @@ const getPublicIdFromUrl = (url) => {
 };
 
 const productController = {
-  // 1. Lấy danh sách sản phẩm
+  // 1. Lấy danh sách sản phẩm (Hỗ trợ tìm kiếm thông qua query parameter 'search')
   getProducts: async (req, res) => {
     try {
-      const products = await Product.find({});
+      const { search } = req.query;
+      let query = {};
+      
+      if (search) {
+        const searchRegex = new RegExp(search.trim(), "i");
+        query = {
+          $or: [
+            { name: searchRegex },
+            { category: searchRegex },
+            { description: searchRegex }
+          ]
+        };
+
+        // Ghi log tìm kiếm để tính phổ biến & lịch sử gần đây
+        try {
+          let userId = null;
+          const authHeader = req.headers.authorization;
+          if (authHeader && authHeader.startsWith("Bearer ")) {
+            const token = authHeader.split(" ")[1];
+            const jwt = require("jsonwebtoken");
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || "techvie_jwt_secret_key_2026");
+            userId = decoded.id || decoded.email || null;
+          }
+          
+          const SearchLog = require("../models/SearchLog");
+          await SearchLog.create({
+            query: search.trim(),
+            userId: userId,
+            ip: req.ip || req.connection.remoteAddress
+          });
+        } catch (logErr) {
+          console.error("Lỗi ghi log tìm kiếm:", logErr);
+        }
+      }
+      
+      const products = await Product.find(query);
       return res.status(200).json(products);
     } catch (error) {
       console.error("Lỗi lấy danh sách sản phẩm:", error);
