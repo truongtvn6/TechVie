@@ -7,20 +7,8 @@ import {
   seedDummyOrder,
   clearAllOrdersFromServer
 } from '../../services/api';
-import { 
-  BarChart3, 
-  Sparkles,
-  Plus,
-  Package,
-  Trash2,
-  ShoppingBag,
-  MessageSquare,
-  ArrowLeft,
-  Ticket,
-  Users,
-  Sun,
-  Moon
-} from 'lucide-react';
+import { Plus, Package, Trash2 } from 'lucide-react';
+import AdminSidebar from './AdminSidebar';
 
 // Sub-components imports
 import DashboardStats from './DashboardStats';
@@ -366,6 +354,7 @@ export default function AdminPage({
       email: `${names[idx].toLowerCase().replace(/\s/g, '')}@gmail.com`,
       address: addresses[idx],
       notes: "Yêu cầu giao hàng nguyên seal, hỗ trợ kỹ thuật tận nơi.",
+      paymentMethod: "cod",
       deliveryMethod: "express",
       cart: [{ product: item, quantity: qty }],
       finalTotal: `${finalTotalNum.toLocaleString('vi-VN')}₫`
@@ -384,162 +373,24 @@ export default function AdminPage({
   };
 
   return (
-    <div className={`min-h-screen w-full flex flex-col md:flex-row admin-dashboard-root ${isDarkMode ? 'dark' : ''}`}>
-      {/* Left Sidebar */}
-      <aside className="w-full md:w-64 lg:w-72 xl:w-80 bg-white border-b md:border-b-0 md:border-r border-gray-200 flex flex-col justify-between md:sticky md:top-0 md:h-screen p-6 md:p-8 shrink-0 z-40">
-        <div className="space-y-8">
-          {/* Brand/TechVie admin identity */}
-          <div>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#6366f1] font-extrabold mb-1.5 block">
-              SYSTEM CONSOLE
-            </span>
-            <div className="flex items-center gap-2">
-              <BarChart3 className="text-black shrink-0" size={24} />
-              <h1 className="text-xl font-black text-gray-955 uppercase tracking-tighter">
-                TECHVIE ADMIN
-              </h1>
-            </div>
-            <div className="mt-3 flex items-center gap-2.5">
-              <div className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 rounded-full px-3 py-1 w-fit">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[9px] text-indigo-700 font-extrabold uppercase tracking-wider font-mono">
-                  Quản trị viên
-                </span>
-              </div>
-              {/* Premium Theme Switcher Button */}
-              <button 
-                type="button"
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer flex items-center justify-center border border-gray-200"
-                title={isDarkMode ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
-              >
-                {isDarkMode ? <Sun size={13} className="text-amber-550" /> : <Moon size={13} className="text-indigo-600" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Subtabs Menu */}
-          <div className="space-y-1.5">
-            <span className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest font-sans mb-3">
-              DANH MỤC QUẢN LÝ
-            </span>
-            
-            <button
-              onClick={() => { setActiveSubTab('overview'); fetchOrders(); fetchMessages(); }}
-              className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                activeSubTab === 'overview' 
-                  ? 'bg-black text-white shadow-md shadow-black/10' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-black'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <BarChart3 size={15} />
-                <span>Tổng quan</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => setActiveSubTab('products')}
-              className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                activeSubTab === 'products' 
-                  ? 'bg-black text-white shadow-md shadow-black/10' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-black'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <Package size={15} />
-                <span>Sản phẩm</span>
-              </div>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${activeSubTab === 'products' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'}`}>
-                {products.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => { setActiveSubTab('orders'); fetchOrders(); }}
-              className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                activeSubTab === 'orders' 
-                  ? 'bg-black text-white shadow-md shadow-black/10' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-black'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <ShoppingBag size={15} />
-                <span>Đơn hàng</span>
-              </div>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${activeSubTab === 'orders' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'}`}>
-                {orders.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => { setActiveSubTab('messages'); fetchMessages(); }}
-              className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                activeSubTab === 'messages' 
-                  ? 'bg-black text-white shadow-md shadow-black/10' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-black'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <MessageSquare size={15} />
-                <span>Khách hàng</span>
-              </div>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${activeSubTab === 'messages' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'}`}>
-                {messages.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => { setActiveSubTab('promos'); }}
-              className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                activeSubTab === 'promos' 
-                  ? 'bg-black text-white shadow-md shadow-black/10' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-black'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <Ticket size={15} />
-                <span>Khuyến mãi</span>
-              </div>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${activeSubTab === 'promos' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'}`}>
-                {promos.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => { setActiveSubTab('users'); }}
-              className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                activeSubTab === 'users' 
-                  ? 'bg-black text-white shadow-md shadow-black/10' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-black'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <Users size={15} />
-                <span>Thành viên</span>
-              </div>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${activeSubTab === 'users' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'}`}>
-                {systemUsers.length}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Bottom actions block inside sidebar */}
-        <div className="pt-6 border-t border-gray-100 mt-6 md:mt-0 space-y-3">
-          <button
-            onClick={() => onNavigate('home')}
-            className="group w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-black/5 hover:bg-black text-gray-900 hover:text-white border border-black/10 hover:border-black transition-all text-[11px] font-black uppercase tracking-wider active:scale-95 cursor-pointer shadow-sm font-sans"
-          >
-            <ArrowLeft size={13} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
-            <span>Trang chủ TechVie</span>
-          </button>
-
-          <div className="text-[10px] text-center text-gray-400 font-mono">
-            v1.0.0 ● Live Production
-          </div>
-        </div>
-      </aside>
+    <div className={`admin-dashboard-root min-h-screen bg-[#f7f9fb] text-gray-900 w-full flex flex-col md:flex-row ${isDarkMode ? 'dark' : ''}`}>
+      {/* Left Sidebar (Decoupled modular component) */}
+      <AdminSidebar
+        activeSubTab={activeSubTab}
+        setActiveSubTab={(tab) => {
+          setActiveSubTab(tab);
+          if (tab === 'overview' || tab === 'orders') fetchOrders();
+          if (tab === 'overview' || tab === 'messages') fetchMessages();
+        }}
+        isDarkMode={isDarkMode}
+        setIsDarkMode={setIsDarkMode}
+        productsCount={products.length}
+        ordersCount={orders.length}
+        messagesCount={messages.length}
+        promosCount={promos.length}
+        usersCount={systemUsers.length}
+        onNavigate={onNavigate}
+      />
 
       {/* Main Content Pane */}
       <main className="flex-1 min-w-0 p-6 md:p-10 lg:p-12">
@@ -643,6 +494,8 @@ export default function AdminPage({
               onRefreshOrders={fetchOrders}
               onSeedOrder={handleSeedOrders}
               onUpdateOrderStatus={handleUpdateOrderStatus}
+              isDarkMode={isDarkMode}
+              products={products}
             />
           )}
 

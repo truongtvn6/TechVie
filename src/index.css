@@ -82,8 +82,8 @@ body::-webkit-scrollbar {
 
 /* Sidebar aside element styling */
 .admin-dashboard-root.dark aside {
-  background-color: #161b22 !important; /* slate-900 */
-  border-color: #30363d !important; /* slate-800 */
+  background-color: transparent !important; /* Let the glassmorphic background layer show through */
+  border-color: rgba(255, 255, 255, 0.08) !important; /* Soft border matching liquid glass */
 }
 
 .admin-dashboard-root.dark aside h1,
@@ -215,4 +215,111 @@ body::-webkit-scrollbar {
   border-radius: 8px;
   padding: 6px;
 }
+
+/* --- Contact Page Special Custom Submit Button --- */
+.contact-submit-btn {
+  position: relative;
+  text-decoration: none;
+  color: #e8e8e8;
+  padding: 15px 30px;
+  width: 100%;
+  height: 60px;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  overflow: hidden;
+  background: #000000; /* normal black before hover */
+  transition: all 0.3s cubic-bezier(0.215, 0.610, 0.355, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-submit-btn span {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* On hover, background becomes purple gradient */
+.contact-submit-btn:hover {
+  background: linear-gradient(-45deg, #6366f1 0%, #a855f7 100%) !important; /* Purple gradient (after) */
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.4), 0 0 30px rgba(168, 85, 247, 0.4);
+}
+
+/* Border outlines expanding on hover */
+.contact-submit-btn::before,
+.contact-submit-btn::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.215, 0.610, 0.355, 1);
+}
+
+.contact-submit-btn::before {
+  top: 0;
+  left: 0;
+  border-top: 2px solid #e8e8e8;
+  border-left: 2px solid #e8e8e8;
+}
+
+.contact-submit-btn::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 2px solid #e8e8e8;
+  border-right: 2px solid #e8e8e8;
+}
+
+.contact-submit-btn:hover::before,
+.contact-submit-btn:hover::after {
+  width: 100%;
+  height: 100%;
+}
+
+.contact-submit-btn:active {
+  scale: 0.97;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4), 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+/* Slide text animation as requested by user */
+.contact-submit-btn-text-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.contact-submit-btn-text-normal,
+.contact-submit-btn-text-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.215, 0.610, 0.355, 1);
+}
+
+.contact-submit-btn-text-hover {
+  top: -100%;
+}
+
+.contact-submit-btn:hover .contact-submit-btn-text-normal {
+  top: 100%;
+}
+
+.contact-submit-btn:hover .contact-submit-btn-text-hover {
+  top: 0%;
+}
+
 

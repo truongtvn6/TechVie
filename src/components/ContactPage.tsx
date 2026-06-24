@@ -272,10 +272,18 @@ export default function ContactPage() {
                     <button 
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-black text-white hover:bg-gray-900 disabled:bg-gray-700 disabled:cursor-not-allowed py-6 text-xs uppercase tracking-[0.4em] font-black transition-all flex items-center justify-center gap-3 shadow-md active:scale-[0.98]"
+                      className="contact-submit-btn"
                     >
-                      <span>{isSubmitting ? 'ĐANG GỬI THƯ...' : 'GỬI THƯ YÊU CẦU HỢP TÁC'}</span>
-                      {!isSubmitting && <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />}
+                      <div className="contact-submit-btn-text-wrapper">
+                        <div className="contact-submit-btn-text-normal">
+                          <span>{isSubmitting ? 'ĐANG GỬI THƯ...' : 'GỬI THƯ YÊU CẦU HỢP TÁC'}</span>
+                          {!isSubmitting && <ArrowRight size={14} />}
+                        </div>
+                        <div className="contact-submit-btn-text-hover">
+                          <span>{isSubmitting ? 'ĐANG GỬI THƯ...' : 'TIẾP CẬN TECHVIE NGAY!'}</span>
+                          {!isSubmitting && <ArrowRight size={14} />}
+                        </div>
+                      </div>
                     </button>
                   </motion.form>
                 ) : (

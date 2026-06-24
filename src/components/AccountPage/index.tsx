@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   User, 
@@ -37,6 +37,18 @@ export default function AccountPage({
 }: AccountPageProps) {
   const [localIsLoggedIn, localSetIsLoggedIn] = useState(false);
   const isLoggedIn = externalIsLoggedIn !== undefined ? externalIsLoggedIn : localIsLoggedIn;
+  
+  // Dynamic background URL state with online Unsplash fallback
+  const [bgUrl, setBgUrl] = useState<string>(backgroundImage);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = backgroundImage;
+    img.onerror = () => {
+      console.warn("Local background image failed to load, falling back to online Unsplash URL.");
+      setBgUrl("https://images.unsplash.com/photo-1616440347437-b1c73416efc2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    };
+  }, []);
   const setIsLoggedIn = externalSetIsLoggedIn !== undefined ? externalSetIsLoggedIn : localSetIsLoggedIn;
   
   // Login input states
@@ -255,7 +267,7 @@ export default function AccountPage({
       {/* Fixed Background Layer */}
       <div 
         className="fixed inset-0 z-0 bg-cover bg-center" 
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        style={{ backgroundImage: `url(${bgUrl})` }}
       />
       {/* Atmospheric Blur Overlay for Text Legibility */}
       <div className="fixed inset-0 z-0 bg-white/40 backdrop-blur-[10px]" />

@@ -1,0 +1,270 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  BarChart3, 
+  Package, 
+  ShoppingBag, 
+  MessageSquare, 
+  Ticket, 
+  Users, 
+  ArrowLeft, 
+  Sun, 
+  Moon 
+} from 'lucide-react';
+
+// @ts-ignore
+import localLightBg from '/image/aleksandra-dementeva-aWBPQHfPwVM-unsplash.jpg';
+// @ts-ignore
+import localDarkBg from '/image/long-chung-uaVvEOCrq8s-unsplash.jpg';
+
+interface AdminSidebarProps {
+  activeSubTab: 'overview' | 'products' | 'orders' | 'messages' | 'promos' | 'users';
+  setActiveSubTab: (tab: 'overview' | 'products' | 'orders' | 'messages' | 'promos' | 'users') => void;
+  isDarkMode: boolean;
+  setIsDarkMode: (val: boolean) => void;
+  productsCount: number;
+  ordersCount: number;
+  messagesCount: number;
+  promosCount: number;
+  usersCount: number;
+  onNavigate: (tab: any) => void;
+}
+
+export default function AdminSidebar({
+  activeSubTab,
+  setActiveSubTab,
+  isDarkMode,
+  setIsDarkMode,
+  productsCount,
+  ordersCount,
+  messagesCount,
+  promosCount,
+  usersCount,
+  onNavigate
+}: AdminSidebarProps) {
+  const [lightBgUrl, setLightBgUrl] = useState<string>(localLightBg);
+  const [darkBgUrl, setDarkBgUrl] = useState<string>(localDarkBg);
+
+  useEffect(() => {
+    const imgLight = new Image();
+    imgLight.src = localLightBg;
+    imgLight.onerror = () => {
+      console.warn("Local light background image failed to load, falling back to online Unsplash URL.");
+      setLightBgUrl("https://images.unsplash.com/photo-1758974643303-df01b895e6a7?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    };
+
+    const imgDark = new Image();
+    imgDark.src = localDarkBg;
+    imgDark.onerror = () => {
+      console.warn("Local dark background image failed to load, falling back to online Unsplash URL.");
+      setDarkBgUrl("https://images.unsplash.com/photo-1781413013976-e29dfd794b36?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    };
+  }, []);
+
+  return (
+    <aside className="relative w-full md:w-64 lg:w-72 xl:w-80 bg-transparent border-b md:border-b-0 md:border-r border-gray-250/20 flex flex-col justify-between md:sticky md:top-0 md:h-screen p-6 md:p-8 shrink-0 z-40 overflow-hidden">
+      {/* Liquid Glass Background Image Layer */}
+      <div 
+        className="absolute inset-0 -z-10 transition-all duration-500 scale-100"
+        style={{ 
+          backgroundImage: `url(${isDarkMode ? darkBgUrl : lightBgUrl})`, 
+          backgroundSize: 'cover', 
+          backgroundPosition: 'center',
+        }}
+      />
+      {/* Glassmorphic Tint Mask Overlay */}
+      <div className={`absolute inset-0 -z-10 backdrop-blur-[8px] -webkit-backdrop-blur-[8px] transition-all duration-500 ${
+        isDarkMode 
+          ? 'bg-black/45 border-r border-white/10' 
+          : 'bg-white/50 border-r border-black/5'
+      }`} />
+
+      {/* Content Wrapper */}
+      <div className="space-y-8 relative z-10">
+        {/* Brand/TechVie admin identity */}
+        <div>
+          <span className="text-[10px] uppercase tracking-[0.3em] text-[#6366f1] font-extrabold mb-1.5 block">
+            SYSTEM CONSOLE
+          </span>
+          <div className="flex items-center gap-2">
+            <BarChart3 className={isDarkMode ? "text-white shrink-0" : "text-black shrink-0"} size={24} />
+            <h1 className={`text-xl font-black uppercase tracking-tighter ${isDarkMode ? 'text-white' : 'text-gray-950'}`}>
+              TECHVIE ADMIN
+            </h1>
+          </div>
+          <div className="mt-3 flex items-center gap-2.5">
+            <div className={`flex items-center gap-1.5 border rounded-full px-3 py-1 w-fit ${
+              isDarkMode 
+                ? 'bg-indigo-950/40 border-indigo-900/55 text-indigo-300' 
+                : 'bg-indigo-50 border-indigo-100 text-indigo-700'
+            }`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[9px] font-extrabold uppercase tracking-wider font-mono">
+                Quản trị viên
+              </span>
+            </div>
+            {/* Premium Theme Switcher Button */}
+            <button 
+              type="button"
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer flex items-center justify-center border ${
+                isDarkMode 
+                  ? 'bg-white/10 hover:bg-white/20 border-white/10 text-white' 
+                  : 'bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-700'
+              }`}
+              title={isDarkMode ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
+            >
+              {isDarkMode ? <Sun size={13} className="text-amber-400" /> : <Moon size={13} className="text-indigo-600" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Subtabs Menu */}
+        <div className="space-y-1.5">
+          <span className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest font-sans mb-3">
+            DANH MỤC QUẢN LÝ
+          </span>
+          
+          <button
+            onClick={() => setActiveSubTab('overview')}
+            className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+              activeSubTab === 'overview' 
+                ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
+                : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-550 hover:bg-gray-50 hover:text-black')
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <BarChart3 size={15} />
+              <span>Tổng quan</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('products')}
+            className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+              activeSubTab === 'products' 
+                ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
+                : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-550 hover:bg-gray-50 hover:text-black')
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Package size={15} />
+              <span>Sản phẩm</span>
+            </div>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+              activeSubTab === 'products' 
+                ? (isDarkMode ? 'bg-black/10 text-black' : 'bg-white/20 text-white') 
+                : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-605')
+            }`}>
+              {productsCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('orders')}
+            className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+              activeSubTab === 'orders' 
+                ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
+                : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-550 hover:bg-gray-50 hover:text-black')
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <ShoppingBag size={15} />
+              <span>Đơn hàng</span>
+            </div>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+              activeSubTab === 'orders' 
+                ? (isDarkMode ? 'bg-black/10 text-black' : 'bg-white/20 text-white') 
+                : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-605')
+            }`}>
+              {ordersCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('messages')}
+            className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+              activeSubTab === 'messages' 
+                ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
+                : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-550 hover:bg-gray-50 hover:text-black')
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <MessageSquare size={15} />
+              <span>Khách hàng</span>
+            </div>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+              activeSubTab === 'messages' 
+                ? (isDarkMode ? 'bg-black/10 text-black' : 'bg-white/20 text-white') 
+                : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-605')
+            }`}>
+              {messagesCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('promos')}
+            className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+              activeSubTab === 'promos' 
+                ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
+                : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-550 hover:bg-gray-50 hover:text-black')
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Ticket size={15} />
+              <span>Khuyến mãi</span>
+            </div>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+              activeSubTab === 'promos' 
+                ? (isDarkMode ? 'bg-black/10 text-black' : 'bg-white/20 text-white') 
+                : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-605')
+            }`}>
+              {promosCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('users')}
+            className={`w-full flex items-center justify-between py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+              activeSubTab === 'users' 
+                ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
+                : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-550 hover:bg-gray-50 hover:text-black')
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Users size={15} />
+              <span>Thành viên</span>
+            </div>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+              activeSubTab === 'users' 
+                ? (isDarkMode ? 'bg-black/10 text-black' : 'bg-white/20 text-white') 
+                : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-605')
+            }`}>
+              {usersCount}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom actions block inside sidebar */}
+      <div className={`pt-6 border-t mt-6 md:mt-0 space-y-3 font-sans relative z-10 ${
+        isDarkMode ? 'border-white/10' : 'border-gray-200/50'
+      }`}>
+        <button
+          onClick={() => onNavigate('home')}
+          className={`group w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl transition-all text-[11px] font-black uppercase tracking-wider active:scale-95 cursor-pointer shadow-sm ${
+            isDarkMode 
+              ? 'bg-white/5 hover:bg-white border border-white/10 hover:border-white text-white hover:text-black' 
+              : 'bg-black/5 hover:bg-black text-gray-900 hover:text-white border border-black/10 hover:border-black'
+          }`}
+        >
+          <ArrowLeft size={13} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
+          <span>Trang chủ TechVie</span>
+        </button>
+
+        <div className="text-[10px] text-center text-gray-400 font-mono">
+          v1.0.0 ● Live Production
+        </div>
+      </div>
+    </aside>
+  );
+}
