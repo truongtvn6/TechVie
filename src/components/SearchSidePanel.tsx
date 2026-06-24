@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, TabType } from '../types';
-import { Search, X, History, Grid2X2 } from 'lucide-react';
+import { Search, X, History, Grid2X2, Loader2 } from 'lucide-react';
+import { getProducts, getPopularSearches, getSearchHistory } from '../services/api';
 
 interface SearchSidePanelProps {
   isOpen: boolean;
@@ -13,26 +14,66 @@ interface SearchSidePanelProps {
 
 export default function SearchSidePanel({ isOpen, onClose, products, onNavigate, onAddToCart }: SearchSidePanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [popularSearches] = useState([
-    'Giao diện Prism-1',
-    'Cảm biến Flux',
-    'Thủy tinh lỏng',
-    'Hệ thống v2.0'
-  ]);
-  const [searchHistory] = useState([
-    'Core v2',
-    'Lab Update'
-  ]);
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [popularSearches, setPopularSearches] = useState<string[]>([]);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const allProducts = products || [];
 
-  const filteredProducts = searchQuery.trim() === ''
-    ? []
-    : allProducts.filter(p => 
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  // Load popular searches and search history from backend when panel is opened
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const loadData = async () => {
+      try {
+        const [popRes, histRes] = await Promise.all([
+          getPopularSearches(),
+          getSearchHistory()
+        ]);
+        if (popRes.success) setPopularSearches(popRes.popular);
+        if (histRes.success) setSearchHistory(histRes.history);
+      } catch (err) {
+        console.error("Lỗi tải lịch sử/phổ biến từ backend:", err);
+      }
+    };
+
+    loadData();
+  }, [isOpen]);
+
+  // Effect to query backend for search results with 300ms debounce
+  useEffect(() => {
+    if (!isOpen) return;
+    if (searchQuery.trim() === '') {
+      setSearchResults([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    const delayDebounce = setTimeout(async () => {
+      try {
+        const res = await getProducts(searchQuery);
+        if (res.success) {
+          setSearchResults(res.products);
+          
+          // Tự động tải lại lịch sử tìm kiếm từ backend để phản ánh từ khóa vừa tìm
+          const histRes = await getSearchHistory();
+          if (histRes.success) {
+            setSearchHistory(histRes.history);
+          }
+        }
+      } catch (err) {
+        console.error("Lỗi tìm kiếm từ backend:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery, isOpen]);
+
+  const filteredProducts = searchResults;
 
   return (
     <AnimatePresence>
@@ -44,7 +85,7 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-white/20 backdrop-blur-[12px] z-[60]"
+            className="fixed inset-0 bg-black/30 backdrop-blur-[12px] z-[60]"
           />
 
           {/* 70% Width Slide-out Panel from the left as described in Viet mockup */}
@@ -91,7 +132,11 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
                   </div>
                 )}
                 
-                <Search size={24} className="absolute right-2 top-5 text-black/20 pointer-events-none z-20" />
+                {isLoading ? (
+                  <Loader2 size={24} className="absolute right-2 top-5 text-black/40 animate-spin z-20" />
+                ) : (
+                  <Search size={24} className="absolute right-2 top-5 text-black/20 pointer-events-none z-20" />
+                )}
               </div>
 
               {/* Suggestions panels shown when search is empty */}

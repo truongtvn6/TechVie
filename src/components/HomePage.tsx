@@ -32,11 +32,8 @@ export default function HomePage({
   const [isLoadedFromApi, setIsLoadedFromApi] = useState(false);
 
   const [images, setImages] = useState<string[]>([
-    "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1468436139062-f60a71c5c892?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1771218829829-3f7b00974fa5?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1593640404951-24f6ef605031?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   ]);
 
   // Fetch slider images dynamically from backend express API (port 5000)
@@ -155,7 +152,9 @@ export default function HomePage({
               </h1>
 
               <p className="font-sans text-gray-650 text-md leading-relaxed mb-8 max-w-md text-justify">
-                Khơi nguồn cảm hứng với các combo phụ kiện tiện ích và ốp lưng custom độc quyền. TechVie đồng hành cùng bạn kiến tạo góc làm việc tối giản, bảo vệ sức khỏe và thể hiện cá tính.
+                Khơi nguồn cảm hứng với các combo phụ kiện tiện ích và ốp lưng
+                custom độc quyền. TechVie đồng hành cùng bạn kiến tạo góc làm
+                việc tối giản, bảo vệ sức khỏe và thể hiện cá tính.
               </p>
 
               {/* Specification stats box in vietnamese template */}
@@ -292,7 +291,9 @@ export default function HomePage({
               Nâng Tầm Cảm Xúc Khi Mở Hộp
             </h2>
             <p className="text-gray-650 font-sans text-md leading-relaxed mt-6 mb-8 text-justify">
-              Không chỉ cung cấp phụ kiện, TechVie chú trọng vào trải nghiệm của bạn. Mọi sản phẩm đều được kiểm tra kỹ lưỡng (QC 100%) và đóng gói dưới dạng hộp quà tặng (Gift box) chỉn chu kèm thiệp viết tay.
+              Không chỉ cung cấp phụ kiện, TechVie chú trọng vào trải nghiệm của
+              bạn. Mọi sản phẩm đều được kiểm tra kỹ lưỡng (QC 100%) và đóng gói
+              dưới dạng hộp quà tặng (Gift box) chỉn chu kèm thiệp viết tay.
             </p>
             <div className="flex flex-wrap gap-8 mb-8 border-t border-gray-200 pt-8">
               <div className="flex items-center gap-3">
@@ -304,7 +305,8 @@ export default function HomePage({
                     Đóng Gói Aesthetic
                   </h4>
                   <p className="text-sm text-gray-500 max-w-xs">
-                    Bao bì chống sốc an toàn, thiết kế tối giản, mang lại sự tinh tế ngay từ cái nhìn đầu tiên
+                    Bao bì chống sốc an toàn, thiết kế tối giản, mang lại sự
+                    tinh tế ngay từ cái nhìn đầu tiên
                   </p>
                 </div>
               </div>
@@ -317,7 +319,8 @@ export default function HomePage({
                     Dịch Vụ Custom
                   </h4>
                   <p className="text-sm text-gray-500 max-w-xs">
-                    Hỗ trợ in ấn tên, hình vẽ lên ốp lưng theo yêu cầu để bạn tự do sáng tạo cái tôi độc bản
+                    Hỗ trợ in ấn tên, hình vẽ lên ốp lưng theo yêu cầu để bạn tự
+                    do sáng tạo cái tôi độc bản
                   </p>
                 </div>
               </div>
@@ -352,7 +355,8 @@ export default function HomePage({
               Độc Quyền
             </h2>
             <p className="text-gray-650 font-sans text-md leading-relaxed max-w-md text-justify">
-              Đăng ký email để không bỏ lỡ các mã Freeship, voucher giảm giá và thông tin mới nhất về các bộ sưu tập đồ setup từ TechVie.
+              Đăng ký email để không bỏ lỡ các mã Freeship, voucher giảm giá và
+              thông tin mới nhất về các bộ sưu tập đồ setup từ TechVie.
             </p>
           </div>
 

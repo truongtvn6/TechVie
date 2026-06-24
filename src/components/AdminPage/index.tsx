@@ -17,7 +17,9 @@ import {
   MessageSquare,
   ArrowLeft,
   Ticket,
-  Users
+  Users,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 // Sub-components imports
@@ -57,6 +59,24 @@ export default function AdminPage({
   onToggleUserStatus,
   onDeleteUser
 }: AdminPageProps) {
+  // Persistent Dark Mode state
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('techvie_admin_dark_mode');
+      return saved === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('techvie_admin_dark_mode', String(isDarkMode));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [isDarkMode]);
+
   // Admin active sub tab
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'products' | 'orders' | 'messages' | 'promos' | 'users'>('overview');
 
@@ -346,7 +366,6 @@ export default function AdminPage({
       email: `${names[idx].toLowerCase().replace(/\s/g, '')}@gmail.com`,
       address: addresses[idx],
       notes: "Yêu cầu giao hàng nguyên seal, hỗ trợ kỹ thuật tận nơi.",
-      paymentMethod: "cod",
       deliveryMethod: "express",
       cart: [{ product: item, quantity: qty }],
       finalTotal: `${finalTotalNum.toLocaleString('vi-VN')}₫`
@@ -365,7 +384,7 @@ export default function AdminPage({
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] text-gray-900 w-full flex flex-col md:flex-row">
+    <div className={`min-h-screen w-full flex flex-col md:flex-row admin-dashboard-root ${isDarkMode ? 'dark' : ''}`}>
       {/* Left Sidebar */}
       <aside className="w-full md:w-64 lg:w-72 xl:w-80 bg-white border-b md:border-b-0 md:border-r border-gray-200 flex flex-col justify-between md:sticky md:top-0 md:h-screen p-6 md:p-8 shrink-0 z-40">
         <div className="space-y-8">
@@ -376,15 +395,26 @@ export default function AdminPage({
             </span>
             <div className="flex items-center gap-2">
               <BarChart3 className="text-black shrink-0" size={24} />
-              <h1 className="text-xl font-black text-gray-950 uppercase tracking-tighter">
+              <h1 className="text-xl font-black text-gray-955 uppercase tracking-tighter">
                 TECHVIE ADMIN
               </h1>
             </div>
-            <div className="mt-3 flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 rounded-full px-3 py-1 w-fit">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[9px] text-indigo-700 font-extrabold uppercase tracking-wider font-mono">
-                Quản trị viên
-              </span>
+            <div className="mt-3 flex items-center gap-2.5">
+              <div className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 rounded-full px-3 py-1 w-fit">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[9px] text-indigo-700 font-extrabold uppercase tracking-wider font-mono">
+                  Quản trị viên
+                </span>
+              </div>
+              {/* Premium Theme Switcher Button */}
+              <button 
+                type="button"
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer flex items-center justify-center border border-gray-200"
+                title={isDarkMode ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
+              >
+                {isDarkMode ? <Sun size={13} className="text-amber-550" /> : <Moon size={13} className="text-indigo-600" />}
+              </button>
             </div>
           </div>
 

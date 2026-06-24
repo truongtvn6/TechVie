@@ -12,9 +12,13 @@ import {
   Cpu, 
   Clock,
   QrCode,
-  BadgeCheck
+  BadgeCheck,
+  ArrowRight
 } from 'lucide-react';
 import FloatingAdminButton from './FloatingAdminButton';
+
+// @ts-ignore
+import backgroundImage from '/image/huum-8fSitumSVw8-unsplash.jpg';
 
 interface AccountPageProps {
   onNavigate: (tab: any) => void;
@@ -99,7 +103,7 @@ export default function AccountPage({
       }
       setIsSubmitting(true);
       setTimeout(() => {
-        setUserProfile(prev => ({
+        setUserProfile((prev: any) => ({
           ...prev,
           email: email,
           name: email.split('@')[0].toUpperCase(),
@@ -111,7 +115,7 @@ export default function AccountPage({
       // Register logic
       setIsSubmitting(true);
       setTimeout(() => {
-        setUserProfile(prev => ({
+        setUserProfile((prev: any) => ({
           ...prev,
           email: email,
           name: email.split('@')[0].toUpperCase(),
@@ -128,482 +132,658 @@ export default function AccountPage({
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8 md:py-12">
-      <AnimatePresence mode="wait">
+    <div className="relative min-h-screen w-full font-body-sm text-body-sm overflow-x-hidden selection:bg-black selection:text-white pb-12">
+      {/* Local Liquid Glass Style Definitions */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800;900&family=JetBrains+Mono:wght@700&display=swap');
         
-        {/* CASE 1: USER NOT SIGNED IN AND INVITED TO NEW LIQUID GLASS AUTH */}
-        {!isLoggedIn ? (
-          <motion.div 
-            key="auth-view"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="max-w-md mx-auto text-center font-sans"
-          >
-            <div className="bg-white rounded-3xl border border-gray-200/80 p-8 shadow-[0_12px_45px_rgba(0,0,0,0.03)] space-y-6">
-              <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center mx-auto shadow-md transition-transform hover:rotate-12 duration-300">
-                <Cpu size={28} className="animate-pulse" />
-              </div>
+        .font-tech-label {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          line-height: 1;
+          letter-spacing: 0.15em;
+          font-weight: 700;
+        }
+        .text-tech-label {
+          font-size: 10px;
+          line-height: 1;
+          letter-spacing: 0.15em;
+          font-weight: 700;
+        }
+        .font-headline-md {
+          font-family: 'Hanken Grotesk', sans-serif;
+          font-size: 18px;
+          line-height: 1.3;
+          letter-spacing: 0.05em;
+          font-weight: 800;
+        }
+        .text-headline-md {
+          font-size: 18px;
+          line-height: 1.3;
+          letter-spacing: 0.05em;
+          font-weight: 800;
+        }
+        .font-display-hero {
+          font-family: 'Hanken Grotesk', sans-serif;
+          font-size: 48px;
+          line-height: 1.1;
+          letter-spacing: -0.04em;
+          font-weight: 900;
+        }
+        .text-display-hero {
+          font-size: 48px;
+          line-height: 1.1;
+          letter-spacing: -0.04em;
+          font-weight: 900;
+        }
+        .font-body-lg {
+          font-family: 'Hanken Grotesk', sans-serif;
+          font-size: 16px;
+          line-height: 1.6;
+          font-weight: 400;
+        }
+        .text-body-lg {
+          font-size: 16px;
+          line-height: 1.6;
+          font-weight: 400;
+        }
+        .font-headline-lg {
+          font-family: 'Hanken Grotesk', sans-serif;
+          font-size: 24px;
+          line-height: 1.2;
+          letter-spacing: 0.1em;
+          font-weight: 900;
+        }
+        .text-headline-lg {
+          font-size: 24px;
+          line-height: 1.2;
+          letter-spacing: 0.1em;
+          font-weight: 900;
+        }
+        .font-body-sm {
+          font-family: 'Hanken Grotesk', sans-serif;
+          font-size: 13px;
+          line-height: 1.5;
+          font-weight: 400;
+        }
+        .text-body-sm {
+          font-size: 13px;
+          line-height: 1.5;
+          font-weight: 400;
+        }
+        .font-caption-tiny {
+          font-family: 'Hanken Grotesk', sans-serif;
+          font-size: 9px;
+          line-height: 1;
+          letter-spacing: 0.05em;
+          font-weight: 900;
+        }
+        .text-caption-tiny {
+          font-size: 9px;
+          line-height: 1;
+          letter-spacing: 0.05em;
+          font-weight: 900;
+        }
+        .px-container-margin {
+          padding-left: 2.5rem;
+          padding-right: 2.5rem;
+        }
+        .p-card-padding {
+          padding: 2rem;
+        }
+        .gap-grid-gutter {
+          gap: 1.5rem;
+        }
+        .gap-stack-gap {
+          gap: 1.5rem;
+        }
+        .text-glow-indigo {
+          text-shadow: 0 0 10px rgba(45, 55, 72, 0.2);
+        }
+        .custom-glass-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-glass-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.3);
+        }
+        .custom-glass-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(45, 55, 72, 0.2);
+          border-radius: 9999px;
+        }
+      `}</style>
 
-              <div className="space-y-2">
-                <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase">
-                  YÊU CẦU ĐĂNG NHẬP
-                </h2>
-                <p className="text-xs text-gray-500 max-w-[280px] mx-auto leading-relaxed">
-                  Để xem chi tiết hồ sơ cá nhân, bản kê vận chuyển và lịch sử đơn đặt hàng thiết bị cao cấp của bạn.
-                </p>
-              </div>
-              
-              <div className="flex flex-col gap-3 pt-2">
-                <a
-                  href="#dang-nhap"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('dang-nhap');
-                  }}
-                  className="w-full py-4 bg-black hover:bg-black/90 text-white rounded-xl text-xs uppercase tracking-widest font-black transition-all shadow-md active:scale-95 cursor-pointer block"
-                >
-                  ĐĂNG NHẬP LIQUID GLASS
-                </a>
-                <a
-                  href="#dang-ky"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate('dang-ky');
-                  }}
-                  className="w-full py-4 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-150 rounded-xl text-xs uppercase tracking-widest font-black transition-all active:scale-95 cursor-pointer block"
-                >
-                  ĐĂNG KÝ TÀI KHOẢN MỚI
-                </a>
-              </div>
+      {/* Fixed Background Layer */}
+      <div 
+        className="fixed inset-0 z-0 bg-cover bg-center" 
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      />
+      {/* Atmospheric Blur Overlay for Text Legibility */}
+      <div className="fixed inset-0 z-0 bg-white/40 backdrop-blur-[10px]" />
 
-              {/* Fast automatic mock login for standard testing */}
-              <div className="pt-2 border-t border-gray-100 flex flex-col items-center">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400">Đăng nhập tài khoản mẫu nhanh:</span>
-                <button 
-                  onClick={() => {
-                    setIsLoggedIn(true);
-                  }}
-                  className="mt-2 bg-indigo-50 border border-indigo-100/60 hover:bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-lg text-[9px] font-mono font-bold tracking-wider transition-all"
-                >
-                  Bỏ qua & Đăng nhập nhanh
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ) : (
+      {/* Main Content Layout Container */}
+      <div className="relative z-10 max-w-[1400px] mx-auto px-container-margin py-12 md:py-20 flex items-center justify-center min-h-[85vh]">
+        <AnimatePresence mode="wait">
           
-          /* CASE 2: LOGGED IN USER INTERFACE PORTAL */
-          <motion.div 
-            key="dashboard-view"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12"
-          >
-            {/* Left side: Profile sidebar & navigation list */}
-            <div className="lg:col-span-4 space-y-6">
-              
-              {/* Card 1: User master visual ID card */}
-              <div className="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-sm overflow-hidden relative">
-                
-                {/* Visual decorative lines like tech passport ID */}
-                <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-indigo-500 via-rose-500 to-amber-500" />
-                
-                <div className="flex flex-col items-center text-center space-y-4 pt-2">
-                  <div className="relative">
-                    <div className="w-20 h-20 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                      {/* Generative high-craft visual representation */}
-                      <User size={38} className="text-gray-400" />
-                    </div>
-                    <span className="absolute bottom-0 right-0 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center text-[8px] text-white font-bold" title="TechVie System Verified">
-                      ✓
-                    </span>
-                  </div>
+          {/* CASE 1: USER NOT SIGNED IN (Premium Glass Auth Card) */}
+          {!isLoggedIn ? (
+            <motion.div 
+              key="auth-view"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md mx-auto relative"
+            >
+              <div className="bg-white/85 backdrop-blur-[40px] border border-white/60 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden p-8 space-y-6">
+                {/* Specular Highlight Top Edge */}
+                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-white/80 via-white/50 to-transparent" />
 
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-center gap-1">
-                      <h3 className="font-extrabold text-gray-900 font-sans tracking-tight text-lg">{userProfile.name}</h3>
-                      <BadgeCheck size={16} className="text-indigo-600" />
-                    </div>
-                    <span className="text-[10px] font-mono tracking-widest text-[#9d9ea5] uppercase">
-                      ID: {userProfile.techvieId}
-                    </span>
-                  </div>
-
-                  {/* Visual QR scan code for showroom or checkups */}
-                  <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl flex items-center gap-3 w-full text-left">
-                    <QrCode size={36} className="text-gray-800 flex-shrink-0" />
-                    <div className="min-w-0 flex-grow font-sans text-[10px]">
-                      <span className="block font-bold text-gray-800">Mã Số Showroom TechVie</span>
-                      <p className="text-gray-400 truncate mt-0.5">Quét mã nhận diện thành viên ưu đãi tại showroom mua sắm</p>
-                    </div>
-                  </div>
+                <div className="w-16 h-16 bg-[#2d3748] text-white rounded-2xl flex items-center justify-center mx-auto shadow-md transition-transform hover:rotate-12 duration-300">
+                  <Cpu size={28} className="animate-pulse" />
                 </div>
 
-                <div className="mt-6 pt-5 border-t border-gray-100 space-y-2.5 font-sans text-xs text-gray-500">
-                  <div className="flex justify-between">
-                    <span>Thành viên từ:</span>
-                    <strong className="text-gray-900 font-semibold">{userProfile.memberSince}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Đặc quyền bảo hộ:</span>
-                    <span className="text-emerald-600 font-extrabold">{userProfile.shieldStatus}</span>
-                  </div>
+                <div className="space-y-2 text-center">
+                  <h2 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest uppercase">
+                    YÊU CẦU ĐĂNG NHẬP
+                  </h2>
+                  <p className="text-xs text-[#4a5568] max-w-[280px] mx-auto leading-relaxed">
+                    Để xem chi tiết hồ sơ cá nhân, bản kê vận chuyển và lịch sử đơn đặt hàng thiết bị cao cấp của bạn.
+                  </p>
                 </div>
-              </div>
-
-              {/* Sidebar Action Buttons */}
-              <div className="bg-white rounded-2xl border border-gray-200/80 p-3 space-y-1 shadow-sm font-sans">
-                <button
-                  onClick={() => setAccountTab('profile')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs font-black uppercase tracking-wider text-left transition-all ${
-                    accountTab === 'profile' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-black'
-                  }`}
-                >
-                  <User size={15} />
-                  Hồ sơ cá nhân
-                </button>
-                <button
-                  onClick={() => setAccountTab('orders')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs font-black uppercase tracking-wider text-left transition-all ${
-                    accountTab === 'orders' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-black'
-                  }`}
-                >
-                  <History size={15} />
-                  Lịch sử đặt hàng
-                  {orders.length > 0 && (
-                    <span className="ml-auto bg-indigo-50 text-indigo-700 hover:bg-black font-semibold text-[9px] px-2 py-0.5 rounded-full">
-                      {orders.length}
-                    </span>
-                  )}
-                </button>
-                <button
-                  onClick={() => setAccountTab('devices')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs font-black uppercase tracking-wider text-left transition-all ${
-                    accountTab === 'devices' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-black'
-                  }`}
-                >
-                  <Laptop size={15} />
-                  Thiết bị & sản phẩm
-                </button>
-                <button
-                  onClick={() => setAccountTab('security')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs font-black uppercase tracking-wider text-left transition-all ${
-                    accountTab === 'security' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-black'
-                  }`}
-                >
-                  <Settings size={15} />
-                  Cấu hình mật mã
-                </button>
                 
-                <div className="pt-3 border-t border-gray-100 mt-2">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs font-black uppercase tracking-wider text-left text-rose-500 hover:bg-rose-50 transition-colors"
+                <div className="flex flex-col gap-3 pt-2">
+                  <a
+                    href="#dang-nhap"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onNavigate('dang-nhap');
+                    }}
+                    className="w-full py-4 bg-black hover:bg-gray-800 text-white rounded-lg font-tech-label text-tech-label text-center transition-all shadow-md active:scale-95 cursor-pointer block"
                   >
-                    <LogOut size={15} />
-                    Đăng xuất ID
+                    ĐĂNG NHẬP LIQUID GLASS
+                  </a>
+                  <a
+                    href="#dang-ky"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onNavigate('dang-ky');
+                    }}
+                    className="w-full py-4 bg-white/70 hover:bg-white text-[#2d3748] border border-gray-200/50 rounded-lg font-tech-label text-tech-label text-center transition-all active:scale-95 cursor-pointer block"
+                  >
+                    ĐĂNG KÝ TÀI KHOẢN MỚI
+                  </a>
+                </div>
+
+                {/* Fast automatic mock login for standard testing */}
+                <div className="pt-4 border-t border-white/60 flex flex-col items-center">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#4a5568]/70">Đăng nhập tài khoản mẫu nhanh:</span>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setIsLoggedIn(true);
+                    }}
+                    className="mt-2 bg-black text-white hover:bg-gray-800 border border-transparent px-4 py-2 rounded-lg text-[9px] font-tech-label text-tech-label tracking-wider transition-all"
+                  >
+                    Bỏ qua & Đăng nhập nhanh
                   </button>
                 </div>
               </div>
-
-            </div>
-
-            {/* Right side: Dynamic Sub-Tab Page Content representation */}
-            <div className="lg:col-span-8">
-              <AnimatePresence mode="wait">
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="dashboard-view"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full"
+            >
+              {/* Liquid Glass Master Container */}
+              <div className="w-full relative bg-white/85 backdrop-blur-[40px] border border-white/60 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden">
+                {/* Specular Highlight Top Edge */}
+                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-white/80 via-white/50 to-transparent" />
                 
-                {/* SUBTAB PROFILE: INFO DISPLAY AND CONTACT INFO EDIT */}
-                {accountTab === 'profile' && (
-                  <motion.div
-                    key="tab-profile"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-6"
-                  >
-                    <div className="bg-white rounded-3xl border border-gray-200 p-6 md:p-8 shadow-sm space-y-6">
-                      <div className="border-b border-gray-100 pb-4">
-                        <h3 className="text-base font-black text-gray-900 uppercase">HỒ SƠ THÀNH VIÊN PREMIUM</h3>
-                        <p className="text-xs text-gray-400 mt-1">
-                          Các thông tin cá nhân của bạn phục vụ điền nhanh bưu kiện tại trang thanh toán Checkout.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 font-sans text-xs">
-                        <div>
-                          <label className="block text-[10px] uppercase font-bold text-gray-450 tracking-wider mb-2">Họ và tên</label>
-                          <input 
-                            type="text" 
-                            value={userProfile.name}
-                            onChange={(e) => setUserProfile({...userProfile, name: e.target.value})}
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black focus:bg-white"
-                          />
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-grid-gutter p-card-padding">
+                  
+                  {/* LEFT SIDEBAR: User ID & Navigation */}
+                  <div className="lg:col-span-4 flex flex-col gap-stack-gap">
+                    
+                    {/* User Master Visual ID Card */}
+                    <div className="bg-white/60 backdrop-blur-md border border-white/60 rounded-xl p-5 relative overflow-hidden group shadow-sm">
+                      {/* Decorative top line */}
+                      <div className="absolute top-0 inset-x-0 h-[2px] bg-gray-300" />
+                      
+                      <div className="flex flex-col items-center text-center space-y-3">
+                        {/* Avatar */}
+                        <div className="relative mt-1">
+                          <div className="w-16 h-16 bg-white/80 border border-white/60 rounded-full flex items-center justify-center overflow-hidden shadow-inner group-hover:border-gray-400 transition-colors duration-500">
+                            <User size={32} className="text-[#4a5568]" />
+                          </div>
+                          <div className="absolute bottom-0 right-0 w-5 h-5 bg-[#2d3748] border-2 border-white rounded-full flex items-center justify-center shadow-sm">
+                            <BadgeCheck size={11} className="text-white" />
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-[10px] uppercase font-bold text-gray-450 tracking-wider mb-2">Số điện thoại liên hệ</label>
-                          <input 
-                            type="text" 
-                            value={userProfile.phone}
-                            onChange={(e) => setUserProfile({...userProfile, phone: e.target.value})}
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black focus:bg-white"
-                          />
+                        
+                        {/* Name & Details */}
+                        <div className="space-y-0.5">
+                          <h2 className="font-headline-md text-headline-md text-[#2d3748] uppercase tracking-wider flex items-center justify-center gap-2">
+                            {userProfile.name}
+                          </h2>
+                          <p className="font-tech-label text-tech-label text-[#4a5568]">MÃ SỐ: {userProfile.techvieId}</p>
                         </div>
-                        <div className="md:col-span-2">
-                          <label className="block text-[10px] uppercase font-bold text-gray-450 tracking-wider mb-2">Email đăng bạ</label>
-                          <input 
-                            type="email" 
-                            readOnly
-                            value={userProfile.email}
-                            className="w-full bg-gray-100 border border-gray-200/80 rounded-xl px-4 py-3 outline-none text-gray-400 cursor-not-allowed"
-                          />
-                        </div>
-                        <div className="md:col-span-2">
-                          <label className="block text-[10px] uppercase font-bold text-gray-450 tracking-wider mb-2">Địa chỉ giao nhận bưu kiện mặc định</label>
-                          <textarea 
-                            rows={3}
-                            value={userProfile.address}
-                            onChange={(e) => setUserProfile({...userProfile, address: e.target.value})}
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black focus:bg-white"
-                          />
+                        
+                        {/* Visual QR Code Area */}
+                        <div className="w-full mt-2.5 p-3 bg-white/50 border border-white/60 rounded-xl flex items-center gap-3">
+                          <div className="w-8 h-8 bg-[#2d3748] rounded flex items-center justify-center flex-shrink-0">
+                            <QrCode size={20} className="text-white" />
+                          </div>
+                          <div className="text-left flex-grow">
+                            <span className="block font-tech-label text-tech-label text-[#2d3748]">SHOWROOM ID</span>
+                            <span className="block font-caption-tiny text-caption-tiny text-[#4a5568] mt-0.5">Quét mã nhận diện thành viên</span>
+                          </div>
                         </div>
                       </div>
+                      
+                      {/* Metadata */}
+                      <div className="mt-4 pt-3 border-t border-white/60 flex flex-col gap-1.5 font-sans text-xs">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#4a5568]">Thành viên từ:</span>
+                          <span className="font-tech-label text-tech-label">{userProfile.memberSince}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#4a5568]">Đặc quyền:</span>
+                          <span className="font-tech-label text-tech-label text-black px-2 py-1 bg-gray-150 border border-gray-200 rounded">
+                            PREMIUM
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Navigation Sidebar */}
+                    <nav className="bg-white/60 backdrop-blur-md border border-white/60 rounded-xl p-2 flex flex-col shadow-sm gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setAccountTab('profile')}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                          accountTab === 'profile'
+                            ? 'bg-white/80 border border-white/60 shadow-md text-black'
+                            : 'text-[#4a5568] hover:text-black hover:bg-white/40 hover:shadow-sm'
+                        }`}
+                      >
+                        <User size={18} />
+                        <span className="font-headline-sm font-bold uppercase tracking-widest text-[11px]">Hồ sơ cá nhân</span>
+                        {accountTab === 'profile' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
+                      </button>
 
-                      <div className="pt-2">
-                        <button 
-                          onClick={() => console.log('Cập nhật dữ liệu thông tin tài khoản thành công!')}
-                          className="px-6 py-3 bg-black hover:bg-gray-900 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all"
+                      <button
+                        type="button"
+                        onClick={() => setAccountTab('orders')}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                          accountTab === 'orders'
+                            ? 'bg-white/80 border border-white/60 shadow-md text-black'
+                            : 'text-[#4a5568] hover:text-black hover:bg-white/40 hover:shadow-sm'
+                        }`}
+                      >
+                        <History size={18} />
+                        <span className="font-headline-sm font-bold uppercase tracking-widest text-[11px]">Lịch sử đặt hàng</span>
+                        {orders.length > 0 && (
+                          <span className={`font-tech-label text-tech-label bg-gray-150 px-2 py-0.5 rounded text-black ${accountTab === 'orders' ? 'ml-2' : 'ml-auto'}`}>
+                            {orders.length}
+                          </span>
+                        )}
+                        {accountTab === 'orders' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setAccountTab('devices')}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                          accountTab === 'devices'
+                            ? 'bg-white/80 border border-white/60 shadow-md text-black'
+                            : 'text-[#4a5568] hover:text-black hover:bg-white/40 hover:shadow-sm'
+                        }`}
+                      >
+                        <Laptop size={18} />
+                        <span className="font-headline-sm font-bold uppercase tracking-widest text-[11px]">Thiết bị & sản phẩm</span>
+                        {accountTab === 'devices' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setAccountTab('security')}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                          accountTab === 'security'
+                            ? 'bg-white/80 border border-white/60 shadow-md text-black'
+                            : 'text-[#4a5568] hover:text-black hover:bg-white/40 hover:shadow-sm'
+                        }`}
+                      >
+                        <Settings size={18} />
+                        <span className="font-headline-sm font-bold uppercase tracking-widest text-[11px]">Cấu hình mật mã</span>
+                        {accountTab === 'security' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
+                      </button>
+
+                      <div className="h-px w-full bg-white/60 my-2" />
+                      
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 hover:shadow-sm transition-all duration-300"
+                      >
+                        <LogOut size={18} />
+                        <span className="font-headline-sm font-bold uppercase tracking-widest text-[11px]">Đăng xuất ID</span>
+                      </button>
+                    </nav>
+                  </div>
+
+                  {/* RIGHT MAIN PANEL: Dynamic Content Section */}
+                  <div className="lg:col-span-8 mt-8 lg:mt-0">
+                    <AnimatePresence mode="wait">
+                      
+                      {/* TAB 1: PROFILE FORM */}
+                      {accountTab === 'profile' && (
+                        <motion.div
+                          key="profile-tab"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.3 }}
+                          className="h-full bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm"
                         >
-                          Lưu hồ sơ thông tin
-                        </button>
-                      </div>
-                    </div>
+                          {/* Top subtle glow */}
+                          <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/40 rounded-full blur-[80px] pointer-events-none" />
+                          
+                          {/* Section Header */}
+                          <div className="mb-4 border-b border-white/60 pb-2">
+                            <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">HỒ SƠ THÀNH VIÊN PREMIUM</h3>
+                            <p className="text-[#4a5568] mt-1 max-w-lg">Các thông tin cá nhân của bạn phục vụ điền nhanh bưu kiện tại trang thanh toán Checkout.</p>
+                          </div>
 
-                    {/* Address quick shortcuts */}
-                    <div className="bg-white rounded-3xl border border-gray-200 p-6 md:p-8 shadow-sm group">
-                      <h4 className="text-xs uppercase tracking-widest font-black text-gray-800 mb-4 flex items-center gap-2">
-                        <MapPin size={16} className="text-gray-400" />
-                        Danh Sách Địa Chỉ Nhận Hàng Liên Kết
-                      </h4>
-                      <p className="text-xs text-gray-500 font-sans leading-relaxed">
-                        Địa chỉ hiện tại của bạn là địa chỉ phòng bưu kiện mặc định. Bạn có thể thay đổi bất cứ lúc nào trong quá trình chuyển giao hàng bưu phẩm.
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* SUBTAB ORDERS: HISTORY OF COMMITTED ORDERS */}
-                {accountTab === 'orders' && (
-                  <motion.div
-                    key="tab-orders"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-6"
-                  >
-                    <div className="bg-white rounded-3xl border border-gray-200 p-6 md:p-8 shadow-sm">
-                      <div className="border-b border-gray-100 pb-4 mb-6">
-                        <h3 className="text-base font-black text-gray-900 uppercase">TIẾN TRÌNH VẬN CHUYỂN ĐƠN HÀNG</h3>
-                        <p className="text-xs text-gray-400 mt-1">
-                          Theo dõi thực tế hành trình đơn sản phẩm cao cấp và trạng thái bàn giao của bạn.
-                        </p>
-                      </div>
-
-                      <div className="space-y-6">
-                        {orders.map((ord) => (
-                          <div key={ord.id} className="border border-gray-150 rounded-2xl overflow-hidden font-sans text-xs">
-                            {/* Top row */}
-                            <div className="bg-gray-50/80 border-b border-gray-150 p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                              <div>
-                                <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Đơn hàng</span>
-                                <strong className="block text-gray-900 font-extrabold text-sm font-mono">{ord.id}</strong>
-                              </div>
-                              <div>
-                                <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block sm:text-right">Ngày đặt</span>
-                                <span className="font-semibold text-gray-700">{ord.date}</span>
-                              </div>
-                              <div>
-                                <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block sm:text-right">Tổng thanh toán</span>
-                                <strong className="text-indigo-600 font-black font-mono text-sm block sm:text-right">{ord.total}</strong>
+                          {/* Form Grid */}
+                          <form className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow">
+                            {/* Input: Full Name */}
+                            <div className="space-y-1.5">
+                              <label className="font-tech-label text-tech-label text-[#4a5568]">HỌ VÀ TÊN</label>
+                              <div className="relative group">
+                                <input
+                                  className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 placeholder-[#4a5568]/50 shadow-sm"
+                                  type="text"
+                                  value={userProfile.name}
+                                  onChange={(e) => setUserProfile({ ...userProfile, name: e.target.value })}
+                                />
+                                <div className="absolute inset-0 rounded-lg pointer-events-none border border-transparent group-hover:border-gray-300 transition-colors" />
                               </div>
                             </div>
 
-                            {/* Middle row */}
-                            <div className="p-5 space-y-4">
-                              {ord.items.map((item, idx) => (
-                                <div key={idx} className="flex gap-4 items-center">
-                                  <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center border border-indigo-100/40 text-indigo-500">
-                                    <Package size={18} />
+                            {/* Input: Phone */}
+                            <div className="space-y-1.5">
+                              <label className="font-tech-label text-tech-label text-[#4a5568]">SỐ ĐIỆN THOẠI LIÊN HỆ</label>
+                              <input
+                                  className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 shadow-sm"
+                                  type="text"
+                                  value={userProfile.phone}
+                                  onChange={(e) => setUserProfile({ ...userProfile, phone: e.target.value })}
+                                />
+                            </div>
+
+                            {/* Input: Email (Readonly) */}
+                            <div className="space-y-1.5 md:col-span-2">
+                              <label className="font-tech-label text-tech-label text-[#4a5568]">EMAIL ĐĂNG BẠ</label>
+                              <input
+                                className="w-full bg-gray-100/50 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#4a5568] cursor-not-allowed shadow-sm"
+                                readonly
+                                type="email"
+                                value={userProfile.email}
+                              />
+                            </div>
+
+                            {/* Input: Address */}
+                            <div className="space-y-1.5 md:col-span-2">
+                              <label className="font-tech-label text-tech-label text-[#4a5568]">ĐỊA CHỈ GIAO NHẬN BƯU KIỆN MẶC ĐỊNH</label>
+                              <textarea
+                                className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 resize-none shadow-sm"
+                                rows={2}
+                                value={userProfile.address}
+                                onChange={(e) => setUserProfile({ ...userProfile, address: e.target.value })}
+                              />
+                            </div>
+
+                            {/* Submit Action */}
+                            <div className="md:col-span-2 pt-2">
+                              <button
+                                className="px-5 py-3 bg-black hover:bg-gray-800 text-white font-tech-label text-tech-label rounded-lg transition-all duration-300 flex items-center gap-2 group shadow-md"
+                                type="button"
+                                onClick={() => alert('Cập nhật dữ liệu thông tin tài khoản thành công!')}
+                              >
+                                <span>LƯU HỒ SƠ THÔNG TIN</span>
+                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                              </button>
+                            </div>
+                          </form>
+
+                          {/* Supplementary Info / Shortcut */}
+                          <div className="mt-4 pt-3 border-t border-white/60">
+                            <div className="bg-white/50 border border-white/60 rounded-xl p-3 flex items-start gap-3 shadow-sm">
+                              <div className="w-8 h-8 rounded-lg bg-gray-105 border border-gray-200 flex items-center justify-center flex-shrink-0">
+                                <MapPin size={16} className="text-black" />
+                              </div>
+                              <div>
+                                <h4 className="font-tech-label text-tech-label text-[#2d3748] mb-0.5">DANH SÁCH ĐỊA CHỈ NHẬN HÀNG LIÊN KẾT</h4>
+                                <p className="text-[#4a5568] leading-relaxed">Đây là địa chỉ nhận bưu kiện mặc định của bạn. Bạn có thể thay đổi nhanh bất kỳ lúc nào khi thanh toán đơn hàng.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {/* TAB 2: ORDERS LIST */}
+                      {accountTab === 'orders' && (
+                        <motion.div
+                          key="orders-tab"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.3 }}
+                          className="h-full bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm custom-glass-scrollbar overflow-y-auto max-h-[75vh]"
+                        >
+                          <div className="mb-4 border-b border-white/60 pb-2">
+                            <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">TIẾN TRÌNH VẬN CHUYỂN ĐƠN HÀNG</h3>
+                            <p className="text-[#4a5568] mt-1 max-w-lg">Theo dõi thực tế hành trình đơn sản phẩm cao cấp và trạng thái bàn giao của bạn.</p>
+                          </div>
+
+                          <div className="space-y-6 flex-grow">
+                            {orders.map((ord) => (
+                              <div key={ord.id} className="bg-white/60 backdrop-blur-md border border-white/60 rounded-xl overflow-hidden shadow-sm font-sans text-xs">
+                                {/* Top row */}
+                                <div className="bg-white/40 border-b border-white/60 p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                  <div>
+                                    <span className="text-[10px] uppercase font-bold text-[#4a5568] tracking-wider block">Đơn hàng</span>
+                                    <strong className="block text-[#2d3748] font-extrabold text-sm font-mono">{ord.id}</strong>
                                   </div>
                                   <div>
-                                    <h4 className="font-extrabold text-gray-900">{item.name}</h4>
-                                    <p className="text-[10px] uppercase tracking-wider text-gray-400 mt-0.5">{item.type} • Số lượng: {item.qty}</p>
+                                    <span className="text-[10px] uppercase font-bold text-[#4a5568] tracking-wider block sm:text-right">Ngày đặt</span>
+                                    <span className="font-semibold text-[#2d3748]">{ord.date}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-[10px] uppercase font-bold text-[#4a5568] tracking-wider block sm:text-right">Tổng thanh toán</span>
+                                    <strong className="text-black font-black font-mono text-sm block sm:text-right">{ord.total}</strong>
                                   </div>
                                 </div>
-                              ))}
 
-                              {/* Progress Status trackline */}
-                              <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                <div className="flex items-center gap-2.5 text-xs text-gray-700">
-                                  {ord.statusType === 'processing' ? (
-                                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-ping" />
-                                  ) : (
-                                    <CheckCircle2 size={16} className="text-emerald-500" />
-                                  )}
-                                  <span className="font-extrabold text-gray-800">Trạng thái: <strong className="text-indigo-600 font-black uppercase text-[10px]">{ord.status}</strong></span>
+                                {/* Middle row */}
+                                <div className="p-6 space-y-4">
+                                  {ord.items.map((item, idx) => (
+                                    <div key={idx} className="flex gap-4 items-center">
+                                      <div className="w-10 h-10 bg-[#2d3748] rounded-lg flex items-center justify-center border border-gray-200/20 text-white">
+                                        <Package size={18} />
+                                      </div>
+                                      <div>
+                                        <h4 className="font-extrabold text-[#2d3748]">{item.name}</h4>
+                                        <p className="text-[10px] uppercase tracking-wider text-[#4a5568] mt-0.5">{item.type} • Số lượng: {item.qty}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+
+                                  {/* Progress Status trackline */}
+                                  <div className="pt-4 border-t border-white/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                    <div className="flex items-center gap-2.5 text-xs text-[#2d3748]">
+                                      {ord.statusType === 'processing' ? (
+                                        <div className="w-2.5 h-2.5 rounded-full bg-black animate-ping" />
+                                      ) : (
+                                        <CheckCircle2 size={16} className="text-emerald-600" />
+                                      )}
+                                      <span className="font-extrabold text-[#2d3748]">
+                                        Trạng thái: <strong className="text-black font-black uppercase text-[10px]">{ord.status}</strong>
+                                      </span>
+                                    </div>
+
+                                    <button 
+                                      type="button"
+                                      onClick={() => alert(`Sản phẩm mã ${ord.id} đang nằm trong lộ trình bưu tá giao hàng tận nơi nguyên seal.`)}
+                                      className="text-[10px] font-tech-label text-tech-label text-black bg-white/80 border border-white/60 hover:bg-white px-4 py-2 rounded-lg transition-all shadow-sm"
+                                    >
+                                      Xem Vị Trí Vận Chuyển
+                                    </button>
+                                  </div>
                                 </div>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
 
-                                <button 
-                                  onClick={() => console.log(`Sản phẩm mã ${ord.id} đang nằm trong lộ trình bưu tá giao hàng tận nơi nguyên seal.`)}
-                                  className="text-[10px] font-sans font-black uppercase tracking-wider text-black bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all"
-                                >
-                                  Xem Vị Trí Vận Chuyển
-                                </button>
+                      {/* TAB 3: DEVICES & PRODUCTS */}
+                      {accountTab === 'devices' && (
+                        <motion.div
+                          key="devices-tab"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.3 }}
+                          className="w-full"
+                        >
+                          <div className="bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm">
+                            <div className="mb-4 border-b border-white/60 pb-2">
+                              <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">THIẾT BỊ HOẠT ĐỘNG & CHỈ SỐ</h3>
+                              <p className="text-[#4a5568] mt-1 max-w-lg">Theo dõi bảo hành phần cứng, trạng thái nâng cấp và cấu hình thiết bị của bạn.</p>
+                            </div>
+
+                            <div className="border border-white/20 rounded-2xl p-6 flex flex-col sm:flex-row gap-5 items-start bg-slate-950 text-white relative overflow-hidden shadow-lg">
+                              <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+                              
+                              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white border border-white/10 flex-shrink-0 animate-pulse">
+                                <Cpu size={22} />
+                              </div>
+                              
+                              <div className="space-y-3 flex-grow min-w-0">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <span className="text-[8px] uppercase font-bold tracking-widest text-indigo-400 font-mono">BẢO HÀNH CHỦ CHỐT</span>
+                                    <h4 className="font-sans font-black text-base text-white uppercase tracking-tight mt-0.5">TECHVIE INTEGRAL CHIP v1.2</h4>
+                                  </div>
+                                  <span className="bg-emerald-600 text-white text-[8px] font-black tracking-widest uppercase px-3 py-1 rounded-full border border-emerald-500">
+                                    CHẤT LƯỢCO CAO
+                                  </span>
+                                </div>
+                                
+                                <p className="text-slate-400 text-[11px] leading-relaxed">
+                                  Có chứa tấm nền OLED siêu sáng cực đại dải màu vô hạn kết hợp chip xử lý thế hệ mới Core v2. Chân thực sắc nét đến từng điểm pixel cảm thị.
+                                </p>
+
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-white/10 text-[10px] text-slate-300 font-mono">
+                                  <div>
+                                    <span className="block text-slate-500 uppercase font-bold text-[8px] mb-1">Tần số quét màn</span>
+                                    <strong className="text-white">120 Hz</strong>
+                                  </div>
+                                  <div>
+                                    <span className="block text-slate-500 uppercase font-bold text-[8px] mb-1">Chuẩn truyền dẫn</span>
+                                    <strong className="text-white">UWB v2.0</strong>
+                                  </div>
+                                  <div>
+                                    <span className="block text-slate-500 uppercase font-bold text-[8px] mb-1 font-sans">Hạn bảo hành</span>
+                                    <strong className="text-white font-sans font-normal">16 - 06 - 2027</strong>
+                                  </div>
+                                  <div>
+                                    <span className="block text-slate-500 uppercase font-bold text-[8px] mb-1">Độ phân giải</span>
+                                    <strong className="text-white">4K UltraHD</strong>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="mt-6 p-4 bg-white/50 border border-white/60 rounded-xl flex items-start gap-3 text-[#2d3748] text-[11px] leading-relaxed shadow-sm">
+                              <Clock size={16} className="text-black flex-shrink-0 mt-0.5" />
+                              <div>
+                                <strong>Bạn cần đặt mua thêm loại phụ kiện nào?</strong>
+                                <p className="text-[#4a5568] mt-0.5">Mọi bộ phụ kiện cao cấp và củ sạc hi-end của TechVie đều đảm bảo truyền dẫn sạc mượt mà đồng bộ. Hãy duyệt sảnh để bổ sung mục giỏ hàng.</p>
                               </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
+                        </motion.div>
+                      )}
 
-                {/* SUBTAB DEVICES: REGISTERED HARDWARE & SPECTRAL CONFIGS */}
-                {accountTab === 'devices' && (
-                  <motion.div
-                    key="tab-devices"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-6 font-sans text-xs"
-                  >
-                    <div className="bg-white rounded-3xl border border-gray-200 p-6 md:p-8 shadow-sm space-y-6">
-                      <div className="border-b border-gray-100 pb-4">
-                        <h3 className="text-base font-black text-gray-900 uppercase">THIẾT BỊ HOẠT ĐỘNG VÀ CHỈ SỐ</h3>
-                        <p className="text-xs text-gray-400 mt-1">
-                          Theo dõi bảo hành phần cứng, trạng thái nâng cấp và cài đặt ứng dụng thiết bị của bạn.
-                        </p>
-                      </div>
-
-                      {/* Mock Hardware specifications card */}
-                      <div className="border border-gray-150 rounded-2xl p-5 flex flex-col sm:flex-row gap-5 items-start bg-slate-950 text-white relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl" />
-                        
-                        <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-indigo-400 border border-white/5 flex-shrink-0 animate-pulse">
-                          <Cpu size={22} />
-                        </div>
-                        <div className="space-y-2 flex-grow min-w-0">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <span className="text-[8px] uppercase font-bold tracking-widest text-indigo-400 font-mono">BẢO HÀNH CHỦ CHỐT</span>
-                              <h4 className="font-sans font-black text-normal text-white uppercase tracking-tight mt-0.5">TECHVIE INTEGRAL CHIP v1.2</h4>
-                            </div>
-                            <span className="bg-emerald-600 text-white text-[8px] font-black tracking-widest uppercase px-3 py-1 rounded-full border border-emerald-500">
-                              CHẤT LƯỢNG CAO
-                            </span>
-                          </div>
-                          
-                          <p className="text-slate-400 text-[11px] leading-relaxed">
-                            Có chứa tấm nền OLED siêu sáng cực đại dải màu vô hạn kết hợp chip xử lý thế hệ mới Core v2. Chân thực sắc nét đến từng điểm pixel cảm thị.
-                          </p>
-
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-3 border-t border-white/10 text-[10px] text-slate-350">
-                            <div>
-                              <span className="block text-slate-500 uppercase font-bold text-[8px]">Tần số quét màn</span>
-                              <strong className="text-white font-mono">120 Hz</strong>
-                            </div>
-                            <div>
-                              <span className="block text-slate-500 uppercase font-bold text-[8px]">Chuẩn truyền dẫn</span>
-                              <strong className="text-white font-mono">UWB v2.0</strong>
-                            </div>
-                            <div>
-                              <span className="block text-slate-500 uppercase font-bold text-[8px]">Hạn bảo hành</span>
-                              <strong className="text-white">16 - 06 - 2027</strong>
-                            </div>
-                            <div>
-                              <span className="block text-slate-500 uppercase font-bold text-[8px]">Độ phân giải</span>
-                              <strong className="text-white font-mono">4K UltraHD</strong>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-indigo-50/50 border border-indigo-100/60 rounded-xl flex items-start gap-3 text-indigo-800 text-[11px] leading-relaxed">
-                        <Clock size={16} className="text-indigo-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <strong>Bạn cần đặt mua thêm loại phụ kiện nào?</strong>
-                          <p className="text-indigo-600/90 mt-0.5">Mọi bộ phụ kiện cao cấp và củ sạc hi-end của TechVie đều đảm bảo truyền dẫn sạc mượt mà đồng bộ. Hãy duyệt sảnh để bổ sung mục giỏ hàng.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* SUBTAB SECURITY: ENCRYPTION & DATA SETTINGS */}
-                {accountTab === 'security' && (
-                  <motion.div
-                    key="tab-security"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-6"
-                  >
-                    <div className="bg-white rounded-3xl border border-gray-200 p-6 md:p-8 shadow-sm space-y-6 font-sans text-xs">
-                      <div className="border-b border-gray-100 pb-4">
-                        <h3 className="text-base font-black text-gray-900 uppercase">BẢO MẬT & MÃ HOÁ QUANTUM THIẾT BI</h3>
-                        <p className="text-xs text-gray-400 mt-1">
-                          Cập nhật mật khẩu kết nối hoặc thiếp lập đặc cách xác thực hai cổng vân quang học.
-                        </p>
-                      </div>
-
-                      <div className="space-y-5">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-[10px] uppercase font-bold text-gray-450 tracking-wider mb-2">Mật khẩu hiện tại</label>
-                            <input 
-                              type="password" 
-                              placeholder="••••••••"
-                              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black focus:bg-white"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] uppercase font-bold text-gray-450 tracking-wider mb-2">Mật khẩu mới bảo vệ</label>
-                            <input 
-                              type="password" 
-                              placeholder="••••••••"
-                              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black focus:bg-white"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-gray-50 border border-gray-250/60 rounded-xl flex items-start gap-3">
-                          <CheckCircle2 size={16} className="text-emerald-500 mt-0.5 flex-shrink-0" />
-                          <p className="text-[11px] text-gray-650 leading-relaxed">
-                            Xác thực thành viên TechVie ID vĩnh viễn được tự động áp dụng ưu đãi giảm giá lên tới 10% tại tất cả các hệ thống showroom và trạm trải nghiệm TechVie chính hãng trên toàn cầu.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="pt-2">
-                        <button 
-                          onClick={() => console.log('Mật khẩu của bạn đã được cấu định an toàn!')}
-                          className="px-6 py-3 bg-black hover:bg-gray-900 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all"
+                      {/* TAB 4: SECURITY CONFIG */}
+                      {accountTab === 'security' && (
+                        <motion.div
+                          key="security-tab"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.3 }}
+                          className="w-full"
                         >
-                          Cấu Định Mật Khẩu
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
+                          <div className="bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm">
+                            <div className="mb-4 border-b border-white/60 pb-2">
+                              <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">BẢO MẬT & MÃ HÓA QUANTUM</h3>
+                              <p className="text-[#4a5568] mt-1 max-w-lg">Cập nhật mật khẩu kết nối hoặc thiết lập đặc cách xác thực hai cổng vân quang học.</p>
+                            </div>
 
-              </AnimatePresence>
-            </div>
+                            <div className="space-y-4 flex-grow">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                  <label className="font-tech-label text-tech-label text-[#4a5568]">MẬT KHẨU HIỆN TẠI</label>
+                                  <input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 placeholder-[#4a5568]/30 shadow-sm"
+                                  />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <label className="font-tech-label text-tech-label text-[#4a5568]">MẬT KHẨU MỚI BẢO VỆ</label>
+                                  <input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 placeholder-[#4a5568]/30 shadow-sm"
+                                  />
+                                </div>
+                              </div>
 
-          </motion.div>
-        )}
+                              <div className="p-3 bg-white/50 border border-white/60 rounded-xl flex items-start gap-3 shadow-sm">
+                                <CheckCircle2 size={16} className="text-emerald-600 mt-0.5 flex-shrink-0" />
+                                <p className="text-[11px] text-[#4a5568] leading-relaxed">
+                                  Xác thực thành viên TechVie ID vĩnh viễn được tự động áp dụng ưu đãi giảm giá lên tới 10% tại tất cả các hệ thống showroom và trạm trải nghiệm TechVie chính hãng trên toàn cầu.
+                                </p>
+                              </div>
+                            </div>
 
-      </AnimatePresence>
+                            <div className="pt-4 border-t border-white/60">
+                              <button
+                                type="button"
+                                onClick={() => alert('Mật khẩu của bạn đã được cấu định an toàn!')}
+                                className="px-5 py-3 bg-black hover:bg-gray-800 text-white font-tech-label text-tech-label rounded-lg transition-all duration-300 flex items-center gap-2 group shadow-md"
+                              >
+                                <span>CẤU ĐỊNH MẬT KHẨU</span>
+                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Floating Back to Admin panel button for logged-in Administrators - Draggable - ONLY on account/profile page */}
       {isLoggedIn && userProfile?.role === 'admin' && (

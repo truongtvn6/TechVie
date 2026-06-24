@@ -69,7 +69,7 @@ export default function CartSidePanel({
                 <div>
                   <h2 className="text-xl font-bold text-gray-950 tracking-tight">Giỏ hàng</h2>
                   <span className="text-xs text-gray-500 font-mono">
-                    ({cart.reduce((sum, item) => sum + item.quantity, 0)} thiết bị quang phổ)
+                    ({cart.reduce((sum, item) => sum + item.quantity, 0)} sản phẩm đã được chọn)
                   </span>
                 </div>
               </div>

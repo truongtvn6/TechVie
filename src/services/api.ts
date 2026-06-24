@@ -192,11 +192,14 @@ export async function getCategories(): Promise<{ success: boolean; categories: s
   }
 }
 
-// Tải danh sách sản phẩm (Products) từ backend
-export async function getProducts(): Promise<{ success: boolean; products: Product[] }> {
+// Tải danh sách sản phẩm (Products) từ backend (Hỗ trợ lọc theo từ khóa tìm kiếm)
+export async function getProducts(search?: string): Promise<{ success: boolean; products: Product[] }> {
   try {
-    console.log('[API getProducts] ➔ Bắt đầu gửi yêu cầu tải danh sách sản phẩm từ backend...');
-    const response = await fetch('http://localhost:5000/api/products');
+    const url = search 
+      ? `http://localhost:5000/api/products?search=${encodeURIComponent(search.trim())}`
+      : 'http://localhost:5000/api/products';
+    console.log(`[API getProducts] ➔ Bắt đầu gửi yêu cầu tải danh sách sản phẩm${search ? ` với từ khóa "${search}"` : ''} từ backend...`);
+    const response = await fetch(url);
     if (!response.ok) throw new Error('Không thể tải danh sách sản phẩm!');
     const data = await response.json();
     
@@ -420,5 +423,38 @@ export async function adminDeleteUser(id: string, token: string): Promise<{ succ
     return { success: false, message: error.message || 'Lỗi kết nối.' };
   }
 }
+
+// Tải danh mục tìm kiếm phổ biến (Popular Searches) từ backend
+export async function getPopularSearches(): Promise<{ success: boolean; popular: string[] }> {
+  try {
+    const response = await fetch('http://localhost:5000/api/search/popular');
+    if (!response.ok) throw new Error('Không thể tải tìm kiếm phổ biến!');
+    return await response.json();
+  } catch (error) {
+    console.error('Lỗi khi tải danh sách tìm kiếm phổ biến:', error);
+    return {
+      success: true,
+      popular: ['Giao diện Prism-1', 'Cảm biến Flux', 'Thủy tinh lỏng', 'Hệ thống v2.0']
+    };
+  }
+}
+
+// Tải lịch sử tìm kiếm gần đây (Search History) từ backend
+export async function getSearchHistory(): Promise<{ success: boolean; history: string[] }> {
+  try {
+    const response = await fetch('http://localhost:5000/api/search/history', {
+      headers: getAuthHeaders() // Tự động đính kèm token nếu đăng nhập để tải lịch sử cá nhân
+    });
+    if (!response.ok) throw new Error('Không thể tải lịch sử tìm kiếm!');
+    return await response.json();
+  } catch (error) {
+    console.error('Lỗi khi tải lịch sử tìm kiếm:', error);
+    return {
+      success: true,
+      history: ['Core v2', 'Lab Update']
+    };
+  }
+}
+
 
 
