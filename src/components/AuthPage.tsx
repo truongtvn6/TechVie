@@ -33,6 +33,7 @@ export default function AuthPage({
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
   const [registerError, setRegisterError] = useState('');
@@ -477,19 +478,19 @@ export default function AuthPage({
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, cubicBezier: [0.16, 1, 0.3, 1] }}
-          className="liquid-glass-slab glass-edge glass-sheen-container w-full h-full max-h-[850px] lg:max-h-full rounded-[28px] sm:rounded-[36px] lg:rounded-none lg:border-none px-6 py-8 sm:px-12 md:px-14 lg:px-10 xl:px-14 flex flex-col justify-center z-10 overflow-y-auto"
+          className="liquid-glass-slab glass-edge glass-sheen-container w-full h-full max-h-[850px] lg:max-h-full rounded-[28px] sm:rounded-[36px] lg:border-none px-6 py-8 sm:px-12 md:px-14 lg:px-10 xl:px-14 flex flex-col justify-center z-10 overflow-y-auto"
         >
           {/* Header Section */}
           <div className="mb-7 mt-3 relative z-10">
-            <h2 className="font-playfair text-3xl sm:text-4xl text-black font-semibold tracking-tight mb-7">
-              {mode === 'login' ? 'Chào mừng trở lại' : 'Tham gia TechVie'}
+            <h2 className="font-sans text-3xl sm:text-4xl text-black font-extrabold tracking-tighter mb-7">
+              {mode === 'login' ? 'Chào mừng trở lại' : 'Mời Bạn Tham Gia TechVie'}
             </h2>
 
             {/* Tab Switcher with Sleek Glassy Styling */}
             <div className="flex border-b border-black/5 relative p-0.5">
               <button 
                 type="button"
-                className={`flex-1 py-4 font-jakarta text-[11px] font-bold tracking-[0.15em] relative z-20 transition-all ${
+                className={`flex-1 py-4 font-jakarta text-[13px] font-bold tracking-[0.15em] relative z-20 transition-all cursor-pointer ${
                   mode === 'login' ? 'text-black border-b-2 border-black font-extrabold' : 'text-black/40 border-b-2 border-transparent hover:text-black/70'
                 }`}
                 onClick={() => {
@@ -501,7 +502,7 @@ export default function AuthPage({
               </button>
               <button 
                 type="button"
-                className={`flex-1 py-4 font-jakarta text-[11px] font-bold tracking-[0.15em] relative z-20 transition-all ${
+                className={`flex-1 py-4 font-jakarta text-[13px] font-bold tracking-[0.15em] relative z-20 transition-all cursor-pointer ${
                   mode === 'register' ? 'text-black border-b-2 border-black font-extrabold' : 'text-black/40 border-b-2 border-transparent hover:text-black/70'
                 }`}
                 onClick={() => {
@@ -538,8 +539,8 @@ export default function AuthPage({
 
                     {/* Email Field with Frosted Glass look */}
                     <div className="space-y-1.5">
-                      <label className="font-jakarta text-[10px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
-                        Email hoặc Tên đăng nhập
+                      <label className="font-jakarta text-[12px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
+                        Email
                       </label>
                       <input 
                         type="email"
@@ -553,7 +554,7 @@ export default function AuthPage({
 
                     {/* Password Field with Frosted Glass look */}
                     <div className="space-y-1.5">
-                      <label className="font-jakarta text-[10px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
+                      <label className="font-jakarta text-[12px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
                         Mật khẩu
                       </label>
                       <div className="relative">
@@ -568,7 +569,7 @@ export default function AuthPage({
                         <button 
                           type="button"
                           onClick={() => setShowLoginPassword(!showLoginPassword)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/45 hover:text-black transition-opacity"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/45 hover:text-black transition-opacity cursor-pointer"
                         >
                           {showLoginPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                         </button>
@@ -583,8 +584,8 @@ export default function AuthPage({
                           defaultChecked
                           className="rounded border-black/20 text-black focus:ring-0 h-4 w-4 bg-transparent cursor-pointer" 
                         />
-                        <span className="font-jakarta text-[11px] font-semibold text-black/60 group-hover:text-black transition-colors uppercase tracking-wider">
-                          Ghi nhớ
+                        <span className="font-jakarta text-[12px] font-semibold text-black/60 group-hover:text-black transition-colors uppercase tracking-wider">
+                          Ghi nhớ tôi
                         </span>
                       </label>
                       <a 
@@ -593,7 +594,7 @@ export default function AuthPage({
                           e.preventDefault();
                           console.log('Liên kết khôi phục mật khẩu đã được gửi đến email của bạn.');
                         }}
-                        className="font-jakarta text-[11px] font-semibold text-black hover:opacity-50 transition-opacity uppercase tracking-wider underline underline-offset-4"
+                        className="font-jakarta text-[12px] font-semibold text-black hover:opacity-50 transition-opacity uppercase tracking-wider underline underline-offset-4"
                       >
                         Quên mật khẩu?
                       </a>
@@ -603,7 +604,7 @@ export default function AuthPage({
                     <button 
                       type="submit"
                       disabled={isLoggingIn}
-                      className="w-full py-4.5 sm:py-5 bg-black text-white rounded-xl font-jakarta text-xs font-bold tracking-[0.2em] mt-2 active:scale-[0.98] transition-all glow-button uppercase"
+                      className="w-full py-4.5 sm:py-5 bg-black text-white rounded-xl font-jakarta text-xs font-bold tracking-[0.2em] mt-2 active:scale-[0.98] transition-all glow-button uppercase cursor-pointer"
                     >
                       {isLoggingIn ? (
                         <div className="flex items-center justify-center gap-2">
@@ -706,7 +707,7 @@ export default function AuthPage({
 
                     {/* Full Name Field */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
+                      <label className="text-[12px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
                         Họ và Tên
                       </label>
                       <input 
@@ -721,7 +722,7 @@ export default function AuthPage({
 
                     {/* Email Field */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
+                      <label className="text-[12px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
                         Email
                       </label>
                       <input 
@@ -737,7 +738,7 @@ export default function AuthPage({
                     {/* Password Row */}
                     <div className="grid grid-cols-2 gap-3.5">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
+                        <label className="text-[12px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
                           Mật khẩu
                         </label>
                         <div className="relative">
@@ -752,7 +753,7 @@ export default function AuthPage({
                           <button 
                             type="button"
                             onClick={() => setShowRegPassword(!showRegPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-black/45 hover:text-black transition-opacity"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-black/45 hover:text-black transition-opacity cursor-pointer"
                           >
                             {showRegPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                           </button>
@@ -760,17 +761,26 @@ export default function AuthPage({
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
-                          Xác nhận
+                        <label className="text-[12px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
+                          Xác nhận lại mật khẩu
                         </label>
-                        <input 
-                          type={showRegPassword ? 'text' : 'password'}
-                          required
-                          placeholder="••••••••"
-                          value={regConfirmPassword}
-                          onChange={(e) => setRegConfirmPassword(e.target.value)}
-                          className="w-full glass-input px-4 py-2.5 rounded-xl text-sm outline-none placeholder-black/35"
-                        />
+                        <div className="relative">
+                          <input 
+                            type={showRegConfirmPassword ? 'text' : 'password'}
+                            required
+                            placeholder="••••••••"
+                            value={regConfirmPassword}
+                            onChange={(e) => setRegConfirmPassword(e.target.value)}
+                            className="w-full glass-input px-4 py-2.5 rounded-xl text-sm outline-none placeholder-black/35"
+                          />
+                          <button 
+                            type="button"
+                            onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-black/45 hover:text-black transition-opacity cursor-pointer"
+                          >
+                            {showRegConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -783,7 +793,7 @@ export default function AuthPage({
                         onChange={(e) => setAgreeTerms(e.target.checked)}
                         className="rounded border-black/20 text-black focus:ring-0 h-4 w-4 bg-transparent cursor-pointer" 
                       />
-                      <label htmlFor="reg-agree-terms" className="font-jakarta text-[11px] font-semibold text-black/60 select-none cursor-pointer">
+                      <label htmlFor="reg-agree-terms" className="font-jakarta text-[12px] font-semibold text-black/60 select-none cursor-pointer">
                         Tôi đồng ý với <span className="text-black hover:underline cursor-pointer">Điều khoản dịch vụ</span> &amp; <span className="text-black hover:underline cursor-pointer">Bảo mật</span>
                       </label>
                     </div>
@@ -792,7 +802,7 @@ export default function AuthPage({
                     <button 
                       type="submit"
                       disabled={isRegistering}
-                      className="w-full py-4.5 sm:py-5 bg-black text-white rounded-xl font-jakarta text-xs font-bold tracking-[0.2em] mt-2 active:scale-[0.98] transition-all glow-button uppercase"
+                      className="w-full py-4.5 sm:py-5 bg-black text-white rounded-xl font-jakarta text-xs font-bold tracking-[0.2em] mt-2 active:scale-[0.98] transition-all glow-button uppercase cursor-pointer"
                     >
                       {isRegistering ? (
                         <div className="flex items-center justify-center gap-2">
@@ -811,9 +821,9 @@ export default function AuthPage({
 
           {/* Social Connect */}
           <div className="mt-7 relative z-10">
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-4 mb-3">
               <div className="h-[1px] flex-1 bg-black/5"></div>
-              <span className="font-jakarta text-[10px] font-bold text-black/40 uppercase tracking-[0.25em] small-caps">Tiếp tục với</span>
+              <span className="font-jakarta text-[12px] font-bold text-black/40 uppercase tracking-[0.25em] small-caps">Tiếp tục với</span>
               <div className="h-[1px] flex-1 bg-black/5"></div>
             </div>
 
@@ -827,7 +837,7 @@ export default function AuthPage({
                     onRegisterSuccess('google-user@gmail.com', 'Google User');
                   }
                 }}
-                className="flex-1 h-13 border border-black/10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-all active:scale-95 glass-edge cursor-pointer"
+                className="flex-1 h-13 border border-black/10 bg-white/40 hover:bg-white/60 rounded-xl flex items-center justify-center transition-all active:scale-95 glass-edge cursor-pointer"
               >
                 <svg className="w-4 h-4 mr-2" role="img" viewBox="0 0 24 24" fill="currentColor">
                   <title>Google</title>
@@ -836,7 +846,7 @@ export default function AuthPage({
                 <span className="font-jakarta text-[11px] font-bold tracking-[0.15em] uppercase">Google</span>
               </button>
 
-              <button 
+              {/* <button 
                 type="button"
                 onClick={() => {
                   if (mode === 'login') {
@@ -852,7 +862,7 @@ export default function AuthPage({
                   <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
                 </svg>
                 <span className="font-jakarta text-[11px] font-bold tracking-[0.15em] uppercase">Apple</span>
-              </button>
+              </button> */}
             </div>
           </div>
         </motion.div>

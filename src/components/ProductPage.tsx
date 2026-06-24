@@ -184,13 +184,13 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
       {/* Page Header */}
       <div className="mb-14">
         <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
-          TECHVIE HARDWARE CATALOG
+          DANH MỤC SẢN PHẨM
         </span>
         <h1 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
-          Hệ Sinh Thái Thiết Bị
+          Phụ Kiện & Đồ Setup
         </h1>
-        <p className="text-sm text-gray-500 font-sans mt-2 max-w-xl">
-          Tinh tuyển các thiết bị laptop, smartphone flagship, tai nghe cao cấp và phụ kiện sạc truyền dẫn bậc nhất được thiết kế và sản xuất theo chuẩn mực hi-end.
+        <p className="text-md text-justify text-gray-500 font-sans mt-2 max-w-2xl">
+          Khám phá bộ sưu tập phụ kiện công nghệ tiện ích và các sản phẩm ốp lưng custom độc bản. Nâng tầm không gian làm việc của bạn với thiết kế tối giản, bảo vệ sức khỏe và mang đậm dấu ấn cá nhân.
         </p>
       </div>
 
@@ -210,7 +210,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                   className={`px-5 py-3 rounded-2xl font-sans text-xs uppercase tracking-wider font-extrabold transition-all duration-300 flex items-center gap-2 relative cursor-pointer group ${
                     isActive
                       ? 'bg-black text-white shadow-lg shadow-black/10 scale-102'
-                      : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900 border border-gray-150/65'
+                      : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-black transition-colors'
                   }`}
                 >
                   <span className={`${isActive ? 'text-white' : 'text-gray-400 group-hover:text-black transition-colors duration-300'}`}>
@@ -229,26 +229,26 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
 
           <div className="hidden lg:flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest bg-gray-50 border border-gray-150 rounded-full px-4 py-2">
             <SlidersHorizontal size={13} className="text-gray-500" />
-            <span>Hiển thị: <strong>{filteredProducts.length}</strong> / {allProducts.length} thiết bị</span>
+            <span>Hiển thị: <strong>{filteredProducts.length}</strong> / {allProducts.length}</span>
           </div>
         </div>
 
         {/* Row 2: Search & Utility filters Panel */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-gray-50/50 border border-gray-150/80 p-4 rounded-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
           {/* Search bar inside filter dashboard */}
           <div className="md:col-span-7 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <input
               type="text"
-              placeholder="Tìm kiếm thiết bị TechVie, thông số hoặc hiệu năng..."
+              placeholder="Tìm kiếm phụ kiện, ốp lưng, đồ setup..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-xs font-sans pl-11 pr-10 py-3.5 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:border-black/50 focus:ring-1 focus:ring-black/10 placeholder-gray-400 transition-all text-gray-800 font-medium"
+              className="w-full text-sm font-sans pl-12 pr-10 bg-gray-50 rounded-full px-6 py-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-black placeholder-gray-400 transition-all text-gray-800 font-medium border border-gray-400"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors cursor-pointer"
                 title="Xóa tìm kiếm"
               >
                 <X size={14} />
@@ -261,13 +261,13 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
             <button
               type="button"
               onClick={() => setIsSortOpen(!isSortOpen)}
-              className="w-full text-xs font-sans pl-10 pr-10 py-3.5 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:border-black/50 focus:ring-1 focus:ring-black/10 text-gray-700 font-extrabold flex items-center justify-between cursor-pointer transition-all hover:bg-gray-50 text-left h-12 relative"
+              className="w-full text-sm font-sans pl-12 pr-10 py-3 bg-gray-50 rounded-full focus:outline-none focus:bg-white focus:ring-1 focus:ring-black text-gray-700 font-bold flex items-center justify-between cursor-pointer transition-all hover:bg-gray-100 text-left relative border border-gray-400"
             >
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
                 <ArrowUpDown size={14} />
               </div>
               <span className="truncate">{currentSortOption.label}</span>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform duration-300" style={{ transform: isSortOpen ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%)' }}>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform duration-300" style={{ transform: isSortOpen ? 'translateY(0%) rotate(180deg)' : 'translateY(0%)' }}>
                 <svg className="w-3 h-3 fill-none stroke-current" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
@@ -287,7 +287,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 left-0 mt-2 bg-white border border-gray-150 rounded-2xl shadow-xl z-40 overflow-hidden"
+                    className="absolute right-0 left-0 mt-2 bg-white border border-gray-400 rounded-2xl shadow-xl z-40 overflow-hidden"
                   >
                     <div className="py-1.5">
                       {sortOptions.map((option) => {
@@ -325,32 +325,32 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                 setSearchQuery('');
                 setSortBy('default');
               }}
-              className="w-full py-3.5 px-4 rounded-2xl border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-white text-xs font-sans uppercase tracking-widest font-black text-gray-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-transparent text-gray-900 hover:text-black disabled:opacity-40 disabled:hover:text-gray-400 text-sm font-sans  font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:cursor-not-allowed border border-gray-400 rounded-full"
             >
               <X size={13} />
-              Đặt lại
+              Đặt Lại
             </button>
           </div>
         </div>
 
         {/* Small results summary on search or filter updates */}
         {(selectedCategory !== 'Tất cả' || searchQuery !== '' || sortBy !== 'default') && (
-          <div className="flex flex-wrap items-center gap-2 mt-4 text-xs text-gray-500 font-sans">
+          <div className="flex flex-wrap items-center gap-2 mt-4 text-md text-gray-500 font-sans">
             <span>Đang lọc theo:</span>
             {selectedCategory !== 'Tất cả' && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[10px] uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
                 {selectedCategory}
                 <X size={10} className="cursor-pointer" onClick={() => setSelectedCategory('Tất cả')} />
               </span>
             )}
             {searchQuery && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[10px] uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
                 Tìm: "{searchQuery}"
                 <X size={10} className="cursor-pointer" onClick={() => setSearchQuery('')} />
               </span>
             )}
             {sortBy !== 'default' && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[10px] uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
                 {sortBy === 'price-asc' ? 'Giá tăng dần' : 'Giá giảm dần'}
                 <X size={10} className="cursor-pointer" onClick={() => setSortBy('default')} />
               </span>
@@ -375,7 +375,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
               key={product.id}
-              className="group bg-white border border-gray-200 hover:border-black/25 rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 h-[560px] shadow-sm relative overflow-hidden"
+              className="group bg-white border border-gray-200 rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-gray-300 h-full relative overflow-hidden"
             >
               {/* Image & Detail Peek Button */}
               <div>
@@ -386,7 +386,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                   
                   <button 
                     onClick={() => setSelectedProduct(product)}
-                    className="w-8 h-8 rounded-full border border-gray-200 hover:border-black hover:bg-gray-50 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
+                    className="w-8 h-8 rounded-full border border-gray-200 hover:border-black hover:bg-gray-50 flex items-center justify-center text-gray-400 hover:text-black transition-colors cursor-pointer"
                     title="Chi tiết kỹ thuật"
                   >
                     <Eye size={14} />
@@ -394,7 +394,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                 </div>
 
                 <div 
-                  className="h-44 flex items-center justify-center py-6 cursor-pointer relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50/50 to-gray-100/30 group-hover:from-gray-100/40 group-hover:to-gray-200/20 transition-all duration-300 border border-transparent group-hover:border-gray-100" 
+                  className="w-full aspect-[4/5] flex items-center justify-center cursor-pointer relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50/50 to-gray-100/30 group-hover:from-gray-100/40 group-hover:to-gray-200/20 transition-all duration-300 border border-transparent group-hover:border-gray-100" 
                   onClick={() => setSelectedProduct(product)}
                 >
                   {/* Subtle inner reflection */}
@@ -404,7 +404,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                     src={product.image} 
                     alt={product.name}
                     referrerPolicy="no-referrer"
-                    className="max-h-36 object-contain mix-blend-multiply transition-all duration-750 ease-out transform group-hover:scale-110 drop-shadow-sm group-hover:drop-shadow-lg"
+                    className="w-full h-full object-cover mix-blend-multiply transition-all duration-750 ease-out transform group-hover:scale-110 drop-shadow-sm group-hover:drop-shadow-lg"
                   />
                 </div>
 
@@ -492,7 +492,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
             >
               <button 
                 onClick={() => setSelectedProduct(null)}
-                className="absolute top-6 right-6 w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center text-gray-500 hover:text-black transition-colors"
+                className="absolute top-6 right-6 w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center text-gray-500 hover:text-black transition-colors cursor-pointer"
               >
                 ✕
               </button>
@@ -544,7 +544,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                         handleAddToCartWithSuccess(selectedProduct);
                         setSelectedProduct(null);
                       }}
-                      className="flex-grow bg-black text-white hover:bg-gray-800 py-4 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-colors"
+                      className="flex-grow bg-black text-white hover:bg-gray-800 py-4 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-colors cursor-pointer"
                     >
                       Thành lập liên kết & Thêm vào giỏ
                     </button>
