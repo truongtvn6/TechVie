@@ -16,7 +16,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
           <h3 className="text-2xl font-black text-gray-900 tracking-tight">
             TECHVIE
           </h3>
-          <p className="text-sm text-gray-500 font-sans leading-relaxed max-w-[260px] text-justify">
+          <p className="text-sm text-gray-500 font-sans leading-relaxed md:max-w-[260px] max-w-xl text-justify">
             Cung cấp các giải pháp phụ kiện tiện ích và đồ setup không gian làm việc. Chúng tôi giúp bạn kiến tạo góc học tập tối giản, bảo vệ sức khỏe và mang đậm cá tính riêng.
           </p>
         </div>
@@ -24,7 +24,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
         {/* Nav columns 1 */}
         <div>
           <h5 className="text-[10px] uppercase font-bold tracking-[0.2em] text-gray-400 mb-6 font-sans">
-            ĐIỀU HƯỚNG
+            CÁC KHÔNG GIAN
           </h5>
           <ul className="space-y-3">
             {navigationItems.map((item) => (
@@ -34,7 +34,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
                     setActiveTab(item.id);
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="text-xs text-gray-600 hover:text-black transition-colors font-sans text-left uppercase tracking-wider font-semibold"
+                  className="text-xs text-gray-600 hover:text-black transition-colors font-sans text-left uppercase tracking-wider font-semibold cursor-pointer"
                 >
                   {item.label}
                 </button>
@@ -55,7 +55,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
                   setActiveTab("brand");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className="hover:underline text-left"
+                className="hover:underline text-left cursor-pointer"
               >
                 TechVie Book Silicon specs
               </button>
@@ -66,7 +66,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
                   setActiveTab("brand");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className="hover:underline text-left"
+                className="hover:underline text-left cursor-pointer"
               >
                 Hệ Sinh Thái Thông Minh 2026
               </button>
@@ -77,7 +77,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
                   setActiveTab("contact");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className="hover:underline text-left"
+                className="hover:underline text-left cursor-pointer"
               >
                 Trạm Trải Nghiệm Premium
               </button>
@@ -88,7 +88,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
                   setActiveTab("contact");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className="hover:underline text-left"
+                className="hover:underline text-left cursor-pointer"
               >
                 Hỗ trợ kỹ thuật & Bảo hành
               </button>
