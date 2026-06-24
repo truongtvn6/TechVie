@@ -13,13 +13,11 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
       <div className="max-w-none mx-auto px-4 md:px-10 lg:px-16 grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Description summary */}
         <div className="space-y-4">
-          <h3 className="text-xl font-black text-gray-900 tracking-tight">
+          <h3 className="text-2xl font-black text-gray-900 tracking-tight">
             TECHVIE
           </h3>
-          <p className="text-xs text-gray-500 font-sans leading-relaxed max-w-[260px]">
-            Cung cấp các thiết bị điện tử đỉnh cao, laptop hiệu năng khủng,
-            smartphone đột phá và các món phụ kiện hi-end chế tác tỉ mỉ dành cho
-            tương lai.
+          <p className="text-sm text-gray-500 font-sans leading-relaxed max-w-[260px] text-justify">
+            Cung cấp các giải pháp phụ kiện tiện ích và đồ setup không gian làm việc. Chúng tôi giúp bạn kiến tạo góc học tập tối giản, bảo vệ sức khỏe và mang đậm cá tính riêng.
           </p>
         </div>
 
@@ -135,10 +133,10 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
           <Copyright  size={11} /> 2026 TECHVIE ELECTRONICS. ĐƯỢC CHẾ TÁC VÌ SỰ
           RÕ NÉT.
         </span>
-        <span className="flex items-center gap-1">
+        {/* <span className="flex items-center gap-1">
           THIẾT KẾ BỞI TECHVIE LAB, GEMINI, AISTUDIO.GOOGLE & STITCH.WITHGOOGLE.
           <ArrowUpRight size={11} />
-        </span>
+        </span> */}
       </div>
     </footer>
   );

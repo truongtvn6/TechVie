@@ -1,61 +1,69 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { TabType, CartItem, Product } from './types';
-import { 
-  createProduct, 
-  updateProduct, 
-  deleteProduct, 
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { TabType, CartItem, Product } from "./types";
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct,
   getProducts,
   getSystemUsers,
   adminCreateUser,
   toggleUserRole,
   toggleUserVip,
   toggleUserStatus,
-  adminDeleteUser
-} from './services/api';
-import HomePage from './components/HomePage';
-import BrandPage from './components/BrandPage';
-import ProductPage from './components/ProductPage';
-import NewsPage from './components/NewsPage';
-import ContactPage from './components/ContactPage';
-import CheckoutPage from './components/CheckoutPage';
-import AccountPage from './components/AccountPage';
-import AuthPage from './components/AuthPage';
-import AdminPage from './components/AdminPage';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import SearchSidePanel from './components/SearchSidePanel';
-import CartSidePanel from './components/CartSidePanel';
+  adminDeleteUser,
+} from "./services/api";
+import HomePage from "./components/HomePage";
+import BrandPage from "./components/BrandPage";
+import ProductPage from "./components/ProductPage";
+import NewsPage from "./components/NewsPage";
+import ContactPage from "./components/ContactPage";
+import CheckoutPage from "./components/CheckoutPage";
+import AccountPage from "./components/AccountPage";
+import AuthPage from "./components/AuthPage";
+import AdminPage from "./components/AdminPage";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import SearchSidePanel from "./components/SearchSidePanel";
+import CartSidePanel from "./components/CartSidePanel";
 
 export default function App() {
   const appRef = useRef<HTMLDivElement>(null);
 
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     try {
-      const saved = localStorage.getItem('active_tab');
-      return saved ? (saved as TabType) : 'home';
+      const saved = localStorage.getItem("active_tab");
+      return saved ? (saved as TabType) : "home";
     } catch {
-      return 'home';
+      return "home";
     }
   });
 
   const [products, setProducts] = useState<Product[]>([]);
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
-  const [token, setToken] = useState<string>(localStorage.getItem('techvie_token') || '');
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('techvie_token'));
+  const [token, setToken] = useState<string>(
+    localStorage.getItem("techvie_token") || "",
+  );
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("techvie_token"),
+  );
   const [userProfile, setUserProfile] = useState({
-    name: localStorage.getItem('techvie_token') ? 'ADMINISTRATOR' : 'Nguyễn Minh Tiến',
-    email: localStorage.getItem('techvie_token') ? 'admin@techvie.com' : 'mintzinfinity898@gmail.com',
-    phone: '0912 345 678',
-    address: '86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
-    memberSince: '17-06-2026',
-    techvieId: 'TV-992-88X',
-    shieldStatus: 'Đang Kích Hoạt (Premium)',
-    role: localStorage.getItem('techvie_token') ? 'admin' : 'user',
+    name: localStorage.getItem("techvie_token")
+      ? "ADMINISTRATOR"
+      : "Nguyễn Minh Tiến",
+    email: localStorage.getItem("techvie_token")
+      ? "admin@techvie.com"
+      : "mintzinfinity898@gmail.com",
+    phone: "0912 345 678",
+    address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
+    memberSince: "17-06-2026",
+    techvieId: "TV-992-88X",
+    shieldStatus: "Đang Kích Hoạt (Premium)",
+    role: localStorage.getItem("techvie_token") ? "admin" : "user",
   });
 
   useEffect(() => {
-    getProducts().then(res => {
+    getProducts().then((res) => {
       if (res.success) {
         setProducts(res.products);
       }
@@ -63,8 +71,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (isLoggedIn && userProfile.role === 'admin' && token) {
-      getSystemUsers(token).then(res => {
+    if (isLoggedIn && userProfile.role === "admin" && token) {
+      getSystemUsers(token).then((res) => {
         if (res.success && res.users) {
           const mapped = res.users.map((u: any) => ({
             id: u.id || u._id,
@@ -74,7 +82,7 @@ export default function App() {
             role: u.role,
             vipStatus: u.vipStatus,
             status: u.status,
-            joinedDate: new Date(u.created_at).toLocaleDateString('vi-VN')
+            joinedDate: new Date(u.created_at).toLocaleDateString("vi-VN"),
           }));
           setSystemUsers(mapped);
         }
@@ -86,7 +94,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('active_tab', activeTab);
+      localStorage.setItem("active_tab", activeTab);
     } catch (e) {
       console.error(e);
     }
@@ -95,39 +103,43 @@ export default function App() {
   const handleSetIsLoggedIn = (val: boolean) => {
     setIsLoggedIn(val);
     if (!val) {
-      setToken('');
-      localStorage.removeItem('techvie_token');
+      setToken("");
+      localStorage.removeItem("techvie_token");
       setUserProfile({
-        name: 'Nguyễn Minh Tiến',
-        email: 'mintzinfinity898@gmail.com',
-        phone: '0912 345 678',
-        address: '86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
-        memberSince: '17-06-2026',
-        techvieId: 'TV-992-88X',
-        shieldStatus: 'Đang Kích Hoạt (Premium)',
-        role: 'user',
+        name: "Nguyễn Minh Tiến",
+        email: "mintzinfinity898@gmail.com",
+        phone: "0912 345 678",
+        address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
+        memberSince: "17-06-2026",
+        techvieId: "TV-992-88X",
+        shieldStatus: "Đang Kích Hoạt (Premium)",
+        role: "user",
       });
     }
   };
 
   const handleAddProduct = async (newProduct: any, imageFile: File | null) => {
     try {
-      console.log('=== BẮT ĐẦU THÊM SẢN PHẨM MỚI ===');
-      console.log('Dữ liệu thô:', newProduct);
+      console.log("=== BẮT ĐẦU THÊM SẢN PHẨM MỚI ===");
+      console.log("Dữ liệu thô:", newProduct);
       if (imageFile) {
-        console.log('Tải kèm tệp ảnh:', imageFile.name, `(${imageFile.size} bytes)`);
+        console.log(
+          "Tải kèm tệp ảnh:",
+          imageFile.name,
+          `(${imageFile.size} bytes)`,
+        );
       }
 
       const formData = new FormData();
-      formData.append('name', newProduct.name);
-      formData.append('price', String(newProduct.price));
-      formData.append('category', newProduct.category);
-      formData.append('description', newProduct.description || '');
-      formData.append('specs', JSON.stringify(newProduct.specs || []));
+      formData.append("name", newProduct.name);
+      formData.append("price", String(newProduct.price));
+      formData.append("category", newProduct.category);
+      formData.append("description", newProduct.description || "");
+      formData.append("specs", JSON.stringify(newProduct.specs || []));
       if (imageFile) {
-        formData.append('imageFile', imageFile);
+        formData.append("imageFile", imageFile);
       } else if (newProduct.image) {
-        formData.append('image', newProduct.image);
+        formData.append("image", newProduct.image);
       }
 
       const res = await createProduct(formData, token);
@@ -139,39 +151,52 @@ export default function App() {
           category: res.product.category,
           image: res.product.image || newProduct.image,
           description: res.product.description,
-          specs: res.product.specs || []
+          specs: res.product.specs || [],
         };
-        console.log('Thêm sản phẩm thành công vào state React! Sản phẩm:', added);
-        setProducts(prev => [added, ...prev]);
-        console.log('Đăng bán sản phẩm thành công!');
+        console.log(
+          "Thêm sản phẩm thành công vào state React! Sản phẩm:",
+          added,
+        );
+        setProducts((prev) => [added, ...prev]);
+        console.log("Đăng bán sản phẩm thành công!");
       } else {
-        console.error('Lỗi phản hồi từ backend khi thêm sản phẩm:', res.message);
+        console.error(
+          "Lỗi phản hồi từ backend khi thêm sản phẩm:",
+          res.message,
+        );
         console.error(`Lỗi khi thêm sản phẩm: ${res.message}`);
       }
     } catch (error: any) {
-      console.error('Lỗi thêm sản phẩm:', error);
-      console.error('Không thể thêm sản phẩm, vui lòng kiểm tra kết nối.');
+      console.error("Lỗi thêm sản phẩm:", error);
+      console.error("Không thể thêm sản phẩm, vui lòng kiểm tra kết nối.");
     }
   };
 
-  const handleEditProduct = async (editedProduct: any, imageFile: File | null) => {
+  const handleEditProduct = async (
+    editedProduct: any,
+    imageFile: File | null,
+  ) => {
     try {
       console.log(`=== BẮT ĐẦU CẬP NHẬT SẢN PHẨM #${editedProduct.id} ===`);
-      console.log('Dữ liệu cập nhật mới:', editedProduct);
+      console.log("Dữ liệu cập nhật mới:", editedProduct);
       if (imageFile) {
-        console.log('Tải kèm tệp ảnh mới:', imageFile.name, `(${imageFile.size} bytes)`);
+        console.log(
+          "Tải kèm tệp ảnh mới:",
+          imageFile.name,
+          `(${imageFile.size} bytes)`,
+        );
       }
 
       const formData = new FormData();
-      formData.append('name', editedProduct.name);
-      formData.append('price', String(editedProduct.price));
-      formData.append('category', editedProduct.category);
-      formData.append('description', editedProduct.description || '');
-      formData.append('specs', JSON.stringify(editedProduct.specs || []));
+      formData.append("name", editedProduct.name);
+      formData.append("price", String(editedProduct.price));
+      formData.append("category", editedProduct.category);
+      formData.append("description", editedProduct.description || "");
+      formData.append("specs", JSON.stringify(editedProduct.specs || []));
       if (imageFile) {
-        formData.append('imageFile', imageFile);
+        formData.append("imageFile", imageFile);
       } else if (editedProduct.image) {
-        formData.append('image', editedProduct.image);
+        formData.append("image", editedProduct.image);
       }
 
       const res = await updateProduct(editedProduct.id, formData, token);
@@ -183,18 +208,23 @@ export default function App() {
           category: res.product.category,
           image: res.product.image || editedProduct.image,
           description: res.product.description,
-          specs: res.product.specs || []
+          specs: res.product.specs || [],
         };
-        console.log('Cập nhật sản phẩm thành công trong state React! Sản phẩm:', updated);
-        setProducts(prev => prev.map(p => p.id === updated.id ? updated : p));
-        console.log('Cập nhật sản phẩm thành công!');
+        console.log(
+          "Cập nhật sản phẩm thành công trong state React! Sản phẩm:",
+          updated,
+        );
+        setProducts((prev) =>
+          prev.map((p) => (p.id === updated.id ? updated : p)),
+        );
+        console.log("Cập nhật sản phẩm thành công!");
       } else {
-        console.error('Lỗi phản hồi từ backend khi sửa sản phẩm:', res.message);
+        console.error("Lỗi phản hồi từ backend khi sửa sản phẩm:", res.message);
         console.error(`Lỗi khi cập nhật sản phẩm: ${res.message}`);
       }
     } catch (error: any) {
-      console.error('Lỗi sửa sản phẩm:', error);
-      console.error('Không thể cập nhật sản phẩm, vui lòng kiểm tra kết nối.');
+      console.error("Lỗi sửa sản phẩm:", error);
+      console.error("Không thể cập nhật sản phẩm, vui lòng kiểm tra kết nối.");
     }
   };
 
@@ -204,15 +234,15 @@ export default function App() {
       const res = await deleteProduct(productId, token);
       if (res.success) {
         console.log(`Xóa sản phẩm #${productId} thành công khỏi state React.`);
-        setProducts(prev => prev.filter(p => p.id !== productId));
-        console.log('Xóa sản phẩm thành công!');
+        setProducts((prev) => prev.filter((p) => p.id !== productId));
+        console.log("Xóa sản phẩm thành công!");
       } else {
-        console.error('Lỗi phản hồi từ backend khi xóa sản phẩm:', res.message);
+        console.error("Lỗi phản hồi từ backend khi xóa sản phẩm:", res.message);
         console.error(`Lỗi khi xóa sản phẩm: ${res.message}`);
       }
     } catch (error: any) {
-      console.error('Lỗi xóa sản phẩm:', error);
-      console.error('Không thể xóa sản phẩm, vui lòng kiểm tra kết nối.');
+      console.error("Lỗi xóa sản phẩm:", error);
+      console.error("Không thể xóa sản phẩm, vui lòng kiểm tra kết nối.");
     }
   };
 
@@ -224,7 +254,7 @@ export default function App() {
         email: newUser.email,
         phone: newUser.phone,
         role: newUser.role,
-        vipStatus: newUser.vipStatus
+        vipStatus: newUser.vipStatus,
       };
       const res = await adminCreateUser(payload, token);
       if (res.success && res.user) {
@@ -236,15 +266,15 @@ export default function App() {
           role: res.user.role,
           vipStatus: res.user.vipStatus,
           status: res.user.status,
-          joinedDate: new Date(res.user.created_at).toLocaleDateString('vi-VN')
+          joinedDate: new Date(res.user.created_at).toLocaleDateString("vi-VN"),
         };
-        setSystemUsers(prev => [mappedUser, ...prev]);
+        setSystemUsers((prev) => [mappedUser, ...prev]);
         return { success: true, message: res.message, user: mappedUser };
       }
-      return { success: false, message: res.message || 'Lỗi từ máy chủ.' };
+      return { success: false, message: res.message || "Lỗi từ máy chủ." };
     } catch (error: any) {
-      console.error('Lỗi thêm thành viên:', error);
-      return { success: false, message: 'Lỗi kết nối khi thêm thành viên.' };
+      console.error("Lỗi thêm thành viên:", error);
+      return { success: false, message: "Lỗi kết nối khi thêm thành viên." };
     }
   };
 
@@ -260,15 +290,17 @@ export default function App() {
           role: res.user.role,
           vipStatus: res.user.vipStatus,
           status: res.user.status,
-          joinedDate: new Date(res.user.created_at).toLocaleDateString('vi-VN')
+          joinedDate: new Date(res.user.created_at).toLocaleDateString("vi-VN"),
         };
-        setSystemUsers(prev => prev.map(u => u.id === id ? mappedUser : u));
+        setSystemUsers((prev) =>
+          prev.map((u) => (u.id === id ? mappedUser : u)),
+        );
         return { success: true, message: res.message, user: mappedUser };
       }
-      return { success: false, message: res.message || 'Lỗi kết nối.' };
+      return { success: false, message: res.message || "Lỗi kết nối." };
     } catch (error: any) {
-      console.error('Lỗi đổi quyền thành viên:', error);
-      return { success: false, message: 'Lỗi kết nối mạng.' };
+      console.error("Lỗi đổi quyền thành viên:", error);
+      return { success: false, message: "Lỗi kết nối mạng." };
     }
   };
 
@@ -284,15 +316,17 @@ export default function App() {
           role: res.user.role,
           vipStatus: res.user.vipStatus,
           status: res.user.status,
-          joinedDate: new Date(res.user.created_at).toLocaleDateString('vi-VN')
+          joinedDate: new Date(res.user.created_at).toLocaleDateString("vi-VN"),
         };
-        setSystemUsers(prev => prev.map(u => u.id === id ? mappedUser : u));
+        setSystemUsers((prev) =>
+          prev.map((u) => (u.id === id ? mappedUser : u)),
+        );
         return { success: true, message: res.message, user: mappedUser };
       }
-      return { success: false, message: res.message || 'Lỗi kết nối.' };
+      return { success: false, message: res.message || "Lỗi kết nối." };
     } catch (error: any) {
-      console.error('Lỗi đổi VIP thành viên:', error);
-      return { success: false, message: 'Lỗi kết nối mạng.' };
+      console.error("Lỗi đổi VIP thành viên:", error);
+      return { success: false, message: "Lỗi kết nối mạng." };
     }
   };
 
@@ -308,15 +342,17 @@ export default function App() {
           role: res.user.role,
           vipStatus: res.user.vipStatus,
           status: res.user.status,
-          joinedDate: new Date(res.user.created_at).toLocaleDateString('vi-VN')
+          joinedDate: new Date(res.user.created_at).toLocaleDateString("vi-VN"),
         };
-        setSystemUsers(prev => prev.map(u => u.id === id ? mappedUser : u));
+        setSystemUsers((prev) =>
+          prev.map((u) => (u.id === id ? mappedUser : u)),
+        );
         return { success: true, message: res.message, user: mappedUser };
       }
-      return { success: false, message: res.message || 'Lỗi kết nối.' };
+      return { success: false, message: res.message || "Lỗi kết nối." };
     } catch (error: any) {
-      console.error('Lỗi đổi trạng thái thành viên:', error);
-      return { success: false, message: 'Lỗi kết nối mạng.' };
+      console.error("Lỗi đổi trạng thái thành viên:", error);
+      return { success: false, message: "Lỗi kết nối mạng." };
     }
   };
 
@@ -324,13 +360,13 @@ export default function App() {
     try {
       const res = await adminDeleteUser(id, token);
       if (res.success) {
-        setSystemUsers(prev => prev.filter(u => u.id !== id));
+        setSystemUsers((prev) => prev.filter((u) => u.id !== id));
         return { success: true, message: res.message };
       }
-      return { success: false, message: res.message || 'Lỗi kết nối.' };
+      return { success: false, message: res.message || "Lỗi kết nối." };
     } catch (error: any) {
-      console.error('Lỗi xóa thành viên:', error);
-      return { success: false, message: 'Lỗi kết nối mạng.' };
+      console.error("Lỗi xóa thành viên:", error);
+      return { success: false, message: "Lỗi kết nối mạng." };
     }
   };
 
@@ -347,7 +383,7 @@ export default function App() {
         return prevCart.map((item) =>
           item.product.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
-            : item
+            : item,
         );
       }
       return [...prevCart, { product, quantity: 1 }];
@@ -366,12 +402,14 @@ export default function App() {
           }
           return item;
         })
-        .filter((item) => item.quantity > 0)
+        .filter((item) => item.quantity > 0),
     );
   };
 
   const handleRemoveItem = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
+    setCart((prevCart) =>
+      prevCart.filter((item) => item.product.id !== productId),
+    );
   };
 
   const handleClearCart = () => {
@@ -380,18 +418,24 @@ export default function App() {
 
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  const showHeaderFooter = activeTab !== 'dang-nhap' && activeTab !== 'dang-ky' && activeTab !== 'admin';
+  const showHeaderFooter =
+    activeTab !== "dang-nhap" &&
+    activeTab !== "dang-ky" &&
+    activeTab !== "admin";
 
   const navigationItems: { id: TabType; label: string }[] = [
-    { id: 'products', label: 'SẢN PHẨM' },
-    { id: 'brand', label: 'THƯƠNG HIỆU' }, // The requested brand page
-    { id: 'news', label: 'TIN TỨC' },
-    { id: 'contact', label: 'LIÊN HỆ' }
+    { id: "home", label: "TRANG CHỦ" },
+    { id: "products", label: "SẢN PHẨM" },
+    { id: "brand", label: "THƯƠNG HIỆU" }, // The requested brand page
+    { id: "news", label: "TIN TỨC" },
+    { id: "contact", label: "LIÊN HỆ" },
   ];
 
   return (
-    <div ref={appRef} className="min-h-screen bg-[#f7f9fb] text-gray-900 font-sans flex flex-col justify-between selection:bg-black selection:text-white relative">
-
+    <div
+      ref={appRef}
+      className="min-h-screen bg-[#f7f9fb] text-gray-900 font-sans flex flex-col justify-between selection:bg-black selection:text-white relative"
+    >
       {/* Aurora Ambient Backgrounds */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-[-200px] left-[-100px] w-[600px] h-[600px] rounded-full bg-indigo-500/5 blur-[120px] animate-drift-slow" />
@@ -417,9 +461,15 @@ export default function App() {
       )}
 
       {/* Interactive Main Body Swap Grid */}
-      <main className={showHeaderFooter ? "flex-grow" : "min-h-screen flex items-center justify-center p-0 w-full"}>
+      <main
+        className={
+          showHeaderFooter
+            ? "flex-grow"
+            : "min-h-screen flex items-center justify-center p-0 w-full"
+        }
+      >
         <AnimatePresence mode="wait">
-          {activeTab === 'home' && (
+          {activeTab === "home" && (
             <motion.div
               key="home-route"
               initial={{ opacity: 0, y: 15 }}
@@ -428,18 +478,18 @@ export default function App() {
               transition={{ duration: 0.35 }}
               className="w-full"
             >
-              <HomePage 
+              <HomePage
                 products={products}
                 onNavigate={(tab) => {
                   setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }} 
-                onAddToCart={handleAddToCart} 
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                onAddToCart={handleAddToCart}
               />
             </motion.div>
           )}
 
-          {activeTab === 'brand' && (
+          {activeTab === "brand" && (
             <motion.div
               key="brand-route"
               initial={{ opacity: 0, y: 15 }}
@@ -452,7 +502,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'products' && (
+          {activeTab === "products" && (
             <motion.div
               key="products-route"
               initial={{ opacity: 0, y: 15 }}
@@ -465,7 +515,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'news' && (
+          {activeTab === "news" && (
             <motion.div
               key="news-route"
               initial={{ opacity: 0, y: 15 }}
@@ -478,7 +528,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'contact' && (
+          {activeTab === "contact" && (
             <motion.div
               key="contact-route"
               initial={{ opacity: 0, y: 15 }}
@@ -491,7 +541,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'checkout' && (
+          {activeTab === "checkout" && (
             <motion.div
               key="checkout-route"
               initial={{ opacity: 0, y: 15 }}
@@ -500,20 +550,20 @@ export default function App() {
               transition={{ duration: 0.35 }}
               className="w-full"
             >
-              <CheckoutPage 
+              <CheckoutPage
                 cart={cart}
                 onQuantityChange={handleQuantityChange}
                 onRemoveItem={handleRemoveItem}
                 onClearCart={handleClearCart}
                 onNavigate={(tab) => {
                   setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               />
             </motion.div>
           )}
 
-          {activeTab === 'dang-nhap' && (
+          {activeTab === "dang-nhap" && (
             <motion.div
               key="dang-nhap-route"
               initial={{ opacity: 0, y: 15 }}
@@ -522,48 +572,50 @@ export default function App() {
               transition={{ duration: 0.35 }}
               className="w-full"
             >
-              <AuthPage 
+              <AuthPage
                 initialMode="login"
                 onNavigate={(tab) => {
                   setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 onLoginSuccess={(email, userToken) => {
-                  const isSystemAdmin = email === 'admin@techvie.com';
+                  const isSystemAdmin = email === "admin@techvie.com";
                   if (userToken) {
                     setToken(userToken);
-                    localStorage.setItem('techvie_token', userToken);
+                    localStorage.setItem("techvie_token", userToken);
                   }
-                  setUserProfile(prev => ({
+                  setUserProfile((prev) => ({
                     ...prev,
                     email: email,
-                    name: isSystemAdmin ? 'ADMINISTRATOR' : email.split('@')[0].toUpperCase(),
-                    role: isSystemAdmin ? 'admin' : 'user',
+                    name: isSystemAdmin
+                      ? "ADMINISTRATOR"
+                      : email.split("@")[0].toUpperCase(),
+                    role: isSystemAdmin ? "admin" : "user",
                   }));
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
-                    setActiveTab('admin');
+                    setActiveTab("admin");
                   } else {
-                    setActiveTab('account');
+                    setActiveTab("account");
                   }
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 onRegisterSuccess={(email, name) => {
-                  setUserProfile(prev => ({
+                  setUserProfile((prev) => ({
                     ...prev,
                     email: email,
                     name: name,
-                    role: 'user',
+                    role: "user",
                   }));
                   setIsLoggedIn(true);
-                  setActiveTab('account');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setActiveTab("account");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               />
             </motion.div>
           )}
 
-          {activeTab === 'dang-ky' && (
+          {activeTab === "dang-ky" && (
             <motion.div
               key="dang-ky-route"
               initial={{ opacity: 0, y: 15 }}
@@ -572,48 +624,50 @@ export default function App() {
               transition={{ duration: 0.35 }}
               className="w-full"
             >
-              <AuthPage 
+              <AuthPage
                 initialMode="register"
                 onNavigate={(tab) => {
                   setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 onLoginSuccess={(email, userToken) => {
-                  const isSystemAdmin = email === 'admin@techvie.com';
+                  const isSystemAdmin = email === "admin@techvie.com";
                   if (userToken) {
                     setToken(userToken);
-                    localStorage.setItem('techvie_token', userToken);
+                    localStorage.setItem("techvie_token", userToken);
                   }
-                  setUserProfile(prev => ({
+                  setUserProfile((prev) => ({
                     ...prev,
                     email: email,
-                    name: isSystemAdmin ? 'ADMINISTRATOR' : email.split('@')[0].toUpperCase(),
-                    role: isSystemAdmin ? 'admin' : 'user',
+                    name: isSystemAdmin
+                      ? "ADMINISTRATOR"
+                      : email.split("@")[0].toUpperCase(),
+                    role: isSystemAdmin ? "admin" : "user",
                   }));
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
-                    setActiveTab('admin');
+                    setActiveTab("admin");
                   } else {
-                    setActiveTab('account');
+                    setActiveTab("account");
                   }
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 onRegisterSuccess={(email, name) => {
-                  setUserProfile(prev => ({
+                  setUserProfile((prev) => ({
                     ...prev,
                     email: email,
                     name: name,
-                    role: 'user',
+                    role: "user",
                   }));
                   setIsLoggedIn(true);
-                  setActiveTab('account');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setActiveTab("account");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               />
             </motion.div>
           )}
 
-          {activeTab === 'account' && (
+          {activeTab === "account" && (
             <motion.div
               key="account-route"
               initial={{ opacity: 0, y: 15 }}
@@ -622,10 +676,10 @@ export default function App() {
               transition={{ duration: 0.35 }}
               className="w-full"
             >
-              <AccountPage 
+              <AccountPage
                 onNavigate={(tab) => {
                   setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 isLoggedIn={isLoggedIn}
                 setIsLoggedIn={handleSetIsLoggedIn}
@@ -635,7 +689,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'admin' && userProfile.role === 'admin' && (
+          {activeTab === "admin" && userProfile.role === "admin" && (
             <motion.div
               key="admin-route"
               initial={{ opacity: 0, y: 15 }}
@@ -644,14 +698,14 @@ export default function App() {
               transition={{ duration: 0.35 }}
               className="w-full"
             >
-              <AdminPage 
+              <AdminPage
                 products={products}
                 onAddProduct={handleAddProduct}
                 onEditProduct={handleEditProduct}
                 onDeleteProduct={handleDeleteProduct}
                 onNavigate={(tab) => {
                   setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 systemUsers={systemUsers}
                 onAddUser={handleAddUser}
@@ -667,26 +721,23 @@ export default function App() {
 
       {/* Master Website Footer conforming to branding mock directions */}
       {showHeaderFooter && (
-        <Footer
-          navigationItems={navigationItems}
-          setActiveTab={setActiveTab}
-        />
+        <Footer navigationItems={navigationItems} setActiveTab={setActiveTab} />
       )}
 
       {/* Left 70%-width Slide out Search panel drawer */}
-      <SearchSidePanel 
+      <SearchSidePanel
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         products={products}
         onNavigate={(tab) => {
           setActiveTab(tab);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }}
         onAddToCart={handleAddToCart}
       />
 
       {/* Right Slide-out Cart panel drawer */}
-      <CartSidePanel 
+      <CartSidePanel
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cart={cart}
@@ -695,10 +746,9 @@ export default function App() {
         onClearCart={handleClearCart}
         onNavigate={(tab) => {
           setActiveTab(tab);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       />
-
     </div>
   );
 }

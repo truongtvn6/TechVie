@@ -137,51 +137,43 @@ export default function HomePage({
               transition={{ duration: 0.8 }}
               className="max-w-2xl bg-white/45 backdrop-blur-[35px] p-8 md:p-14 rounded-3xl border border-white/60 shadow-[0_30px_70px_rgba(0,0,0,0.1)] relative"
             >
-              <div className="absolute top-0 right-0 p-6 flex flex-col items-end opacity-35 text-[9px] font-mono tracking-widest text-gray-800">
+              {/* <div className="absolute top-0 right-0 p-6 flex flex-col items-end opacity-35 text-[9px] font-mono tracking-widest text-gray-800">
                 <span>MÃ LƯỚI: 48.85 / 2.35</span>
                 <div className="w-12 h-px bg-gray-800 mt-1"></div>
-              </div>
+              </div> */}
 
               <div className="absolute -left-px top-1/4 h-24 w-1 bg-gradient-to-b from-transparent via-secondary/40 to-transparent"></div>
 
-              <span className="text-xs uppercase tracking-[0.4em] text-secondary font-bold mb-6 block flex items-center gap-3">
+              <span className="text-sm uppercase tracking-[0.25em] text-secondary font-bold mb-6 block">
                 <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
-                Hệ Sinh Thái Độc Bản v2.0
+                PHỤ KIỆN & ĐỒ SETUP AESTHETIC
               </span>
 
               <h1 className="text-5xl md:text-6xl font-sans font-black tracking-tighter text-gray-900 mb-6 leading-[1.05]">
-                Công Nghệ <br />
-                Hiện Đại.
+                Góc Làm Việc <br />
+                Đậm Chất Riêng
               </h1>
 
-              <p className="font-sans text-gray-650 text-sm leading-relaxed mb-8 max-w-sm">
-                Kiến tạo phong cách số tối giản, nâng tầm hiệu suất làm việc và
-                giải trí hàng ngày với hệ sinh thái thiết bị điện tử đỉnh cao từ
-                TechVie.
+              <p className="font-sans text-gray-650 text-md leading-relaxed mb-8 max-w-md text-justify">
+                Khơi nguồn cảm hứng với các combo phụ kiện tiện ích và ốp lưng custom độc quyền. TechVie đồng hành cùng bạn kiến tạo góc làm việc tối giản, bảo vệ sức khỏe và thể hiện cá tính.
               </p>
 
               {/* Specification stats box in vietnamese template */}
-              <div className="grid grid-cols-2 gap-8 mb-8 border-y border-black/5 py-6">
+              <div className="grid grid-cols-2 gap-8 mb-8 py-2">
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">
-                    CHIP XỬ LÝ M1
+                  <div className="text-[15px] font-extrabold uppercase tracking-widest text-gray-900 mb-1">
+                    BẢO HÀNH 1-ĐỔI-1
                   </div>
-                  <div className="text-3xl font-extrabold tracking-tight text-gray-900 flex items-baseline gap-1">
-                    3.6
-                    <span className="text-xs font-normal text-gray-600 font-mono">
-                      GHz
-                    </span>
+                  <div className="text-[13px] text-gray-500 flex items-baseline gap-1">
+                    Lỗi từ nhà sản xuất
                   </div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">
-                    MÀN HÌNH ĐỘ NÉT
+                  <div className="text-[15px] font-extrabold uppercase tracking-widest text-gray-900 mb-1">
+                    ĐÓNG GÓI GIFT BOX
                   </div>
-                  <div className="text-3xl font-extrabold tracking-tight text-gray-900 flex items-baseline gap-1">
-                    4K
-                    <span className="text-xs font-normal text-gray-600 font-mono">
-                      UHD
-                    </span>
+                  <div className="text-[13px] text-gray-500 flex items-baseline gap-1">
+                    Trải nghiệm unbox khác biệt
                   </div>
                 </div>
               </div>
@@ -189,14 +181,14 @@ export default function HomePage({
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => onNavigate("brand")}
-                  className="bg-black text-white hover:bg-gray-800 px-10 py-4 rounded-full font-sans font-black uppercase tracking-widest text-[13px] hover:scale-102 transition-all shadow-md flex items-center justify-center gap-2"
+                  className="bg-black text-white hover:bg-gray-800 px-8 py-4 rounded-full font-sans font-black uppercase tracking-widest text-[13px] hover:scale-102 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Khám Phá Thương Hiệu
                   <ArrowRight size={16} />
                 </button>
                 <button
                   onClick={() => onNavigate("products")}
-                  className="bg-white/80 hover:bg-white text-gray-900 border border-gray-300 px-8 py-4 rounded-full font-sans font-extrabold uppercase tracking-wider text-[13px] transition-all flex items-center justify-center"
+                  className="bg-white/80 hover:bg-white text-gray-900 border border-gray-300 px-8 py-4 rounded-full font-sans font-extrabold uppercase tracking-wider text-[13px] transition-all flex items-center justify-center cursor-pointer"
                 >
                   Bộ Sưu Tập
                 </button>
@@ -230,14 +222,14 @@ export default function HomePage({
               SẢN PHẨM NỔI BẬT
             </span>
             <h2 className="text-3xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
-              Thiết Bị TechVie Premium
+              Góc Setup Trendy & Tiện Ích
             </h2>
           </div>
           <button
             onClick={() => onNavigate("products")}
-            className="mt-4 md:mt-0 text-[13px] uppercase tracking-[0.3em] font-black border-b-2 border-primary pb-1.5 hover:opacity-75 transition-opacity"
+            className="mt-4 md:mt-0 text-[13px] uppercase tracking-[0.3em] font-black border-b-2 border-primary pb-1.5 hover:opacity-75 transition-opacity cursor-pointer"
           >
-            Đến Cửa Hàng
+            Gian Trưng Bày
           </button>
         </div>
 
@@ -279,7 +271,7 @@ export default function HomePage({
 
                 <button
                   onClick={() => onAddToCart(product)}
-                  className="w-full bg-black text-white hover:bg-gray-900 font-sans text-xs uppercase tracking-widest font-black py-4 rounded-full flex items-center justify-center gap-2 shadow transition-all duration-300"
+                  className="w-full bg-black text-white hover:bg-gray-900 font-sans text-xs uppercase tracking-widest font-black py-4 rounded-full flex items-center justify-center gap-2 shadow transition-all duration-300 cursor-pointer"
                 >
                   Thêm Vào Giỏ
                 </button>
@@ -294,52 +286,51 @@ export default function HomePage({
         <div className="bg-gray-100 rounded-[3rem] p-8 md:p-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
-              CHẾ TÁC PHẦN CỨNG TIÊN PHONG
+              TRẢI NGHIỆM MUA SẮM KHÁC BIỆT
             </span>
             <h2 className="text-3xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-tight">
-              Bật Sáng Hiệu Năng Cùng TechVie Lab.
+              Nâng Tầm Cảm Xúc Khi Mở Hộp
             </h2>
-            <p className="text-gray-650 font-sans text-sm leading-relaxed mt-6 mb-8">
-              Mỗi bảng mạch vi xử lý, mỗi góc bo góc nẹp hợp kim trên các dòng
-              Laptop, điện thoại và phụ kiện của TechVie đều tuân thủ các quy
-              tắc thiết kế công thái học khắt khe nhất. Đảm bảo độ bền cơ học ấn
-              tượng và hiệu năng xử lý vi mạch hoàn hảo.
+            <p className="text-gray-650 font-sans text-md leading-relaxed mt-6 mb-8 text-justify">
+              Không chỉ cung cấp phụ kiện, TechVie chú trọng vào trải nghiệm của bạn. Mọi sản phẩm đều được kiểm tra kỹ lưỡng (QC 100%) và đóng gói dưới dạng hộp quà tặng (Gift box) chỉn chu kèm thiệp viết tay.
             </p>
             <div className="flex flex-wrap gap-8 mb-8 border-t border-gray-200 pt-8">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-secondary">
+                <div className="w-15 h-10 rounded-xl flex items-center justify-center text-secondary">
                   <Activity size={20} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-gray-900">
-                    Chuẩn Âu Thụy Sĩ
+                  <h4 className="font-bold text-lg text-gray-900">
+                    Đóng Gói Aesthetic
                   </h4>
-                  <p className="text-xs text-gray-500">
-                    Gia công sắc sảo đến từng góc cạnh
+                  <p className="text-sm text-gray-500 max-w-xs">
+                    Bao bì chống sốc an toàn, thiết kế tối giản, mang lại sự tinh tế ngay từ cái nhìn đầu tiên
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-secondary">
+                <div className="w-15 h-10 rounded-xl flex items-center justify-center text-secondary">
                   <Cpu size={20} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-gray-900">
-                    Hệ Sinh Thái Silicon
+                  <h4 className="font-bold text-lg text-gray-900">
+                    Dịch Vụ Custom
                   </h4>
-                  <p className="text-xs text-gray-500">
-                    Vi mạch đồng bộ, tối ưu năng lượng
+                  <p className="text-sm text-gray-500 max-w-xs">
+                    Hỗ trợ in ấn tên, hình vẽ lên ốp lưng theo yêu cầu để bạn tự do sáng tạo cái tôi độc bản
                   </p>
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => onNavigate("brand")}
-              className="bg-black text-white hover:bg-gray-800 font-sans text-xs uppercase tracking-widest font-black px-8 py-3.5 rounded-full flex items-center gap-2"
-            >
-              Xem Qui Trình Chế Tác Lab
-              <ArrowRight size={14} />
-            </button>
+            <div className="flex justify-end">
+              <button
+                onClick={() => onNavigate("brand")}
+                className="bg-black text-white hover:bg-gray-800 font-sans text-xs uppercase tracking-widest font-black px-8 py-3.5 rounded-full flex items-center gap-2 cursor-pointer"
+              >
+                TÌM HIỂU THÊM
+                <ArrowRight size={14} />
+              </button>
+            </div>
           </div>
           <div className="aspect-video lg:aspect-square overflow-hidden rounded-[2rem] bg-gray-200 border border-gray-300 shadow relative">
             <img
@@ -356,13 +347,12 @@ export default function HomePage({
       <section className="py-24 px-6 max-w-7xl mx-auto border-t border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-none uppercase mb-6">
-              Đón Đầu <br />
-              Công Nghệ.
+            <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-none mb-6">
+              Nhận Ưu Đãi <br />
+              Độc Quyền
             </h2>
-            <p className="text-gray-650 font-sans text-sm leading-relaxed max-w-sm">
-              Đăng ký để nhận quyền truy cập sớm vào các đợt phát hành sản phẩm
-              mới, chương trình ưu đãi đặc quyền và cập nhật phần mềm sớm nhất.
+            <p className="text-gray-650 font-sans text-md leading-relaxed max-w-md text-justify">
+              Đăng ký email để không bỏ lỡ các mã Freeship, voucher giảm giá và thông tin mới nhất về các bộ sưu tập đồ setup từ TechVie.
             </p>
           </div>
 
@@ -393,7 +383,7 @@ export default function HomePage({
                   <button
                     type="submit"
                     disabled={isSubmittingSubscription}
-                    className="bg-black text-white hover:bg-gray-900 disabled:bg-gray-700 disabled:cursor-not-allowed px-8 py-4 rounded-2xl font-sans text-xs uppercase tracking-[0.3em] font-black w-full flex items-center justify-center gap-2 transition-transform h-14"
+                    className="bg-black text-white hover:bg-gray-900 disabled:bg-gray-700 disabled:cursor-not-allowed px-8 py-4 rounded-2xl font-sans text-xs uppercase tracking-[0.3em] font-black w-full flex items-center justify-center gap-2 transition-transform h-14 cursor-pointer"
                   >
                     {isSubmittingSubscription
                       ? "ĐANG GỬI ĐĂNG KÝ..."

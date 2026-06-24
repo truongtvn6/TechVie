@@ -110,7 +110,7 @@ export default function Header({
                 setActiveTab(item.id);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`nav-btn px-4 py-2 text-[11px] lg:text-[13px] font-sans tracking-widest font-extrabold transition-all duration-300 rounded-sm ${
+              className={`nav-btn px-4 py-2 text-[11px] lg:text-[13px] font-sans tracking-widest font-extrabold transition-all duration-300 rounded-sm cursor-pointer ${
                 activeTab === item.id 
                   ? 'nav-btn-active' 
                   : 'text-gray-500'
@@ -125,7 +125,7 @@ export default function Header({
         <div className="flex items-center space-x-4">
           <button 
             onClick={() => setIsSearchOpen(true)}
-            className="relative w-12 h-12 flex items-center justify-center bg-white/40 border border-black/5 rounded hover:bg-white/80 transition-all duration-300 active:scale-95"
+            className="relative w-12 h-12 flex items-center justify-center bg-white/40 border border-black/5 rounded hover:bg-white/80 transition-all duration-300 active:scale-95 cursor-pointer"
             title="Tìm kiếm thiết bị"
           >
             <Search size={18} className="text-gray-900" />
@@ -134,7 +134,7 @@ export default function Header({
 
           <button 
             onClick={() => setIsCartOpen(true)}
-            className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/70 hover:backdrop-blur-sm transition-all duration-300 relative"
+            className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/70 hover:backdrop-blur-sm transition-all duration-300 relative cursor-pointer"
             title="Giỏ hàng TechVie"
           >
             <ShoppingBag size={20} className="text-gray-900" />
@@ -163,7 +163,7 @@ export default function Header({
                 }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative ${
+              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative cursor-pointer ${
                 activeTab === 'account' || activeTab === 'dang-nhap' || activeTab === 'dang-ky'
                   ? 'bg-black text-white shadow-md' 
                   : 'hover:bg-white/70 hover:backdrop-blur-sm text-gray-950 border border-transparent/0'
@@ -176,7 +176,7 @@ export default function Header({
 
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/70 hover:backdrop-blur-sm transition-all duration-300"
+            className="md:hidden w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/70 hover:backdrop-blur-sm transition-all duration-300 cursor-pointer"
             title="Danh mục menu"
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -201,7 +201,7 @@ export default function Header({
                     setIsMobileMenuOpen(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`text-left text-sm uppercase tracking-widest font-black py-2.5 ${
+                  className={`text-left text-sm uppercase tracking-widest font-black py-2.5 cursor-pointer font-bold ${
                     activeTab === item.id ? 'text-indigo-600 font-extrabold' : 'text-gray-600 shadow-none'
                   }`}
                 >
@@ -210,7 +210,7 @@ export default function Header({
               ))}
               
               {!isLoggedIn ? (
-                <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
+                <div className="pt-4 border-t border-gray-200 flex flex-col gap-2">
                   <a
                     href="#dang-nhap"
                     onClick={(e) => {
@@ -219,11 +219,12 @@ export default function Header({
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 ${
+                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 font-bold ${
                       activeTab === 'dang-nhap' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
                     }`}
                   >
-                    <User size={16} /> ĐĂNG NHẬP
+                    {/* <User size={16} />  */}
+                    ĐĂNG NHẬP
                   </a>
                   <a
                     href="#dang-ky"
@@ -233,7 +234,7 @@ export default function Header({
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 ${
+                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 font-bold ${
                       activeTab === 'dang-ky' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
                     }`}
                   >
