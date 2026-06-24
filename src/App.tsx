@@ -25,6 +25,7 @@ import AdminPage from "./components/AdminPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import SearchSidePanel from "./components/SearchSidePanel";
+import PolicyPage from "./components/PolicyPage";
 import CartSidePanel from "./components/CartSidePanel";
 
 export default function App() {
@@ -428,6 +429,7 @@ export default function App() {
     { id: "products", label: "SẢN PHẨM" },
     { id: "brand", label: "THƯƠNG HIỆU" }, // The requested brand page
     { id: "news", label: "TIN TỨC" },
+    { id: "policy", label: "CHÍNH SÁCH" },
     { id: "contact", label: "LIÊN HỆ" },
   ];
 
@@ -538,6 +540,19 @@ export default function App() {
               className="w-full"
             >
               <ContactPage />
+            </motion.div>
+          )}
+
+          {activeTab === "policy" && (
+            <motion.div
+              key="policy-route"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35 }}
+              className="w-full"
+            >
+              <PolicyPage />
             </motion.div>
           )}
 

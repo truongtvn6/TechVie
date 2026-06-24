@@ -1,4 +1,4 @@
-export type TabType = 'home' | 'brand' | 'products' | 'news' | 'contact' | 'checkout' | 'account' | 'dang-nhap' | 'dang-ky' | 'admin';
+export type TabType = 'home' | 'brand' | 'products' | 'news' | 'contact' | 'checkout' | 'account' | 'dang-nhap' | 'dang-ky' | 'admin' | 'policy';
 
 export interface Product {
   id: string;
