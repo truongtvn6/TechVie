@@ -17,24 +17,24 @@ export default function ContactManager({
 
   return (
     <div className="space-y-6 animate-fade-in font-sans">
-      <div className={`flex flex-col sm:flex-row justify-between sm:items-center gap-4 p-5 rounded-3xl shadow-sm border ${
+      <div className={`flex flex-col sm:flex-row justify-between sm:items-center gap-4 p-6 sm:p-8 rounded-3xl shadow-sm border transition-all duration-300 ${
         d ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-gray-200'
       }`}>
         <div>
-          <h3 className={`font-extrabold text-sm uppercase ${d ? 'text-white' : 'text-gray-955'}`}>Hòm thư góp ý khách hàng</h3>
-          <p className={`text-xs font-sans ${d ? 'text-gray-400' : 'text-gray-405'}`}>
+          <h3 className={`font-extrabold text-base uppercase tracking-wider transition-colors duration-300 ${d ? 'text-white' : 'text-gray-955'}`}>Hòm thư góp ý khách hàng</h3>
+          <p className={`text-xs md:text-[13px] font-sans mt-1.5 leading-relaxed transition-colors duration-300 ${d ? 'text-gray-400' : 'text-gray-405'}`}>
             Cập nhật và đọc những bình bách của khách hàng tương tác qua biểu mẫu liên hệ.
           </p>
         </div>
 
         <button
           onClick={onRefreshMessages}
-          className={`w-10 h-10 border flex items-center justify-center rounded-xl transition-all cursor-pointer ${
+          className={`w-12 h-12 border flex items-center justify-center rounded-xl transition-all duration-300 cursor-pointer ${
             d ? 'bg-[#21262d] border-[#30363d] hover:bg-[#30363d] text-white' : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-800'
           }`}
           title="Tải lại thư"
         >
-          <RotateCcw size={15} />
+          <RotateCcw size={16} />
         </button>
       </div>
 
