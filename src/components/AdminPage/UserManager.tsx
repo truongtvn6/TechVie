@@ -70,12 +70,12 @@ export default function UserManager({
   return (
     <div className="space-y-6 animate-fade-in font-sans">
       
-      <div className={`flex flex-col sm:flex-row justify-between sm:items-center gap-4 border p-5 rounded-[2rem] shadow-sm transition-all duration-300 ${
+      <div className={`flex flex-col sm:flex-row justify-between sm:items-center gap-4 border p-6 sm:p-8 rounded-3xl shadow-sm transition-all duration-300 ${
         d ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-gray-200'
       }`}>
         <div className="flex-1 min-w-0 text-left">
-          <h3 className={`font-extrabold text-sm uppercase ${d ? 'text-white' : 'text-gray-955'}`}>Sổ thành viên TechVie ID</h3>
-          <p className="text-xs text-gray-400">Quản trị phân quyền cán bộ nhân viên, theo dõi trạng thái VIP tài khoản hoặc chặn truy cập.</p>
+          <h3 className={`font-extrabold text-base uppercase tracking-wider transition-colors duration-300 ${d ? 'text-white' : 'text-gray-955'}`}>Sổ thành viên TechVie ID</h3>
+          <p className={`text-xs md:text-[13px] font-sans mt-1.5 leading-relaxed transition-colors duration-300 ${d ? 'text-gray-400' : 'text-gray-400'}`}>Quản trị phân quyền cán bộ nhân viên, theo dõi trạng thái VIP tài khoản hoặc chặn truy cập.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full sm:w-auto">
@@ -85,7 +85,7 @@ export default function UserManager({
             placeholder="Tìm tên, email thành viên..."
             value={userQuery}
             onChange={(e) => setUserQuery(e.target.value)}
-            className={`rounded-xl px-4 py-2 text-xs outline-none font-semibold shadow-sm w-full sm:w-60 text-left transition-all border ${
+            className={`h-12 rounded-xl px-4 text-xs outline-none font-semibold shadow-sm w-full sm:w-60 text-left transition-all border ${
               d 
                 ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:!border-white focus:!ring-white placeholder-gray-500' 
                 : 'bg-slate-50 border-slate-200 hover:bg-slate-100/50 focus:bg-white focus:border-black text-gray-905 placeholder-gray-400'
@@ -95,11 +95,11 @@ export default function UserManager({
           <button
             type="button"
             onClick={() => setIsNewUsrFormOpen(true)}
-            className={`px-4 py-2.5 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow flex items-center justify-center gap-1 cursor-pointer ${
+            className={`h-12 px-6 text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow active:scale-95 flex items-center justify-center gap-2 cursor-pointer ${
               d ? 'bg-white! hover:bg-gray-100! text-black' : 'bg-black hover:bg-slate-900 text-white'
             }`}
           >
-            <Plus size={14} />
+            <Plus size={16} />
             Thêm tài khoản
           </button>
         </div>
@@ -133,7 +133,7 @@ export default function UserManager({
                 .map((usr) => (
                   <tr 
                     key={usr.id} 
-                    className={`transition-colors duration-200 ${
+                    className={`transition-colors duration-300 ${
                       d 
                         ? `hover:bg-[#21262d]/50 ${usr.status === 'blocked' ? 'bg-rose-955/10' : ''}` 
                         : `hover:bg-slate-50/40 ${usr.status === 'blocked' ? 'bg-rose-50/10' : ''}`
@@ -142,7 +142,7 @@ export default function UserManager({
                     {/* Member identity */}
                     <td className="py-5 px-6 text-left">
                       <div className="flex items-center gap-3 justify-start">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs uppercase shrink-0 ${
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs uppercase shrink-0 transition-all duration-300 ${
                           usr.role === 'admin' 
                             ? 'bg-indigo-300 text-black shadow-sm' 
                             : d ? 'bg-gray-800 text-white border border-gray-600' : 'bg-slate-100 text-slate-600'
@@ -150,15 +150,15 @@ export default function UserManager({
                           {usr.name.charAt(0)}
                         </div>
                         <div className="text-left">
-                            <span className={`font-extrabold text-sm block tracking-tight ${d ? 'text-gray-50' : 'text-gray-900'}`}>{usr.name}</span>
-                            <span className={`text-[10px] font-mono block mt-0.5 ${d ? 'text-slate-400' : 'text-gray-500'}`}>{usr.email}</span>
+                            <span className={`font-extrabold text-sm block tracking-tight transition-colors duration-300 ${d ? 'text-gray-50' : 'text-gray-900'}`}>{usr.name}</span>
+                            <span className={`text-[10px] font-mono block mt-0.5 transition-colors duration-300 ${d ? 'text-slate-400' : 'text-gray-500'}`}>{usr.email}</span>
                         </div>
                       </div>
                     </td>
 
                     {/* Contacts phone */}
                     <td className="py-5 px-6 text-left">
-                      <span className={`font-mono font-medium ${d ? 'text-white' : 'text-gray-950'}`}>{usr.phone}</span>
+                      <span className={`font-mono font-medium transition-colors duration-300 ${d ? 'text-white' : 'text-gray-955'}`}>{usr.phone}</span>
                     </td>
 
                     {/* Role selection toggle */}
@@ -166,7 +166,7 @@ export default function UserManager({
                       <button
                         type="button"
                         onClick={() => onToggleUserRole(usr.id)}
-                        className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all duration-300 hover:scale-95 active:scale-90 cursor-pointer ${
                           usr.role === 'admin'
                             ? d
                               ? 'bg-white! text-black hover:bg-gray-100! border-transparent font-black shadow-sm'
@@ -183,12 +183,12 @@ export default function UserManager({
                     {/* Vip premium level */}
                     <td className="py-5 px-6 text-left">
                       {usr.role === 'admin' ? (
-                          <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1 border ${d ? 'bg-indigo-950/30 text-indigo-400 border-indigo-900/40' : 'bg-indigo-50 text-indigo-700 border-indigo-100'}`}>Admin</span>
+                          <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1 border transition-colors duration-300 ${d ? 'bg-indigo-950/30 text-indigo-400 border-indigo-900/40' : 'bg-indigo-50 text-indigo-700 border-indigo-100'}`}>Admin</span>
                         ) : (
                         <button
                           type="button"
                           onClick={() => onToggleUserVip(usr.id)}
-                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
+                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all duration-300 hover:scale-95 active:scale-90 cursor-pointer ${
                             usr.vipStatus === 'Premium'
                               ? d
                                 ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-400 border border-amber-500/20 font-black shadow-sm'
@@ -206,12 +206,12 @@ export default function UserManager({
 
                     {/* Join date */}
                     <td className="py-5 px-6 text-left">
-                            <span className={`font-extrabold text-sm block tracking-tight ${d ? 'text-white' : 'text-gray-950'}`}>{usr.joinedDate}</span>
+                            <span className={`font-extrabold text-sm block tracking-tight transition-colors duration-300 ${d ? 'text-white' : 'text-gray-955'}`}>{usr.joinedDate}</span>
                     </td>
 
                     {/* Status tag */}
                     <td className="py-5 px-6 text-left">
-                      <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-extrabold ${
+                      <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-extrabold transition-colors duration-300 ${
                         usr.status === 'active'
                           ? d
                             ? 'text-emerald-400 bg-emerald-950/30 border border-emerald-900/40 px-2 py-0.5 rounded-lg'
