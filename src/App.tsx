@@ -524,7 +524,14 @@ export default function App() {
               transition={{ duration: 0.35 }}
               className="w-full"
             >
-              <ProductPage products={products} onAddToCart={handleAddToCart} />
+              <ProductPage 
+                products={products} 
+                onAddToCart={handleAddToCart} 
+                onNavigate={(tab) => {
+                  setActiveTab(tab);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              />
             </motion.div>
           )}
 
