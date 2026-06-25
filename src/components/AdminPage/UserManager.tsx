@@ -150,7 +150,7 @@ export default function UserManager({
                           {usr.name.charAt(0)}
                         </div>
                         <div className="text-left">
-                            <span className="font-extrabold text-sm block tracking-tight text-black dark:text-white">{usr.name}</span>
+                            <span className={`font-extrabold text-sm block tracking-tight ${d ? 'text-white' : 'text-black'}`}>{usr.name}</span>
                             <span className="text-[10px] font-mono text-slate-400 block mt-0.5">{usr.email}</span>
                         </div>
                       </div>
@@ -158,7 +158,7 @@ export default function UserManager({
 
                     {/* Contacts phone */}
                     <td className="py-5 px-6 text-left">
-                      <span className="font-mono font-medium text-black dark:text-white">{usr.phone}</span>
+                      <span className={`font-mono font-medium ${d ? 'text-white' : 'text-black'}`}>{usr.phone}</span>
                     </td>
 
                     {/* Role selection toggle */}
@@ -206,7 +206,7 @@ export default function UserManager({
 
                     {/* Join date */}
                     <td className="py-5 px-6 text-left">
-                            <span className="font-extrabold text-sm block tracking-tight text-black dark:text-white">{usr.joinedDate}</span>
+                            <span className={`font-extrabold text-sm block tracking-tight ${d ? 'text-white' : 'text-black'}`}>{usr.joinedDate}</span>
                     </td>
 
                     {/* Status tag */}

@@ -515,6 +515,7 @@ export default function AdminPage({
               onAddPromo={handleAddPromo}
               onTogglePromoStatus={handleTogglePromoStatus}
               onDeletePromo={handleDeletePromo}
+              
             />
           )}
 
@@ -526,6 +527,8 @@ export default function AdminPage({
               onToggleUserVip={handleToggleUserVip}
               onToggleUserStatus={handleToggleUserStatus}
               onDeleteUser={handleDeleteUser}
+              // Đã thêm nhưng không hoạt động
+              isDarkMode={isDarkMode}
             />
           )}
 
