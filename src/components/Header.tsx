@@ -148,7 +148,7 @@ export default function Header({
 
           <div className="flex items-center space-x-2">
             {isLoggedIn && (
-              <span className="hidden lg:inline-block text-[10px] tracking-widest uppercase font-mono bg-indigo-50 border border-indigo-150 text-indigo-700 py-1.5 px-3 rounded-full font-black">
+              <span className="hidden lg:inline-block text-[10px] tracking-widest uppercase font-mono bg-indigo-50 border border-indigo-150 text-black py-1.5 px-3 rounded-full font-black">
                 Chào, {userProfile.name.split(' ').pop()?.toUpperCase()}
               </span>
             )}

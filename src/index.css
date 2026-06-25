@@ -76,7 +76,8 @@ body::-webkit-scrollbar {
 
 /* --- Admin Dashboard Dark Mode Override Styles --- */
 .admin-dashboard-root.dark {
-  background-color: #0d1117 !important; /* slate-950 */
+  /* background-color: #0d1117 !important; slate-950 */
+  background-image: linear-gradient(to bottom, #171717, #6d6d6d, #949494);
   color: #f1f5f9 !important;
 }
 
@@ -86,28 +87,6 @@ body::-webkit-scrollbar {
   border-color: rgba(255, 255, 255, 0.08) !important; /* Soft border matching liquid glass */
 }
 
-.admin-dashboard-root.dark aside h1,
-.admin-dashboard-root.dark aside span,
-.admin-dashboard-root.dark aside strong,
-.admin-dashboard-root.dark aside div {
-  color: #ffffff !important;
-}
-
-/* Non-active buttons in sidebar */
-.admin-dashboard-root.dark aside button:not(.bg-black):not(.bg-white) {
-  color: #94a3b8 !important; /* slate-400 */
-}
-
-.admin-dashboard-root.dark aside button:not(.bg-black):not(.bg-white):hover {
-  background-color: #30363d !important; /* slate-850 */
-  color: #ffffff !important;
-}
-
-/* Active sub-tab buttons */
-.admin-dashboard-root.dark aside button.bg-black {
-  background-color: #4f46e5 !important; /* indigo-600 */
-  color: #ffffff !important;
-}
 
 /* White boxes, cards, and stat panels */
 .admin-dashboard-root.dark .bg-white,
@@ -126,8 +105,9 @@ body::-webkit-scrollbar {
 }
 
 /* Table hover row effect */
-.admin-dashboard-root.dark tbody tr:hover {
-  background-color: rgba(51, 65, 85, 0.2) !important;
+.admin-dashboard-root.dark tbody tr:hover,
+.admin-dashboard-root.dark tbody tr:hover td {
+  background-color: #21262d !important;
 }
 
 /* Heading texts */
@@ -152,18 +132,18 @@ body::-webkit-scrollbar {
 }
 
 /* Inputs and select options */
-.admin-dashboard-root.dark input,
-.admin-dashboard-root.dark select,
-.admin-dashboard-root.dark textarea {
+.admin-dashboard-root.dark input:not(.bg-transparent),
+.admin-dashboard-root.dark select:not(.bg-transparent),
+.admin-dashboard-root.dark textarea:not(.bg-transparent) {
   background-color: #0d1117 !important; /* slate-950 */
   border-color: #30363d !important; /* slate-800 */
   color: #ffffff !important;
 }
 
-.admin-dashboard-root.dark input:focus,
-.admin-dashboard-root.dark select:focus,
-.admin-dashboard-root.dark textarea:focus {
-  border-color: #6366f1 !important; /* indigo-500 */
+.admin-dashboard-root.dark input:not(.bg-transparent):focus,
+.admin-dashboard-root.dark select:not(.bg-transparent):focus,
+.admin-dashboard-root.dark textarea:not(.bg-transparent):focus {
+  border-color: #ffffff !important; /* white */
   outline: none !important;
 }
 

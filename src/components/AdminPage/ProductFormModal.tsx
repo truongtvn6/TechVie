@@ -106,31 +106,31 @@ export default function ProductFormModal({
   }, []);
 
   // Initialize fields on open or change in editingProduct
-  useEffect(() => {
-    if (isOpen) {
-      setImageFile(null);
-      if (editingProduct) {
-        setProdName(editingProduct.name);
-        setProdPrice(editingProduct.price);
-        setProdCategory(editingProduct.category);
-        setProdImage(editingProduct.image);
-        setProdDesc(editingProduct.description || '');
-        setFormSpecs(editingProduct.specs || []);
-      } else {
-        setProdName('');
-        setProdPrice(9900000);
-        setProdCategory('Điện thoại');
-        setProdImage('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80');
-        setProdDesc('Sản phẩm công nghệ tinh tế bứt phá hiệu năng, chế tác cao cấp từ TechVie Lab Thụy Sĩ.');
-        setFormSpecs([
-          { label: 'Hộp chip', value: 'Silicon TechVie Standard' },
-          { label: 'Màn hình', value: '6.1" OLED Retina' },
-          { label: 'Dung lượng Pin', value: '4000 mAh' },
-          { label: 'Chuẩn kháng nước', value: 'IP68 chuẩn hãng' }
-        ]);
-      }
-    }
-  }, [isOpen, editingProduct]);
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     setImageFile(null);
+  //     if (editingProduct) {
+  //       setProdName(editingProduct.name);
+  //       setProdPrice(editingProduct.price);
+  //       setProdCategory(editingProduct.category);
+  //       setProdImage(editingProduct.image);
+  //       setProdDesc(editingProduct.description || '');
+  //       setFormSpecs(editingProduct.specs || []);
+  //     } else {
+  //       setProdName('');
+  //       setProdPrice(9900000);
+  //       setProdCategory('Điện thoại');
+  //       setProdImage('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80');
+  //       setProdDesc('Sản phẩm công nghệ tinh tế bứt phá hiệu năng, chế tác cao cấp từ TechVie Lab Thụy Sĩ.');
+  //       setFormSpecs([
+  //         { label: 'Hộp chip', value: 'Silicon TechVie Standard' },
+  //         { label: 'Màn hình', value: '6.1" OLED Retina' },
+  //         { label: 'Dung lượng Pin', value: '4000 mAh' },
+  //         { label: 'Chuẩn kháng nước', value: 'IP68 chuẩn hãng' }
+  //       ]);
+  //     }
+  //   }
+  // }, [isOpen, editingProduct]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,7 +171,7 @@ export default function ProductFormModal({
             onClick={onClose}
             className={`px-5 py-2.5 rounded-xl border transition-all font-sans text-xs font-black uppercase cursor-pointer ${
               d 
-                ? 'border-[#30363d] text-gray-400 hover:bg-[#21262d] hover:text-white' 
+                ? 'border-[#30363d] text-gray-100 hover:bg-[#21262d] hover:text-white' 
                 : 'border-gray-200 text-gray-655 hover:bg-gray-50 hover:text-black'
             }`}
           >
@@ -182,7 +182,7 @@ export default function ProductFormModal({
             form="product-form-modal-form"
             className={`px-5 py-2.5 rounded-xl font-sans text-xs uppercase tracking-widest font-black transition-all shadow active:scale-95 cursor-pointer ${
               d 
-                ? 'bg-indigo-600 hover:bg-indigo-700 text-white' 
+                ? 'bg-white! hover:bg-gray-100! text-black' 
                 : 'bg-black hover:bg-gray-900 text-white'
             }`}
           >
@@ -202,14 +202,14 @@ export default function ProductFormModal({
           </button>
         </div>
 
-        <h2 className={`text-2xl font-black uppercase tracking-tight mb-6 text-left pr-60 ${d ? 'text-white' : 'text-gray-955'}`}>
+        <h2 className={`text-2xl font-black uppercase tracking-tight mb-6 text-left pr-60 ${d ? 'text-white' : 'text-gray-900'}`}>
           {editingProduct ? 'Hiệu chỉnh đặc tả độc bản' : 'Chế tác nguyên mẫu'}
         </h2>
 
         <form id="product-form-modal-form" onSubmit={handleSubmit} className="space-y-6">
           {/* Prominent Section 1: Thông tin chung */}
           <section className={`border rounded-3xl p-6 text-left transition-all duration-300 ${
-            d ? 'bg-[#0d1117]/60 border-[#30363d]' : 'bg-slate-50 border-gray-150'
+            d ? 'bg-[#0d1117]/60 border-black' : 'bg-slate-50 border-gray-100'
           }`}>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">01 / Thông tin chung</span>
@@ -229,8 +229,8 @@ export default function ProductFormModal({
                   placeholder="Ví dụ: TechVie Ultra Book X"
                   className={`w-full focus:outline-none focus:ring-1 rounded-xl px-4 py-3 text-xs transition-all font-semibold ${
                     d 
-                      ? 'bg-[#161b22] border border-[#30363d] focus:border-indigo-500 focus:ring-indigo-500 text-white placeholder-gray-500' 
-                      : 'bg-white border border-gray-250 focus:border-black focus:ring-black text-gray-905 placeholder-gray-400'
+                      ? 'bg-[#161b22] border border-[#30363d] focus:!border-white focus:!ring-white !text-white placeholder-gray-500' 
+                      : 'bg-white border border-gray-200 focus:border-black focus:ring-black text-gray-905 placeholder-gray-400'
                   }`}
                 />
               </div>
@@ -246,8 +246,8 @@ export default function ProductFormModal({
                   placeholder="0"
                   className={`w-full focus:outline-none focus:ring-1 rounded-xl px-4 py-3 text-xs transition-all font-mono font-bold ${
                     d 
-                      ? 'bg-[#161b22] border border-[#30363d] focus:border-indigo-500 focus:ring-indigo-500 text-white placeholder-gray-500' 
-                      : 'bg-white border border-gray-250 focus:border-black focus:ring-black text-gray-905 placeholder-gray-400'
+                      ? 'bg-[#161b22] border border-[#30363d] focus:!border-white focus:!ring-white !text-white placeholder-gray-500' 
+                      : 'bg-white border border-gray-200 focus:border-black focus:ring-black text-gray-905 placeholder-gray-400'
                   }`}
                 />
               </div>
@@ -263,11 +263,11 @@ export default function ProductFormModal({
                   className={`w-full flex items-center justify-between px-4 py-2 rounded-xl border text-left transition-all duration-200 cursor-pointer
                     ${d
                       ? isDropdownOpen
-                        ? 'bg-[#161b22] border-indigo-500 ring-1 ring-indigo-500 text-white shadow-sm'
+                        ? 'bg-[#161b22] border-white ring-1 ring-white text-white shadow-sm'
                         : 'bg-[#161b22] border-[#30363d] text-white hover:border-gray-700 hover:bg-[#21262d]/50'
                       : isDropdownOpen
                         ? 'bg-white border-black ring-1 ring-black text-gray-905 shadow-sm'
-                        : 'bg-white border-gray-250 text-gray-905 hover:border-gray-300 hover:bg-gray-50/50'
+                        : 'bg-white border-gray-200 text-gray-905 hover:border-gray-300 hover:bg-gray-50/50'
                     }
                   `}
                 >
@@ -298,7 +298,7 @@ export default function ProductFormModal({
                   <div className={`absolute top-full left-0 z-50 w-full mt-2 rounded-2xl shadow-xl py-2 animate-fade-in text-xs transition-all duration-350 border ${
                     d 
                       ? 'bg-[#161b22] border-[#30363d] text-white shadow-[0_12px_40px_rgba(0,0,0,0.5)]' 
-                      : 'bg-white border-gray-150 text-gray-900 shadow-xl'
+                      : 'bg-white border-gray-200 text-gray-900 shadow-xl'
                   }`}>
                     <ul className="max-h-60 overflow-auto scrollbar-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                       {categoriesList.map((category) => (
@@ -311,7 +311,7 @@ export default function ProductFormModal({
                           className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors mx-2 rounded-xl group
                             ${prodCategory === category.name 
                               ? d
-                                ? 'bg-[#21262d] text-white font-black hover:bg-indigo-600 hover:text-white'
+                                ? 'bg-[#21262d] text-white font-black hover:bg-white/10 hover:text-white'
                                 : 'bg-slate-100 text-black font-black hover:bg-black hover:text-white' 
                               : d
                                 ? 'text-gray-350 hover:bg-[#21262d] hover:text-white font-bold'
@@ -345,7 +345,7 @@ export default function ProductFormModal({
             
             {/* Column 1: Description */}
             <section className={`border rounded-3xl p-6 flex flex-col text-left transition-all duration-300 ${
-              d ? 'bg-[#0d1117]/60 border-[#30363d]' : 'bg-slate-50 border-gray-150'
+              d ? 'bg-[#0d1117]/60 border-[#30363d]' : 'bg-slate-50 border-gray-100'
             }`}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">02 / Mô tả sản phẩm</span>
@@ -359,7 +359,7 @@ export default function ProductFormModal({
                   placeholder="Nhập những đặc điểm nổi bật đặc biệt nhất của thiết bị..."
                   className={`w-full flex-1 min-h-[220px] focus:outline-none focus:ring-1 rounded-xl px-4 py-3 text-xs transition-all resize-none leading-relaxed ${
                     d 
-                      ? 'bg-[#161b22] border border-[#30363d] focus:border-indigo-500 focus:ring-indigo-500 text-white placeholder-gray-500' 
+                      ? 'bg-[#161b22] border border-[#30363d] focus:!border-white focus:!ring-white !text-white placeholder-gray-500' 
                       : 'bg-white border border-gray-200 focus:border-black focus:ring-black text-gray-900 placeholder-gray-400'
                   }`}
                 />
@@ -368,7 +368,7 @@ export default function ProductFormModal({
 
             {/* Column 2: Media/Image upload preview */}
             <section className={`border rounded-3xl p-6 flex flex-col text-left transition-all duration-300 ${
-              d ? 'bg-[#0d1117]/60 border-[#30363d]' : 'bg-slate-50 border-gray-150'
+              d ? 'bg-[#0d1117]/60 border-[#30363d]' : 'bg-slate-50 border-gray-100'
             }`}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">03 / Hình ảnh & Render</span>
@@ -425,10 +425,10 @@ export default function ProductFormModal({
                           setImageFile(e.target.files[0]);
                         }
                       }}
-                      className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
+                      className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none focus:ring-1 cursor-pointer ${
                         d 
-                          ? 'bg-[#161b22] border-[#30363d] text-gray-300' 
-                          : 'bg-white border-gray-200 text-gray-900'
+                          ? 'bg-[#161b22] border-[#30363d] focus:!border-white focus:!ring-white text-gray-300' 
+                          : 'bg-white border-gray-200 focus:border-black focus:ring-black text-gray-900'
                       }`}
                     />
                   </div>
@@ -442,7 +442,7 @@ export default function ProductFormModal({
                       placeholder="Dán liên kết hình ảnh độc bản..."
                       className={`w-full focus:outline-none focus:ring-1 rounded-xl px-3 py-2 text-xs transition-all font-mono ${
                         d 
-                          ? 'bg-[#161b22] border border-[#30363d] focus:border-indigo-500 focus:ring-indigo-500 text-white placeholder-gray-500' 
+                          ? 'bg-[#161b22] border border-[#30363d] focus:!border-white focus:!ring-white !text-white placeholder-gray-500' 
                           : 'bg-white border border-gray-200 focus:border-black focus:ring-black text-gray-900 placeholder-gray-400'
                       }`}
                     />
@@ -453,7 +453,7 @@ export default function ProductFormModal({
 
             {/* Column 3: Technical specifications */}
             <section className={`border rounded-3xl p-6 flex flex-col text-left transition-all duration-300 ${
-              d ? 'bg-[#0d1117]/60 border-[#30363d]' : 'bg-slate-50 border-gray-150'
+              d ? 'bg-[#0d1117]/60 border-[#30363d]' : 'bg-slate-50 border-gray-100'
             }`}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">04 / Thông số kỹ thuật</span>
@@ -465,8 +465,8 @@ export default function ProductFormModal({
                     key={index}
                     className={`p-3 rounded-2xl group transition-all flex gap-3 items-center shadow-[0_2px_6px_rgba(0,0,0,0.01)] border ${
                       d 
-                        ? 'bg-[#161b22] border-[#30363d] hover:border-indigo-500/30' 
-                        : 'bg-white border-gray-150 hover:border-black/15'
+                        ? 'bg-[#161b22] border-[#30363d] hover:border-white/20' 
+                        : 'bg-white border-gray-200 hover:border-black/15'
                     }`}
                   >
                     <div className="flex-1 min-w-0 grid grid-cols-2 gap-2">
@@ -484,7 +484,7 @@ export default function ProductFormModal({
                           className={`w-full bg-transparent border-0 p-0 text-xs font-black focus:outline-none focus:ring-0 resize-none leading-normal whitespace-pre-wrap break-words scrollbar-none ${
                             d ? 'text-slate-200 placeholder-slate-600' : 'text-slate-800 placeholder-slate-350'
                           }`}
-                          placeholder="Nhãn..."
+                          placeholder="Nhập vào đây..."
                           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                         />
                       </div>
@@ -534,7 +534,7 @@ export default function ProductFormModal({
                   onClick={() => setFormSpecs([...formSpecs, { label: '', value: '' }])}
                   className={`w-full py-3.5 border border-dashed rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer mt-2 ${
                     d 
-                      ? 'border-[#30363d] text-gray-400 hover:border-indigo-500/50 hover:bg-[#21262d] hover:text-white' 
+                      ? 'border-transparent bg-white! text-black hover:bg-gray-100!' 
                       : 'border-gray-250 text-slate-500 hover:border-black/20 hover:bg-slate-100/30 hover:text-black'
                   }`}
                 >

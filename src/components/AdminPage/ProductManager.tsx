@@ -35,11 +35,11 @@ export default function ProductManager({
         <button
           onClick={onOpenCreateForm}
           className={`h-12 px-6 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
-            d ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-black hover:bg-gray-900 text-white'
+            d ? ' bg-white! hover:bg-gray-100! text-black' : 'bg-black hover:bg-gray-900 text-white'
           }`}
         >
           <Plus size={16} />
-          Đăng sản phẩm mới
+          Thêm sản phẩm mới
         </button>
       </div>
 
@@ -65,27 +65,27 @@ export default function ProductManager({
             }`}>
               {products.map((p) => (
                 <tr key={p.id} className={`transition-colors duration-200 ${
-                  d ? 'hover:bg-[#21262d]/50' : 'hover:bg-gray-50/50'
+                  d ? '' : 'hover:bg-gray-100'
                 }`}>
-                  <td className="px-6 py-4 flex gap-3.5 items-center">
-                    <div className={`w-11 h-11 border rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 transition-colors duration-300 ${
-                      d ? 'bg-[#21262d] border-[#30363d]' : 'bg-white border-gray-150'
-                    }`}>
-                      <img
-                        src={p.image}
-                        alt={p.name}
-                        className={`w-full h-full object-cover ${d ? '' : 'mix-blend-multiply'}`}
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <span className={`block font-extrabold text-sm truncate ${d ? 'text-white' : 'text-gray-900'}`}>{p.name}</span>
-                      <span className={`font-mono text-[9px] block truncate ${d ? 'text-gray-500' : 'text-gray-400'}`}>{p.id}</span>
+                  <td className="px-6 py-4">
+                    <div className="flex gap-3.5 items-center">
+                      <div className={`w-11 h-11 border rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 transition-colors duration-300 ${
+                        d ? 'bg-[#21262d] border-[#30363d]' : 'bg-white border-gray-150'
+                      }`}>
+                        <img
+                          src={p.image}
+                          alt={p.name}
+                          className={`w-full h-full object-cover ${d ? '' : 'mix-blend-multiply'}`}
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <span className={`block font-extrabold text-sm truncate ${d ? 'text-white' : 'text-gray-900'}`}>{p.name}</span>
+                        <span className={`font-mono text-[9px] block truncate ${d ? 'text-gray-500' : 'text-gray-400'}`}>{p.id}</span>
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 border rounded-full text-[9px] tracking-wider uppercase font-bold transition-colors duration-300 ${
-                      d ? 'bg-[#21262d] border-[#30363d] text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500'
-                    }`}>
+                    <span className={`text-[9px] tracking-wider uppercase font-bold transition-colors duration-300 border-none`}>
                       {p.category}
                     </span>
                   </td>

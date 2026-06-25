@@ -87,7 +87,7 @@ export default function UserManager({
             onChange={(e) => setUserQuery(e.target.value)}
             className={`rounded-xl px-4 py-2 text-xs outline-none font-semibold shadow-sm w-full sm:w-60 text-left transition-all border ${
               d 
-                ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:border-indigo-500 placeholder-gray-500' 
+                ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:!border-white focus:!ring-white placeholder-gray-500' 
                 : 'bg-slate-50 border-slate-200 hover:bg-slate-100/50 focus:bg-white focus:border-black text-gray-905 placeholder-gray-400'
             }`}
           />
@@ -95,8 +95,8 @@ export default function UserManager({
           <button
             type="button"
             onClick={() => setIsNewUsrFormOpen(true)}
-            className={`px-4 py-2.5 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow flex items-center justify-center gap-1 cursor-pointer ${
-              d ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-black hover:bg-slate-900'
+            className={`px-4 py-2.5 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow flex items-center justify-center gap-1 cursor-pointer ${
+              d ? 'bg-white! hover:bg-gray-100! text-black' : 'bg-black hover:bg-slate-900 text-white'
             }`}
           >
             <Plus size={14} />
@@ -144,21 +144,21 @@ export default function UserManager({
                       <div className="flex items-center gap-3 justify-start">
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs uppercase shrink-0 ${
                           usr.role === 'admin' 
-                            ? 'bg-indigo-600 text-white shadow-sm' 
+                            ? 'bg-indigo-300 text-black shadow-sm' 
                             : d ? 'bg-gray-800 text-white border border-gray-600' : 'bg-slate-100 text-slate-600'
                         }`}>
                           {usr.name.charAt(0)}
                         </div>
                         <div className="text-left">
-                            <span className="font-extrabold text-sm block tracking-tight text-black dark:text-white">{usr.name}</span>
-                            <span className="text-[10px] font-mono text-slate-400 block mt-0.5">{usr.email}</span>
+                            <span className={`font-extrabold text-sm block tracking-tight ${d ? 'text-gray-50' : 'text-gray-900'}`}>{usr.name}</span>
+                            <span className={`text-[10px] font-mono block mt-0.5 ${d ? 'text-slate-400' : 'text-gray-500'}`}>{usr.email}</span>
                         </div>
                       </div>
                     </td>
 
                     {/* Contacts phone */}
                     <td className="py-5 px-6 text-left">
-                      <span className="font-mono font-medium text-black dark:text-white">{usr.phone}</span>
+                      <span className={`font-mono font-medium ${d ? 'text-white' : 'text-gray-950'}`}>{usr.phone}</span>
                     </td>
 
                     {/* Role selection toggle */}
@@ -169,7 +169,7 @@ export default function UserManager({
                         className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
                           usr.role === 'admin'
                             ? d
-                              ? 'bg-indigo-950/40 text-indigo-400 border border-indigo-900/40 font-black shadow-sm'
+                              ? 'bg-white! text-black hover:bg-gray-100! border-transparent font-black shadow-sm'
                               : 'bg-indigo-50 text-indigo-700 border border-indigo-100/60 font-black shadow-sm'
                             : d
                               ? 'bg-[#21262d] text-gray-300 hover:bg-[#30363d] hover:text-white border border-transparent'
@@ -206,7 +206,7 @@ export default function UserManager({
 
                     {/* Join date */}
                     <td className="py-5 px-6 text-left">
-                            <span className="font-extrabold text-sm block tracking-tight text-black dark:text-white">{usr.joinedDate}</span>
+                            <span className={`font-extrabold text-sm block tracking-tight ${d ? 'text-white' : 'text-gray-950'}`}>{usr.joinedDate}</span>
                     </td>
 
                     {/* Status tag */}
@@ -293,7 +293,7 @@ export default function UserManager({
                   placeholder="Nguyễn Văn A"
                   className={`w-full rounded-xl px-4 py-2.5 outline-none text-xs font-semibold transition-all border ${
                     d 
-                      ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:border-indigo-500 placeholder-gray-500' 
+                      ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:!border-white focus:!ring-white placeholder-gray-500' 
                       : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905 placeholder-gray-400'
                   }`}
                 />
@@ -309,7 +309,7 @@ export default function UserManager({
                   placeholder="mail@techvie.com"
                   className={`w-full rounded-xl px-4 py-2.5 outline-none text-xs font-semibold transition-all border ${
                     d 
-                      ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:border-indigo-500 placeholder-gray-500' 
+                      ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:!border-white focus:!ring-white placeholder-gray-500' 
                       : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905 placeholder-gray-400'
                   }`}
                 />
@@ -324,7 +324,7 @@ export default function UserManager({
                   placeholder="0912 345 678"
                   className={`w-full rounded-xl px-4 py-2.5 outline-none text-xs font-semibold transition-all border ${
                     d 
-                      ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:border-indigo-500 placeholder-gray-500' 
+                      ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:!border-white focus:!ring-white placeholder-gray-500' 
                       : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905 placeholder-gray-400'
                   }`}
                 />
@@ -338,7 +338,7 @@ export default function UserManager({
                     onChange={(e) => setNewUsrRole(e.target.value as 'user' | 'admin')}
                     className={`w-full rounded-xl px-3 py-2 outline-none text-xs font-semibold transition-all border ${
                       d 
-                        ? 'bg-[#161b22] border-[#30363d] text-white focus:border-indigo-500' 
+                        ? 'bg-[#161b22] border-[#30363d] text-white focus:!border-white focus:!ring-white' 
                         : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905'
                     }`}
                   >
@@ -354,7 +354,7 @@ export default function UserManager({
                     onChange={(e) => setNewUsrVip(e.target.value as 'Normal' | 'Premium')}
                     className={`w-full rounded-xl px-3 py-2 outline-none text-xs font-semibold transition-all border ${
                       d 
-                        ? 'bg-[#161b22] border-[#30363d] text-white focus:border-indigo-500' 
+                        ? 'bg-[#161b22] border-[#30363d] text-white focus:!border-white focus:!ring-white' 
                         : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905'
                     }`}
                   >
@@ -366,8 +366,8 @@ export default function UserManager({
 
               <button
                 type="submit"
-                className={`w-full mt-4 py-3.5 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow active:scale-95 cursor-pointer text-center ${
-                  d ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-black hover:bg-slate-900'
+                className={`w-full mt-4 py-3.5 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow active:scale-95 cursor-pointer text-center ${
+                  d ? 'bg-white! hover:bg-gray-100! text-black' : 'bg-black hover:bg-slate-900 text-white'
                 }`}
               >
                 Cấp tài khoản

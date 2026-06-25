@@ -220,6 +220,7 @@ export default function AccountPage({
                     setAccountTab={setAccountTab}
                     ordersCount={orders.length}
                     handleLogout={handleLogout}
+                    onNavigate={onNavigate}
                   />
                   
                   {/* RIGHT MAIN PANEL: Dynamic Content Section */}
@@ -282,11 +283,6 @@ export default function AccountPage({
           )}
         </AnimatePresence>
       </div>
-
-      {/* Floating Back to Admin panel button for logged-in Administrators - ONLY on account/profile page */}
-      {isLoggedIn && userProfile?.role === 'admin' && (
-        <FloatingAdminButton onNavigate={onNavigate} />
-      )}
     </div>
   );
 }

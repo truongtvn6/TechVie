@@ -6,6 +6,7 @@ interface DashboardStatsProps {
   processingOrdersCount: number;
   productsCount: number;
   messagesCount: number;
+  isDarkMode?: boolean;
 }
 
 export default function DashboardStats({
@@ -14,7 +15,9 @@ export default function DashboardStats({
   processingOrdersCount,
   productsCount,
   messagesCount,
+  isDarkMode = false,
 }: DashboardStatsProps) {
+  const d = isDarkMode;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Stat 1: Revenue */}
@@ -28,7 +31,7 @@ export default function DashboardStats({
             ● Dữ liệu máy chủ thực
           </span>
         </div>
-        <div className="w-12 h-12 bg-[#e0e7ff] text-[#4f46e5] rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform">
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform ${d ? 'bg-indigo-950/40 text-indigo-400' : 'bg-[#e0e7ff] text-[#4f46e5]'}`}>
           <DollarSign size={20} />
         </div>
       </div>
@@ -44,7 +47,7 @@ export default function DashboardStats({
             Gồm {processingOrdersCount} đơn đang xử lý
           </span>
         </div>
-        <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform">
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform ${d ? 'bg-indigo-950/40 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
           <ShoppingBag size={20} />
         </div>
       </div>
@@ -60,7 +63,7 @@ export default function DashboardStats({
             ● Sẵn sàng hiển thị
           </span>
         </div>
-        <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform">
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform ${d ? 'bg-emerald-950/40 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
           <Package size={20} />
         </div>
       </div>
@@ -76,7 +79,7 @@ export default function DashboardStats({
             Khách hàng gửi qua Contact form
           </span>
         </div>
-        <div className="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform">
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform ${d ? 'bg-amber-950/40 text-amber-500' : 'bg-amber-50 text-amber-500'}`}>
           <MessageSquare size={20} />
         </div>
       </div>

@@ -15,13 +15,15 @@ interface PromoManagerProps {
   onAddPromo: (promo: Promo) => void;
   onTogglePromoStatus: (code: string) => void;
   onDeletePromo: (code: string) => void;
+  isDarkMode?: boolean;
 }
 
 export default function PromoManager({
   promos,
   onAddPromo,
   onTogglePromoStatus,
-  onDeletePromo
+  onDeletePromo,
+  isDarkMode = false,
 }: PromoManagerProps) {
   // Local states for Promo Creation form
   const [newPromoCode, setNewPromoCode] = useState('');
@@ -47,6 +49,8 @@ export default function PromoManager({
     setNewPromoCode('');
     setNewPromoDesc('');
     setNewPromoMinOrder(0);
+
+    
   };
 
   return (
@@ -114,7 +118,10 @@ export default function PromoManager({
 
             <button
               type="submit"
-              className="w-full py-3.5 bg-black hover:bg-slate-900 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow active:scale-95 cursor-pointer text-center"
+              className={`w-full py-3.5 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all shadow active:scale-95 cursor-pointer text-center ${
+                isDarkMode ? 'bg-white! hover:bg-gray-100! text-black' 
+                  : 'bg-black hover:bg-slate-900 text-white'
+              }`}
             >
               Công định Voucher
             </button>
@@ -150,15 +157,15 @@ export default function PromoManager({
                 >
                   <div className="text-left">
                     {/* Header card info */}
-                    <div className="flex justify-between items-center border-b border-gray-100 pb-2 mb-2.5">
-                      <code className="px-2.5 py-1 rounded-lg bg-slate-900 text-amber-400 font-mono font-black text-xs tracking-wider">
+                    <div className={`flex justify-between items-center border-b pb-2 mb-2.5 ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                      <code className={`px-2.5 py-1 rounded-lg font-mono font-black text-xs tracking-wider ${isDarkMode ? 'bg-[#21262d] text-cyan-400' : 'bg-gray-100 text-cyan-600'}`}>
                         {p.code}
                       </code>
-                      <span className="text-xs font-mono font-extrabold text-indigo-600">
+                      <span className={`text-xs font-mono font-extrabold ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
                         Giảm {p.discount * 100}%
                       </span>
                     </div>
-                    <p className="font-bold text-gray-800 text-xs mb-1 truncate">{p.description}</p>
+                    <p className={`font-bold text-xs mb-1 truncate ${isDarkMode ? '!text-white' : 'text-gray-800'}`}>{p.description}</p>
                     
                     {p.minOrderVal > 0 && (
                       <p className="text-[10px] text-slate-400 font-mono">
@@ -167,12 +174,12 @@ export default function PromoManager({
                     )}
                     <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                      Đã sử dụng: <strong className="font-mono text-gray-700 font-black">{p.usedCount || 0} lượt</strong>
+                      Đã sử dụng: <strong className={`font-mono font-black ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>{p.usedCount || 0} lượt</strong>
                     </p>
                   </div>
 
                   {/* Bottom action bar inside card */}
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-50 text-xs">
+                  <div className={`flex items-center justify-between pt-3 border-t text-xs ${isDarkMode ? 'border-gray-700' : 'border-gray-50'}`}>
                     <button
                       type="button"
                       onClick={() => onTogglePromoStatus(p.code)}
@@ -180,7 +187,7 @@ export default function PromoManager({
                         p.isActive ? 'text-amber-600 hover:text-amber-800' : 'text-emerald-600 hover:text-emerald-800'
                       }`}
                     >
-                      {p.isActive ? '● Tạm dừng' : '▲ Kích hoạt'}
+                      {p.isActive ? 'Tạm dừng' : 'Kích hoạt'}
                     </button>
                     <button
                       type="button"

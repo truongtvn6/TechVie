@@ -429,6 +429,7 @@ export default function AdminPage({
                 processingOrdersCount={orders.filter(o => o.statusType === 'processing').length}
                 productsCount={products.length}
                 messagesCount={messages.length}
+                isDarkMode={isDarkMode}
               />
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -442,7 +443,7 @@ export default function AdminPage({
                   <div className="flex flex-col gap-3 pt-2">
                     <button
                       onClick={handleSeedOrders}
-                      className="w-full py-4.5 bg-black hover:bg-gray-900 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                      className={`w-full py-4.5 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-800`}
                     >
                       <Plus size={15} />
                       Tạo đơn thử nghiệm (random)
@@ -450,7 +451,7 @@ export default function AdminPage({
 
                     <button
                       onClick={openCreateForm}
-                      className="w-full py-4.5 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 text-indigo-700 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                      className={`w-full py-4.5 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 bg-green-100 hover:bg-green-200 text-green-700 border-transparent}`}
                     >
                       <Package size={15} />
                       Đăng Thêm Thiết bị mới
@@ -466,10 +467,10 @@ export default function AdminPage({
                     </button>
                   </div>
 
-                  <div className="p-4 bg-gray-50 border border-gray-150 rounded-2xl text-[11px] text-gray-500 font-sans leading-relaxed">
+                  {/* <div className="p-4 bg-gray-50 border border-gray-150 rounded-2xl text-[11px] text-gray-500 font-sans leading-relaxed">
                     <strong className="text-gray-800 block mb-1">Ghi chú về bảo trợ:</strong>
                     Cơ sở đặt hàng được tối ưu mượt mà dưới môi trường Full-stack in-memory của máy chủ Express.
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* System Log terminal stream */}
@@ -515,6 +516,7 @@ export default function AdminPage({
               onAddPromo={handleAddPromo}
               onTogglePromoStatus={handleTogglePromoStatus}
               onDeletePromo={handleDeletePromo}
+              isDarkMode={isDarkMode}
             />
           )}
 
@@ -526,6 +528,7 @@ export default function AdminPage({
               onToggleUserVip={handleToggleUserVip}
               onToggleUserStatus={handleToggleUserStatus}
               onDeleteUser={handleDeleteUser}
+              isDarkMode={isDarkMode}
             />
           )}
 

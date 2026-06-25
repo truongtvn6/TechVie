@@ -173,10 +173,10 @@ export default function OrderManager({
 
           <button
             onClick={onSeedOrder}
-            className={`h-12 px-6 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
+            className={`h-12 px-6 text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
               d
-                ? "bg-indigo-600 hover:bg-indigo-700"
-                : "bg-black hover:bg-gray-955"
+                ? "bg-white! hover:bg-gray-100! text-black"
+                : "bg-black hover:bg-gray-955 text-white"
             }`}
           >
             <Plus size={16} />

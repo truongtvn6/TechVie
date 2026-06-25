@@ -52,8 +52,8 @@ export default function TabDevices() {
       </div>
 
       <div className="mt-6 p-4 bg-white/50 border border-white/60 rounded-xl flex items-start gap-3 text-[#2d3748] text-[11px] leading-relaxed shadow-sm">
-        <Clock size={16} className="text-black flex-shrink-0 mt-0.5" />
-        <div>
+        <Clock size={20} className="text-black flex-shrink-0 mt-0.5" />
+        <div className='!text-sm'>
           <strong>Bạn cần đặt mua thêm loại phụ kiện nào?</strong>
           <p className="text-[#4a5568] mt-0.5">Mọi bộ phụ kiện cao cấp và củ sạc hi-end của TechVie đều đảm bảo truyền dẫn sạc mượt mà đồng bộ. Hãy duyệt sảnh để bổ sung mục giỏ hàng.</p>
         </div>
