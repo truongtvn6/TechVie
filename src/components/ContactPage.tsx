@@ -85,7 +85,7 @@ export default function ContactPage() {
       {/* Inject Google Font for Editorial Design */}
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
       <style>{`
-        .editorial-font {
+        .font-sans tracking-tight {
           font-family: 'Playfair Display', serif;
         }
         .roboto-condensed-font {
@@ -105,12 +105,12 @@ export default function ContactPage() {
                 <span className="text-xs font-black uppercase tracking-[0.4em] text-gray-500 block mb-4">
                   TECHVIE REPRESENTATIVE CONTACT
                 </span>
-                <h1 className="editorial-font text-5xl md:text-7xl lg:text-8xl font-black italic tracking-tight leading-none text-gray-950 mb-8">
-                  Liên Hệ Hợp Tác.
+                <h1 className="font-sans tracking-tighter text-5xl md:text-7xl lg:text-8xl font-black  tracking-tight leading-none text-gray-950 mb-8">
+                  Liên Hệ <br />Hợp Tác
                 </h1>
               </div>
               {/* context */}
-              <p className="roboto-condensed-font text-lg md:text-xl font-medium leading-relaxed max-w-xl text-gray-800 mt-auto">
+              <p className="text-lg font-sans leading-relaxed max-w-xl text-gray-800 mt-auto">
                 Kết nối với chúng tôi để thiết lập cầu nối đổi mới sáng tạo, nhận tư vấn về thiết bị công nghệ hi-end hoặc đăng ký phân phối sản phẩm chính hãng.
               </p>
             </div>
@@ -124,7 +124,7 @@ export default function ContactPage() {
                   src={heroImage}
                 />
                 <div className="absolute top-4 left-4 bg-black text-white px-3 py-1 text-[8px] font-mono uppercase tracking-[0.2em]">
-                  TechVie Lab / HQ
+                  TechVie
                 </div>
                 <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-md text-gray-900 px-3 py-1.5 text-[8px] font-mono uppercase tracking-[0.2em] border border-black/10">
                   EST. 2026
@@ -149,7 +149,7 @@ export default function ContactPage() {
                 </h3>
                 <div className="space-y-10">
                   <div className="group">
-                    <h4 className="editorial-font text-2xl md:text-3xl italic font-black mb-2 text-gray-950">
+                    <h4 className="font-sans tracking-tight text-2xl md:text-3xl font-black mb-2 text-gray-950">
                       TechVie Lab Switzerland
                     </h4>
                     <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold leading-relaxed">
@@ -159,10 +159,14 @@ export default function ContactPage() {
                       <Phone size={14} className="text-secondary" />
                       +41 (21) 500-TECH
                     </p>
+                    <p className="mt-3 font-bold text-sm text-gray-900 flex items-center gap-2">
+                      <Mail size={14} className="text-secondary" />
+                      contact@techvie-lab.com
+                    </p>
                   </div>
                   
-                  <div className="group">
-                    <h4 className="editorial-font text-2xl md:text-3xl italic font-black mb-2 text-gray-950">
+                  {/* <div className="group">
+                    <h4 className="font-sans tracking-tight text-2xl md:text-3xl italic font-black mb-2 text-gray-950">
                       TechVie Seoul Lab
                     </h4>
                     <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold leading-relaxed">
@@ -172,19 +176,19 @@ export default function ContactPage() {
                       <Mail size={14} className="text-secondary" />
                       contact@techvie-lab.com
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
               {/* Quote Block */}
-              <div className="bg-black text-white p-8 md:p-12 rounded-3xl relative overflow-hidden shadow-lg">
+              <div className="bg-black/10 text-white p-8 md:p-12 rounded-3xl relative overflow-hidden shadow-lg">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_right_bottom,rgba(70,72,212,0.25),transparent_75%)] pointer-events-none" />
-                <h4 className="text-xl font-black uppercase tracking-tight mb-4">Trở Thành Trọng Tâm</h4>
-                <p className="text-xs md:text-sm leading-relaxed text-gray-400 font-light italic">
+                <h4 className="text-xl font-black text-black uppercase tracking-tight mb-4">Trở Thành Trọng Tâm</h4>
+                <p className="text-xs md:text-[15px] leading-relaxed text-black font-light italic">
                   &ldquo;Khoảng cách giữa giấc mơ thiết bị tối tân và một sản phẩm công nghệ thực tiễn là khoảng thời gian TechVie tinh tế thiết lập chuẩn mực độ bền cơ học hi-end.&rdquo;
                 </p>
-                <p className="mt-6 text-[9px] font-mono tracking-[0.3em] font-black text-indigo-400">
-                  — KỸ SƯ TRƯỞNG MINH TRÍ
+                <p className="mt-6 text-[12px] font-mono tracking-[0.3em] font-black text-black float-end">
+                  — TECHVIE —
                 </p>
               </div>
 
@@ -195,11 +199,11 @@ export default function ContactPage() {
           <div className="lg:col-span-7 bg-white">
             <div className="p-8 lg:p-16">
               <div className="mb-12">
-                <h2 className="editorial-font text-3xl sm:text-4xl md:text-5xl italic font-black tracking-wide mb-3 text-gray-950">
+                <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl  font-black tracking-wide mb-3 text-gray-950">
                   Gửi Thư Yêu Cầu
                 </h2>
                 <p className="text-[10px] md:text-xs uppercase tracking-widest text-gray-500 font-black">
-                  Chúng tôi sẽ bảo mật tuyệt đối thông tin và phản hồi nhanh nhất.
+                  Chúng tôi sẽ bảo mật tuyệt đối thông tin và phản hồi nhanh nhất
                 </p>
               </div>
 
@@ -215,7 +219,7 @@ export default function ContactPage() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                       <div className="relative border-b-2 border-black pb-2">
-                        <label className="text-[9px] uppercase font-black tracking-wider mb-2 block text-gray-500">
+                        <label className="text-[10px] uppercase font-black tracking-wider mb-2 block text-gray-500">
                           Họ và Tên <span className="text-red-500">*</span>
                         </label>
                         <input 
@@ -224,12 +228,12 @@ export default function ContactPage() {
                           placeholder="Nguyễn Văn A"
                           value={formName}
                           onChange={(e) => setFormName(e.target.value)}
-                          className="w-full bg-transparent border-none p-0 text-lg font-bold placeholder:text-gray-250 focus:ring-0 outline-none"
+                          className="w-full bg-transparent border-none p-0 text-lg placeholder:text-gray-250 focus:ring-0 outline-none"
                         />
                       </div>
 
                       <div className="relative border-b-2 border-black pb-2">
-                        <label className="text-[9px] uppercase font-black tracking-wider mb-2 block text-gray-500">
+                        <label className="text-[10px] uppercase font-black tracking-wider mb-2 block text-gray-500">
                           Địa chỉ Email <span className="text-red-500">*</span>
                         </label>
                         <input 
@@ -238,13 +242,13 @@ export default function ContactPage() {
                           placeholder="contact@example.com"
                           value={formEmail}
                           onChange={(e) => setFormEmail(e.target.value)}
-                          className="w-full bg-transparent border-none p-0 text-lg font-bold placeholder:text-gray-250 focus:ring-0 outline-none"
+                          className="w-full bg-transparent border-none p-0 text-lg placeholder:text-gray-250 focus:ring-0 outline-none"
                         />
                       </div>
                     </div>
 
                     <div className="relative border-b-2 border-black pb-2">
-                      <label className="text-[9px] uppercase font-black tracking-wider mb-2 block text-gray-500">
+                      <label className="text-[10px] uppercase font-black tracking-wider mb-2 block text-gray-500">
                         Chủ đề hợp tác
                       </label>
                       <input 
@@ -252,12 +256,12 @@ export default function ContactPage() {
                         placeholder="Kế hoạch đại lý bán hàng / Tư vấn cấu hình thiết bị..."
                         value={formSubject}
                         onChange={(e) => setFormSubject(e.target.value)}
-                        className="w-full bg-transparent border-none p-0 text-lg font-bold placeholder:text-gray-250 focus:ring-0 outline-none"
+                        className="w-full bg-transparent border-none p-0 text-lg placeholder:text-gray-250 focus:ring-0 outline-none"
                       />
                     </div>
 
                     <div className="relative border-b-2 border-black pb-2">
-                      <label className="text-[9px] uppercase font-black tracking-wider mb-2 block text-gray-500">
+                      <label className="text-[10px] uppercase font-black tracking-wider mb-2 block text-gray-500">
                         Chi tiết thư yêu cầu
                       </label>
                       <textarea 
@@ -265,7 +269,7 @@ export default function ContactPage() {
                         placeholder="Hãy mô tả chi tiết mong muốn hợp tác hoặc câu hỏi của bạn..."
                         value={formMessage}
                         onChange={(e) => setFormMessage(e.target.value)}
-                        className="w-full bg-transparent border-none p-0 text-lg font-bold placeholder:text-gray-250 focus:ring-0 outline-none resize-none"
+                        className="w-full bg-transparent border-none p-0 text-lg placeholder:text-gray-250 focus:ring-0 outline-none resize-none"
                       />
                     </div>
 
@@ -297,7 +301,7 @@ export default function ContactPage() {
                     <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
                       <Check size={28} />
                     </div>
-                    <h4 className="text-xl font-bold text-gray-950 mb-2 editorial-font italic">Thư Yêu Cầu Đã Gửi!</h4>
+                    <h4 className="text-xl font-bold text-gray-950 mb-2 font-sans tracking-tight italic">Thư Yêu Cầu Đã Gửi!</h4>
                     <p className="text-xs md:text-sm text-gray-650 font-sans leading-relaxed max-w-md mx-auto">
                       Cảm ơn tin nhắn của bạn. Yêu cầu hỗ trợ đã được gửi thành công đến hệ thống và lưu trữ trong cơ sở dữ liệu. Đội ngũ tư vấn viên của TechVie sẽ liên hệ lại với bạn trong vòng 24 đến 48 giờ làm việc.
                     </p>
@@ -318,8 +322,8 @@ export default function ContactPage() {
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] mb-8 block text-gray-500">
                   Flagship Showroom
                 </span>
-                <h2 className="editorial-font text-4xl md:text-5xl italic font-black leading-tight mb-8 text-gray-950">
-                  Ghé Thăm<br />Chúng Tôi.
+                <h2 className="font-sans tracking-tight text-4xl md:text-5xl font-black leading-tight mb-8 text-gray-950">
+                  Ghé Thăm<br />Chúng Tôi
                 </h2>
                 <div className="space-y-5 text-xs md:text-sm text-gray-800 font-sans font-bold">
                   <p className="flex gap-3 uppercase tracking-wider items-start">
@@ -339,13 +343,13 @@ export default function ContactPage() {
             </div>
             
             {/* Middle Column: Map iframe */}
-            <div className="lg:col-span-6 bg-gray-100 grayscale hover:grayscale-0 transition-all duration-3000 hover:duration-900 relative min-h-[350px] lg:min-h-full border-b lg:border-b-0 lg:border-r border-black">
+            <div className="lg:col-span-6 bg-gray-100 grayscale hover:grayscale-0 transition-all duration-1000 hover:duration-900 relative min-h-[350px] lg:min-h-full border-b lg:border-b-0 lg:border-r border-black">
               <iframe 
                 allowFullScreen={true}
                 height="100%" 
                 loading="lazy" 
                 src="https://maps.google.com/maps?q=H%E1%BB%93+Ch%C3%AD+Minh,+Vi%E1%BB%87t+Nam&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed" 
-                style={{ border: 0, filter: "contrast(1.2) brightness(1.1)" }} 
+                style={{ border: 0 }} 
                 width="100%"
               />
             </div>
@@ -356,19 +360,19 @@ export default function ContactPage() {
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] mb-8 block text-gray-500">
                   Operational Hours
                 </span>
-                <h2 className="editorial-font text-3xl md:text-4xl lg:text-5xl italic font-black leading-tight mb-8 text-gray-950">
-                  Giờ Làm Việc.
+                <h2 className="font-sans tracking-tight text-3xl md:text-4xl lg:text-5xl font-black leading-tight mb-8 text-gray-950">
+                  Giờ Làm Việc
                 </h2>
                 <div className="space-y-8">
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest mb-3 text-gray-500 border-b border-black pb-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest mb-3 text-gray-500 border-b border-black pb-1">
                       Flagship Showroom
                     </p>
                     <p className="text-xs font-bold italic text-gray-900">T2 - T6: 08:00 - 21:30</p>
                     <p className="text-xs font-bold italic text-gray-900 mt-1">T7 - CN: 09:00 - 22:00</p>
                   </div>
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest mb-3 text-gray-500 border-b border-black pb-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest mb-3 text-gray-500 border-b border-black pb-1">
                       Trung Tâm Bảo Hành & Sửa Chữa
                     </p>
                     <p className="text-xs font-bold italic text-gray-900">T2 - T6: 09:00 - 18:00</p>
@@ -389,12 +393,12 @@ export default function ContactPage() {
               <span className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 block text-gray-500">
                 The Leadership
               </span>
-              <h2 className="editorial-font text-5xl lg:text-6xl italic font-black leading-none text-gray-950">
-                Đội Ngũ<br />Sáng Tạo.
+              <h2 className="font-sans tracking-tight text-5xl lg:text-6xl font-black leading-none text-gray-950">
+                Đội Ngũ<br />Sáng Tạo
               </h2>
             </div>
             <div className="max-w-md">
-              <p className="text-xs md:text-sm font-medium leading-relaxed border-l-4 border-black pl-6 text-gray-700">
+              <p className="text-md font-medium leading-relaxed border-l-4 border-black pl-6 text-gray-700 italic">
                 Hội tụ những chuyên gia công nghệ, kỹ sư đầu ngành và nhà thiết kế xuất sắc cùng chung lý tưởng định hình tương lai các thiết bị cá nhân cao cấp.
               </p>
             </div>
@@ -404,7 +408,7 @@ export default function ContactPage() {
             {teamMembers.map((member, idx) => (
               <div 
                 key={idx}
-                className="border-r border-b border-black p-8 group hover:bg-black hover:text-white transition-colors duration-500 flex flex-col justify-between min-h-[450px]"
+                className="border-r border-b border-black p-8 group hover:bg-linear-to-b hover:from-black/10 hover:to-white/90 transition-all duration-500 flex flex-col justify-between min-h-[450px]"
               >
                 <div>
                   <div className="aspect-[3/4] mb-6 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700 rounded-lg bg-gray-50 border border-gray-200 group-hover:border-transparent">
@@ -418,11 +422,11 @@ export default function ContactPage() {
                   <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600 group-hover:text-indigo-400 transition-colors">
                     {member.role}
                   </span>
-                  <h3 className="editorial-font text-2xl md:text-3xl italic font-black mt-1 text-gray-950 group-hover:text-white transition-colors">
+                  <h3 className="font-sans tracking-tight text-2xl md:text-3xl italic font-black mt-1 text-gray-950 ">
                     {member.name}
                   </h3>
                 </div>
-                <p className="mt-4 text-[11px] md:text-xs font-light leading-relaxed opacity-70 group-hover:opacity-85 transition-opacity">
+                <p className="mt-4 text-[12px] md:text-xs font-light leading-relaxed opacity-70 group-hover:opacity-85 transition-opacity">
                   {member.bio}
                 </p>
               </div>
@@ -434,8 +438,8 @@ export default function ContactPage() {
         <section className="px-6 py-16 lg:py-24 bg-gray-50">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="editorial-font text-4xl md:text-5xl italic font-black mb-4 text-gray-950">
-                Câu hỏi phổ biến.
+              <h2 className="font-sans tracking-tight text-4xl md:text-5xl font-black mb-4 text-gray-950">
+                Câu hỏi phổ biến
               </h2>
               <div className="w-16 h-1.5 bg-black mx-auto"></div>
             </div>
@@ -448,7 +452,7 @@ export default function ContactPage() {
                 >
                   <button 
                     onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
-                    className="w-full px-4 py-6 flex items-center justify-between text-left hover:bg-black/5 transition-colors focus:outline-none"
+                    className="w-full px-4 py-6 flex items-center justify-between text-left hover:bg-black/5 transition-colors focus:outline-none cursor-pointer"
                   >
                     <span className="font-bold uppercase tracking-tight text-sm md:text-base text-gray-955 font-sans">
                       {faq.q}
@@ -468,7 +472,7 @@ export default function ContactPage() {
                         transition={{ duration: 0.3 }}
                         className="overflow-hidden bg-white/40"
                       >
-                        <p className="px-6 pb-6 text-xs md:text-sm text-gray-700 leading-relaxed font-sans max-w-3xl">
+                        <p className="px-6 pb-6 text-md text-gray-700 leading-relaxed font-sans max-w-3xl">
                           {faq.a}
                         </p>
                       </motion.div>

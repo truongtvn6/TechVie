@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { ChevronUp } from "lucide-react";
 import { TabType, CartItem, Product } from "./types";
 import {
   createProduct,
@@ -39,6 +40,16 @@ export default function App() {
       return "home";
     }
   });
+
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 80);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
@@ -766,6 +777,26 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       />
+
+      {/* Back to Top Button */}
+      <AnimatePresence>
+        {showScrollTop && 
+         activeTab !== 'account' && 
+         activeTab !== 'admin' && 
+         activeTab !== 'dang-nhap' && 
+         activeTab !== 'dang-ky' && (
+          <motion.button
+            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.8 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-8 right-8 z-[40] w-12 h-12 bg-black text-white rounded-full flex items-center justify-center shadow-2xl hover:bg-gray-800 transition-colors cursor-pointer group"
+            title="Lên đầu trang"
+          >
+            <ChevronUp size={24} className="group-hover:-translate-y-1 transition-transform" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

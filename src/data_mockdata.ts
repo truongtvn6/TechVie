@@ -77,31 +77,31 @@ export const products: Product[] = [
 
 export const newsArticles: NewsArticle[] = [
   {
-    id: 'news-1',
-    title: 'TechVie Silicon Ra Mắt Thế Hệ Vi Xử Lý M1 Pro siêu vi',
-    category: 'CÔNG NGHỆ',
-    date: '15/06/2026',
-    summary: 'Bước nhảy vọt đột phá trong công nghệ sản xuất chip của TechVie giúp thiết bị tiết kiệm điện năng hơn 40% đồng thời tối đa hóa luồng xử lý đồ họa phức tạp.',
-    content: 'Đội ngũ kỹ sư tại TechVie Lab Thụy Sĩ vừa công bố bản thiết kế chip bán dẫn 2nm đầu tiên mang tên M1 Pro. Bằng việc xếp chồng mật độ bóng bán dẫn theo công nghệ ba chiều mới nhất, con chip này đạt hiệu năng xử lý tác vụ trí tuệ nhân tạo cao gấp 2.5 lần các thế hệ tiền nhiệm, mở ra chương mới cho hệ sinh thái laptop di động cấu hình siêu khủng.',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80'
+    id: "techvie-blog-01",
+    title: "Tuyệt Chiêu Giấu Dây Cáp Gọn Gàng Cho Góc Làm Việc Minimalist",
+    category: "Setup Tips",
+    date: "20 Tháng 6, 2026",
+    image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&q=80&w=800",
+    summary: "Dây điện chằng chịt luôn là kẻ thù của một góc học tập aesthetic. Khám phá ngay 3 bước đơn giản để giấu hoàn toàn dây cáp, trả lại không gian tối giản cho bạn.",
+    content: "Một góc làm việc lộn xộn sẽ làm giảm đáng kể cảm hứng học tập và sự tập trung. Việc đầu tiên để có một không gian chuẩn aesthetic chính là quy hoạch lại hệ thống dây điện. Bạn có thể sử dụng các khay đi dây kẹp dưới mặt bàn kết hợp cùng dây rút velcro để cố định các cáp sạc, dây nguồn. Đừng quên trang bị thêm các loại cáp sạc nhanh bọc dù từ TechVie để vừa tăng độ bền, vừa chống rối hiệu quả."
   },
   {
-    id: 'news-2',
-    title: 'Khai Trương Trạm Trải Nghiệm Premium Store Tại Hà Nội & TP. HCM',
-    category: 'CÔNG TY',
-    date: '28/05/2026',
-    summary: 'Điểm chạm vật lý đặc thù mang thiết kế futuristic tối giản Thụy Sĩ cho khách hàng chạm tay vào các siêu phẩm công nghệ đỉnh cao.',
-    content: 'TechVie Electronics chính thức chào đón quý khách hàng tham quan không gian phân phối và bảo hành ủy quyền chính hãng đầu tiên tại Việt Nam. Trạm trải nghiệm được tối giản hóa toàn bộ các chi tiết rườm rà, tập trung tuyệt đối vào sự kết nối tự nhiên giữa người dùng và sản phẩm công nghệ thông qua các bục kính trưng bày lơ lửng.',
-    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80'
+    id: "techvie-blog-02",
+    title: "Hướng Dẫn Chọn Ốp Lưng Custom: Chất Liệu Nào Chống Ố Vàng Tốt Nhất?",
+    category: "Product Guide",
+    date: "15 Tháng 6, 2026",
+    image: "https://images.unsplash.com/photo-1601593346740-925612772716?auto=format&fit=crop&q=80&w=800",
+    summary: "Sở hữu một chiếc ốp lưng in hình cá nhân là cách tuyệt vời để thể hiện chất riêng. Nhưng làm sao để chọn được chất liệu ốp vừa bảo vệ máy, vừa bền màu?",
+    content: "Ốp lưng trong suốt thường gặp phải tình trạng ố vàng sau một thời gian sử dụng do tác động của tia UV và mồ hôi tay. Tại TechVie, các sản phẩm ốp lưng custom được ưu tiên sử dụng mặt lưng PC (Polycarbonate) cứng kết hợp viền TPU dẻo cao cấp. Sự kết hợp này không chỉ giúp giảm chấn động khi va đập mà còn giữ được độ trong suốt bền lâu, làm nổi bật sắc nét từng chi tiết hình ảnh mà bạn đã thiết kế."
   },
   {
-    id: 'news-3',
-    title: 'Vật liệu hợp kim hàng không thân thiện môi trường trong thiết kế mới',
-    category: 'CHẾ TÁC',
-    date: '10/04/2026',
-    summary: 'TechVie cam kết đạt trạng thái trung hòa carbon toàn bộ chuỗi sản xuất thiết bị vào cuối năm 2026.',
-    content: 'Triết lý gia công lớp vỏ nhôm của TechVie Book Pro X sử dụng 100% tài nguyên tái chế được điện phân bằng năng lượng mặt trởi sạch. Điều này không những giảm thiểu ô nhiễm môi trường công nghiệp mà còn giúp cải thiện độ đàn hồi chịu lực của vật liệu tăng thêm 15% so với nhôm thô thương mại.',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80'
+    id: "techvie-blog-03",
+    title: "5 Phụ Kiện Không Thể Thiếu Cho Góc Học Tập Công Thái Học",
+    category: "Lifestyle",
+    date: "05 Tháng 6, 2026",
+    image: "https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&q=80&w=800",
+    summary: "Đau mỏi vai gáy do ngồi sai tư thế? Tham khảo ngay danh sách 5 phụ kiện công nghệ thiết yếu giúp bạn bảo vệ sức khỏe và nâng cao năng suất mỗi ngày.",
+    content: "Xu hướng học tập và làm việc cường độ cao đòi hỏi chúng ta phải quan tâm nhiều hơn đến sức khỏe thể chất. Hãy bắt đầu từ việc trang bị một chiếc giá đỡ laptop tản nhiệt để nâng tầm nhìn ngang mắt, hạn chế việc phải cúi gập cổ. Tiếp đó, một chiếc đèn LED kẹp màn hình hoặc đèn decor RGB sẽ giúp giảm tình trạng mỏi mắt khi làm việc ban đêm, đồng thời tăng gấp đôi cảm hứng sáng tạo cho góc làm việc của bạn."
   }
 ];
 

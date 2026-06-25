@@ -68,7 +68,7 @@ export default function CartSidePanel({
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-950 tracking-tight">Giỏ hàng</h2>
-                  <span className="text-xs text-gray-500 font-mono">
+                  <span className="text-sm text-gray-500 font-sans">
                     ({cart.reduce((sum, item) => sum + item.quantity, 0)} sản phẩm đã được chọn)
                   </span>
                 </div>
@@ -76,7 +76,7 @@ export default function CartSidePanel({
               
               <button 
                 onClick={onClose}
-                className="w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center text-gray-400 hover:text-black transition-colors"
+                className="w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center text-gray-400 hover:text-black transition-colors cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -91,7 +91,7 @@ export default function CartSidePanel({
                       {cart.map((item) => (
                         <div 
                           key={item.product.id}
-                          className="flex gap-4 p-4 rounded-2xl border border-gray-150 hover:border-black/10 transition-colors"
+                          className="flex gap-4 p-4 rounded-2xl border border-gray-200 hover:border-black/30 transition-colors"
                         >
                           <div className="w-16 h-16 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center p-2 shrink-0">
                             <img 
@@ -107,7 +107,7 @@ export default function CartSidePanel({
                               <h4 className="font-bold text-sm text-gray-950 truncate">{item.product.name}</h4>
                               <button 
                                 onClick={() => onRemoveItem(item.product.id)}
-                                className="text-gray-400 hover:text-red-500 transition-colors shrink-0"
+                                className="text-gray-400 hover:text-red-500 transition-colors shrink-0 cursor-pointer"
                                 title="Xoá khỏi giỏ"
                               >
                                 <Trash2 size={14} />
@@ -146,13 +146,16 @@ export default function CartSidePanel({
                       <div className="w-16 h-16 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto mb-4">
                         <ShoppingBag size={28} />
                       </div>
-                      <h3 className="text-base font-bold text-gray-900">Giỏ hàng rỗng</h3>
-                      <p className="text-xs text-gray-550 mt-1 max-w-[240px] mx-auto">
-                        Hãy thêm các thiết bị smartphone, laptop hay phụ kiện công nghệ hi-end tối tân vào giỏ hàng.
+                      <h3 className="text-2xl font-bold text-gray-900">Giỏ hàng rỗng</h3>
+                      <p className="text-sm text-gray-550 mt-1 max-w-[240px] mx-auto">
+                        Hãy lấp đầy giỏ hàng bằng những món đồ setup đậm chất riêng để khơi nguồn cảm hứng mỗi ngày.
                       </p>
                       <button 
-                        onClick={onClose}
-                        className="text-xs text-indigo-650 font-bold uppercase tracking-widest mt-4 hover:underline"
+                        onClick={() => {
+                          onClose(); 
+                          onNavigate("products");
+                        }}
+                        className="text-sm text-indigo-650 font-bold uppercase tracking-widest mt-4 hover:underline cursor-pointer"
                       >
                         Bắt đầu mua sắm
                       </button>
@@ -235,7 +238,7 @@ export default function CartSidePanel({
             {/* Footer Summary & checkout trigger */}
             {cart.length > 0 && (
               <div className="p-6 md:p-8 bg-gray-50 border-t border-gray-200 space-y-4">
-                <div className="flex justify-between text-xs text-gray-500 font-sans">
+                <div className="flex justify-between text-sm text-gray-500 font-sans">
                   <span>Vận chuyển (TechVie Express)</span>
                   <span className="font-mono text-emerald-600 font-bold">Miễn phí</span>
                 </div>
@@ -251,7 +254,7 @@ export default function CartSidePanel({
                     onNavigate('checkout');
                     onClose();
                   }}
-                  className="w-full bg-black text-white hover:bg-gray-900 py-4 rounded-xl font-sans text-xs uppercase tracking-widest font-black transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-black text-white hover:bg-gray-900 py-4 rounded-xl font-sans text-xs uppercase tracking-widest font-black transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Tiến hành kết nối đặt hàng
                   <ArrowRight size={14} />

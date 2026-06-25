@@ -9,7 +9,7 @@ interface FooterProps {
 
 export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
   return (
-    <footer className="w-full bg-white/40 border-t border-gray-200 py-16 mt-20">
+    <footer className="w-full bg-white border-t border-gray-200 pt-16 pb-6 mt-20 relative z-10">
       <div className="max-w-none mx-auto px-4 md:px-10 lg:px-16 grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Description summary */}
         <div className="space-y-4">
@@ -23,7 +23,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
 
         {/* Nav columns 1 */}
         <div>
-          <h5 className="text-[10px] uppercase font-bold tracking-[0.2em] text-gray-400 mb-6 font-sans">
+          <h5 className="text-[12px] uppercase font-bold tracking-[0.2em] text-gray-400 mb-6 font-sans">
             CÁC KHÔNG GIAN
           </h5>
           <ul className="space-y-3">
@@ -34,7 +34,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
                     setActiveTab(item.id);
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="text-xs text-gray-600 hover:text-black transition-colors font-sans text-left uppercase tracking-wider font-semibold cursor-pointer"
+                  className="text-sm text-gray-600 hover:text-black transition-colors font-sans text-left uppercase tracking-wider font-semibold cursor-pointer"
                 >
                   {item.label}
                 </button>
@@ -45,10 +45,10 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
 
         {/* Nav columns 2 */}
         <div>
-          <h5 className="text-[10px] uppercase font-bold tracking-[0.2em] text-gray-400 mb-6 font-sans">
+          <h5 className="text-[12px] uppercase font-bold tracking-[0.2em] text-gray-400 mb-6 font-sans">
             DỊCH VỤ & LAB
           </h5>
-          <ul className="space-y-3 text-xs text-gray-600 font-sans">
+          <ul className="space-y-3 text-sm text-gray-600 font-sans">
             <li>
               <button
                 onClick={() => {
@@ -98,7 +98,7 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
 
         {/* Social Links columns */}
         <div>
-          <h5 className="text-[10px] uppercase font-bold tracking-[0.2em] text-gray-400 mb-6">
+          <h5 className="text-[12px] uppercase font-bold tracking-[0.2em] text-gray-400 mb-6">
             MẠNG XÃ HỘI
           </h5>
           <div className="flex space-x-4">
@@ -107,31 +107,30 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:border-black transition-all"
               title="TechVie Global Network"
             >
-              <Globe size={16} />
+              <Globe size={18} />
             </a>
             <a
               href="#"
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:border-black transition-all"
               title="TechVie Micro-Animations"
             >
-              <Layers size={16} />
+              <Layers size={18} />
             </a>
             <a
               href="#"
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:border-black transition-all"
               title="TechVie Crafts"
             >
-              <Brush size={16} />
+              <Brush size={18} />
             </a>
           </div>
         </div>
       </div>
 
       {/* Rights bar */}
-      <div className="max-w-none mx-auto px-4 md:px-10 lg:px-16 mt-16 pt-8 border-t border-gray-150 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono uppercase tracking-widest text-gray-400 gap-4 text-center md:text-left">
+      <div className="max-w-none mx-auto px-4 md:px-10 lg:px-16 mt-16 pt-6 border-t border-gray-150 flex flex-col md:flex-row justify-between items-center text-[11px] font-mono uppercase tracking-widest text-gray-500 gap-4 text-center md:text-left">
         <span className="flex items-center gap-1">
-          <Copyright  size={11} /> 2026 TECHVIE ELECTRONICS. ĐƯỢC CHẾ TÁC VÌ SỰ
-          RÕ NÉT.
+          <Copyright size={13} /> 2026 TechVie. Kiến tạo góc học tập đậm chất riêng.
         </span>
         {/* <span className="flex items-center gap-1">
           THIẾT KẾ BỞI TECHVIE LAB, GEMINI, AISTUDIO.GOOGLE & STITCH.WITHGOOGLE.

@@ -30,13 +30,13 @@ export default function NewsPage() {
       {/* Header */}
       <div className="mb-14 text-center">
         <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
-          TECHVIE NEWS & JOURNAL
+          TECHVIE BLOG & LIFESTYLE
         </span>
         <h1 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
-          Nhật Ký Đổi Mới
+          Cảm Hứng & Mẹo Setup
         </h1>
-        <p className="text-sm text-gray-500 font-sans mt-3 max-w-lg mx-auto leading-relaxed">
-          Nơi cập nhật những công nghệ đột phá mới nhất, thông tin khai trương các showroom trải nghiệm và các chương trình ưu đãi độc quyền từ TechVie.
+        <p className="text-md text-gray-500 font-sans mt-3 max-w-lg mx-auto leading-relaxed">
+          Cập nhật những xu hướng trang trí góc làm việc aesthetic, mẹo tối ưu không gian và các chương trình ưu đãi mới nhất từ TechVie.
         </p>
       </div>
 
@@ -46,7 +46,7 @@ export default function NewsPage() {
           <article 
             key={article.id}
             onClick={() => setSelectedArticle(article)}
-            className="group cursor-pointer bg-white border border-gray-150 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-black/20 flex flex-col justify-between"
+            className="group cursor-pointer bg-white border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-black/20 flex flex-col justify-between"
           >
             <div>
               {/* Grayscale hover to colors image strip */}
@@ -65,16 +65,16 @@ export default function NewsPage() {
 
               {/* Title & info summary */}
               <div className="p-8">
-                <div className="flex items-center gap-2 text-xs text-gray-400 font-mono mb-3">
+                <div className="flex items-center gap-2 text-sm text-gray-400 font-mono mb-3">
                   <Calendar size={12} />
                   {article.date}
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 tracking-tight leading-snug group-hover:text-secondary group-hover:underline underline-offset-4 transition-all">
+                <h3 className="text-2xl font-bold text-gray-900 tracking-tight leading-snug group-hover:text-secondary group-hover:underline underline-offset-4 transition-all">
                   {article.title}
                 </h3>
 
-                <p className="text-gray-500 font-sans text-xs mt-3 leading-relaxed line-clamp-3">
+                <p className="text-gray-500 font-sans text-[14px] mt-3 leading-relaxed line-clamp-3">
                   {article.summary}
                 </p>
               </div>
@@ -82,7 +82,7 @@ export default function NewsPage() {
 
             {/* Read more button strip */}
             <div className="p-8 pt-0 flex justify-between items-center border-t border-gray-50 mt-4">
-              <span className="text-[11px] uppercase tracking-widest font-black text-gray-900 flex items-center gap-1 group-hover:text-secondary group-hover:translate-x-1 transition-all">
+              <span className="text-[13px] uppercase tracking-widest font-black text-gray-900 flex items-center gap-1 group-hover:text-secondary group-hover:translate-x-1 transition-all">
                 Đọc bài viết
                 <ChevronRight size={14} />
               </span>
@@ -90,7 +90,7 @@ export default function NewsPage() {
               {/* Minimal like mechanism */}
               <button 
                 onClick={(e) => handleLike(article.id, e)}
-                className={`flex items-center gap-1.5 text-xs font-mono transition-colors py-1.5 px-3 rounded-full ${
+                className={`flex items-center gap-1.5 text-md font-mono transition-colors py-1.5 px-3 rounded-full ${
                   hasLiked[article.id]
                     ? 'text-red-600 bg-red-50'
                     : 'text-gray-400 hover:text-red-500 hover:bg-gray-50'
@@ -116,7 +116,7 @@ export default function NewsPage() {
             >
               <button 
                 onClick={() => setSelectedArticle(null)}
-                className="absolute top-6 right-6 w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center text-gray-500 hover:text-black transition-colors"
+                className="absolute top-6 right-6 w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center text-gray-500 hover:text-black transition-colors cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -130,9 +130,9 @@ export default function NewsPage() {
                   {selectedArticle.title}
                 </h2>
 
-                <div className="flex items-center gap-3 text-xs text-gray-500 font-mono mt-3">
+                <div className="flex items-center gap-3 text-sm text-gray-500 font-mono mt-3">
                   <Calendar size={12} />
-                  Đăng ngày {selectedArticle.date} • Tác giả TechVie Press Room
+                  Đăng ngày {selectedArticle.date} • Tác giả TechVie Team
                 </div>
               </div>
 
@@ -147,18 +147,18 @@ export default function NewsPage() {
               </div>
 
               {/* Content body */}
-              <div className="prose prose-gray max-w-none text-sm leading-relaxed text-gray-700 font-sans space-y-4">
-                <p className="font-semibold text-gray-900 text-base">{selectedArticle.summary}</p>
+              <div className="prose prose-gray max-w-none text-md leading-relaxed text-gray-700 font-sans space-y-4">
+                <p className="font-semibold text-gray-900 text-lg">{selectedArticle.summary}</p>
                 <p>{selectedArticle.content}</p>
-                <p>Chúng tôi luôn nỗ lực tuyệt đối để nâng cao tiêu chuẩn phục vụ và duy trì chuỗi nghiên cứu chân thực, đưa các thiết bị quang học Thủy Tinh Lỏng hội nhập vào đời sống kết nối bền bỉ nhất.</p>
+                <p className='italic'>Đội ngũ TechVie luôn nỗ lực tìm kiếm và mang đến những giải pháp phụ kiện chất lượng, giúp bạn tối ưu hóa không gian làm việc và thể hiện cá tính độc bản của riêng mình.</p>
               </div>
 
               <div className="mt-10 pt-6 border-t border-gray-100 flex justify-end">
                 <button 
                   onClick={() => setSelectedArticle(null)}
-                  className="bg-black text-white hover:bg-gray-800 px-8 py-3 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-colors"
+                  className="bg-black text-white hover:bg-gray-800 px-8 py-3 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-colors cursor-pointer"
                 >
-                  Xác nhận lưu hành
+                  XEM BÀI VIẾT KHÁC →
                 </button>
               </div>
             </motion.div>

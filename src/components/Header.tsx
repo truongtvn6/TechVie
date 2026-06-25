@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TabType } from '../types';
 import { Search, ShoppingBag, Menu, X, User } from 'lucide-react';
+import Logo from '../assets/logopage/logo-b-w-techvie.png'
 
 interface HeaderProps {
   activeTab: TabType;
@@ -89,7 +90,7 @@ export default function Header({
           width: 100%;
         }
       `}</style>
-      <div className="flex justify-between items-center h-24 px-4 md:px-10 lg:px-16 max-w-none mx-auto relative w-full">
+      <div className="flex justify-between items-center h-18 px-4 md:px-8 lg:px-10 max-w-none mx-auto relative w-full">
         {/* Brand Logo text */}
         <button 
           onClick={() => {
@@ -98,7 +99,7 @@ export default function Header({
           }}
           className="text-2xl md:text-3xl font-sans tracking-tighter text-black font-black hover:opacity-80 transition-opacity"
         >
-          TECHVIE
+          <img src={Logo} alt="TechVie Logo" className="h-12 md:h-14 lg:h-16 w-auto object-contain cursor-pointer" />
         </button>
 
         {/* Desktop Nav menu items */}
@@ -125,16 +126,16 @@ export default function Header({
         <div className="flex items-center space-x-4">
           <button 
             onClick={() => setIsSearchOpen(true)}
-            className="relative w-12 h-12 flex items-center justify-center bg-white/40 border border-black/5 rounded hover:bg-white/80 transition-all duration-300 active:scale-95 cursor-pointer"
+            className="relative w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-200 transition-all duration-300 active:scale-95 cursor-pointer"
             title="Tìm kiếm thiết bị"
           >
-            <Search size={18} className="text-gray-900" />
-            <div className="absolute top-[-2px] right-[-2px] w-2 h-2 bg-indigo-600 rounded-full shadow-[0_0_8px_rgba(70,72,212,0.6)]" />
+            <Search size={20} className="text-gray-900" />
+            {/* <div className="absolute top-[-2px] right-[-2px] w-2 h-2 bg-indigo-600 rounded-full shadow-[0_0_8px_rgba(70,72,212,0.6)]" /> */}
           </button>
 
           <button 
             onClick={() => setIsCartOpen(true)}
-            className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/70 hover:backdrop-blur-sm transition-all duration-300 relative cursor-pointer"
+            className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-200 hover:backdrop-blur-sm transition-all duration-300 relative cursor-pointer"
             title="Giỏ hàng TechVie"
           >
             <ShoppingBag size={20} className="text-gray-900" />
@@ -166,17 +167,17 @@ export default function Header({
               className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative cursor-pointer ${
                 activeTab === 'account' || activeTab === 'dang-nhap' || activeTab === 'dang-ky'
                   ? 'bg-black text-white shadow-md' 
-                  : 'hover:bg-white/70 hover:backdrop-blur-sm text-gray-950 border border-transparent/0'
+                  : 'hover:bg-gray-200 hover:backdrop-blur-sm text-gray-950 border border-transparent/0'
               }`}
               title="Tài khoản TechVie ID"
             >
-              <User size={18} />
+              <User size={20} />
             </a>
           </div>
 
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/70 hover:backdrop-blur-sm transition-all duration-300 cursor-pointer"
+            className="md:hidden w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-200 hover:backdrop-blur-sm transition-all duration-300 cursor-pointer"
             title="Danh mục menu"
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -190,7 +191,7 @@ export default function Header({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t border-gray-150 py-6"
+            className="md:hidden bg-white border-t border-gray-150 py-6 h"
           >
             <div className="flex flex-col px-6 space-y-4">
               {navigationItems.map((item) => (

@@ -94,16 +94,16 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="fixed top-0 left-0 bottom-0 z-[70] w-[85vw] md:w-[70vw] bg-white/50 backdrop-blur-[90px] saturate-[200%] border-r border-white/20 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.15)] overflow-hidden"
+            className="fixed top-0 left-0 bottom-0 z-[70] w-[85vw] md:w-[70vw] bg-linear-to-bl from-white to-slate-200 backdrop-blur-[90px] saturate-[200%] border-r border-white/20 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.15)] overflow-hidden"
           >
             {/* Header */}
-            <div className="p-8 md:p-14 flex justify-between items-center border-b border-black/5">
+            <div className="p-8 md:px-14 md:py-10 flex justify-between items-center border-b border-black/15">
               <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black uppercase">
                 Tìm kiếm
               </h2>
               <button 
                 onClick={onClose}
-                className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-black/5 transition-all border border-black/10 group"
+                className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-black/5 transition-all border border-black/10 group cursor-pointer"
               >
                 <X size={20} className="group-hover:rotate-90 transition-transform" />
               </button>
@@ -126,8 +126,8 @@ export default function SearchSidePanel({ isOpen, onClose, products, onNavigate,
                 {searchQuery === '' && (
                   <div className="absolute inset-x-0 bottom-0 top-0 pr-12 flex items-center pointer-events-none overflow-hidden select-none z-0">
                     <div className="animate-marquee whitespace-nowrap flex gap-16 text-black/15 font-sans text-lg md:text-2xl lg:text-3xl tracking-tight uppercase font-extrabold">
-                      <span>• TÌM KIẾM TECHVIE: ĐIỆN THOẠI TECHVIE ULTRA S26 • LAPTOP TECHVIE BOOK PRO X • TRẠM SẠC VÒM KHÔNG DÂY • TECHVIE WATCH S • TAI NGHE AMBIENT BUDS PRO • HỆ SINH THÁI COLD-HARDWARE •</span>
-                      <span>• TÌM KIẾM TECHVIE: ĐIỆN THOẠI TECHVIE ULTRA S26 • LAPTOP TECHVIE BOOK PRO X • TRẠM SẠC VÒM KHÔNG DÂY • TECHVIE WATCH S • TAI NGHE AMBIENT BUDS PRO • HỆ SINH THÁI COLD-HARDWARE •</span>
+                      <span>• ỐP LƯNG CUSTOM ĐỘC BẢN • GIÁ ĐỠ LAPTOP CÔNG THÁI HỌC • CÁP SẠC NHANH TỰ NGẮT • ĐÈN LED DECOR RGB • TÚI CHỐNG SỐC AESTHETIC • COMBO SETUP BỨT PHÁ •</span>
+                      <span> ỐP LƯNG CUSTOM ĐỘC BẢN • GIÁ ĐỠ LAPTOP CÔNG THÁI HỌC • CÁP SẠC NHANH TỰ NGẮT • ĐÈN LED DECOR RGB • TÚI CHỐNG SỐC AESTHETIC • COMBO SETUP BỨT PHÁ </span>
                     </div>
                   </div>
                 )}

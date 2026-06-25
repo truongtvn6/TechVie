@@ -361,7 +361,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
       </div>
 
       {/* Hardware Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
         <AnimatePresence mode="popLayout">
           {filteredProducts.map((product) => (
             <motion.div 
@@ -375,7 +375,7 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
               key={product.id}
-              className="group bg-white border border-gray-200 rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-gray-300 h-full relative overflow-hidden"
+              className="group bg-white border border-gray-200 rounded-2xl md:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-gray-300 h-full relative overflow-hidden"
             >
               {/* Image & Detail Peek Button */}
               <div>
@@ -423,20 +423,20 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
               </div>
 
               {/* Pricing & Add to cart button */}
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                <div>
+              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between relative min-h-[48px]">
+                <div className="pr-12 truncate">
                   <span className="text-[10px] text-gray-450 uppercase font-bold tracking-widest block font-sans">GIÁ NIÊM YẾT</span>
-                  <span className="text-xl font-black text-gray-950">
+                  <span className="text-lg sm:text-xl font-black text-gray-950 block truncate">
                     {product.price.toLocaleString('vi-VN')}₫
                   </span>
                 </div>
 
                 <button 
                   onClick={(e) => handleAddToCartWithSuccess(product, e)}
-                  className={`group/btn h-12 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-all duration-300 flex items-center justify-center overflow-hidden cursor-pointer relative shrink-0 hover:scale-105 active:scale-95 z-10 ${
+                  className={`group/btn h-10 w-10 sm:h-12 sm:w-12 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-all duration-300 flex items-center justify-center overflow-hidden cursor-pointer absolute right-0 shrink-0 hover:scale-105 active:scale-95 z-10 ${
                     justAddedId === product.id
-                      ? 'bg-emerald-600 text-white w-12 xl:w-32 px-0 xl:px-4'
-                      : 'bg-black text-white hover:bg-gray-800 w-12 xl:hover:w-40 px-0 xl:hover:px-4 shadow-md shadow-black/5 hover:shadow-lg hover:shadow-black/10'
+                      ? 'lg:w-full bg-emerald-600 text-white w-full -translate-x-1.5'
+                      : 'bg-black text-white hover:bg-gray-800 xl:hover:w-full px-0 hover:px-3 sm:hover:px-4 shadow-md shadow-black/5 hover:shadow-lg hover:shadow-black/10'
                   }`}
                 >
                   {/* Dynamic Click Ripples */}
@@ -460,15 +460,15 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                   {justAddedId === product.id ? (
                     <>
                       <Check size={14} className="shrink-0 transition-transform duration-300 group-hover/btn:scale-120" />
-                      <span className="hidden xl:inline-block ml-2 whitespace-nowrap text-[10px] font-black tracking-wider transition-all duration-350">
-                        Đã Thêm
+                      <span className="inline-block ml-1.5 whitespace-nowrap text-[10px] font-black tracking-wider transition-all duration-350">
+                        ĐÃ THÊM
                       </span>
                     </>
                   ) : (
                     <>
                       <Plus size={14} className="shrink-0 transition-transform duration-500 group-hover/btn:rotate-90" />
                       <span className="hidden xl:inline-block w-0 opacity-0 xl:group-hover/btn:w-24 xl:group-hover/btn:opacity-100 xl:group-hover/btn:ml-2 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out text-center text-[10px] tracking-wider font-extrabold">
-                        Thêm Vào Giỏ
+                        THÊM VÀO GIỎ
                       </span>
                     </>
                   )}

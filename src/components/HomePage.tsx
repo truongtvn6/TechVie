@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Check,
   Send,
+  Plus
 } from "lucide-react";
 import { subscribeNewsletter } from "../services/api";
 
@@ -244,7 +245,7 @@ export default function HomePage({
                 <span className="text-[10px] uppercase font-bold tracking-widest bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">
                   {product.category}
                 </span>
-                <span className="text-[9px] font-mono text-gray-400">
+                <span className="text-[10px] font-mono text-gray-400">
                   {product.specs[0].label}: {product.specs[0].value}
                 </span>
               </div>
@@ -261,10 +262,10 @@ export default function HomePage({
 
               {/* Title & Price & Purchase Controls */}
               <div className="mt-4">
-                <h3 className="text-xl font-bold text-gray-900 tracking-tight group-hover:text-secondary transition-colors truncate">
+                <h3 className="text-xl font-semibold text-gray-900 tracking-tight group-hover:text-secondary transition-colors truncate">
                   {product.name}
                 </h3>
-                <p className="text-lg font-black text-gray-800 mt-1 mb-6">
+                <p className="text-2xl font-black text-gray-800 mt-1 mb-6">
                   {product.price.toLocaleString("vi-VN")}₫
                 </p>
 
@@ -272,6 +273,7 @@ export default function HomePage({
                   onClick={() => onAddToCart(product)}
                   className="w-full bg-black text-white hover:bg-gray-900 font-sans text-xs uppercase tracking-widest font-black py-4 rounded-full flex items-center justify-center gap-2 shadow transition-all duration-300 cursor-pointer"
                 >
+                  <Plus size={16} />
                   Thêm Vào Giỏ
                 </button>
               </div>
@@ -282,7 +284,7 @@ export default function HomePage({
 
       {/* Exquisite Brand Promo Card Banner */}
       <section className="px-6 max-w-7xl mx-auto mb-20">
-        <div className="bg-gray-100 rounded-[3rem] p-8 md:p-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="bg-linear-to-l from-black/5 to-white/90 rounded-[3rem] p-8 md:p-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
               TRẢI NGHIỆM MUA SẮM KHÁC BIỆT
@@ -335,19 +337,19 @@ export default function HomePage({
               </button>
             </div>
           </div>
-          <div className="aspect-video lg:aspect-square overflow-hidden rounded-[2rem] bg-gray-200 border border-gray-300 shadow relative">
+          <div className="aspect-video lg:aspect-square overflow-hidden rounded-[2rem] shadow relative hover:-translate-y-2 transition-all duration-300 shadow-2xl">
             <img
               src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80"
               alt="TechVie Laboratory equipment"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
+              className="w-full h-full object-cover transition-all"
             />
           </div>
         </div>
       </section>
 
       {/* Luxurious Newsletter subscription matching modern grid template details */}
-      <section className="py-24 px-6 max-w-7xl mx-auto border-t border-gray-200">
+      <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-none mb-6">
