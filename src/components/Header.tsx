@@ -147,9 +147,9 @@ export default function Header({
           </button>
 
           <div className="flex items-center space-x-2">
-            {isLoggedIn && (
+            {isLoggedIn && userProfile.name && (
               <span className="hidden lg:inline-block text-[10px] tracking-widest uppercase font-mono bg-indigo-50 border border-indigo-150 text-black py-1.5 px-3 rounded-full font-black">
-                Chào, {userProfile.name.split(' ').pop()?.toUpperCase()}
+                Chào, {userProfile.name.split(' ').pop()?.toUpperCase() || ''}
               </span>
             )}
 
@@ -256,7 +256,7 @@ export default function Header({
                       activeTab === 'account' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
                     }`}
                   >
-                    <User size={16} /> TÀI KHOẢN ({userProfile.name.split(' ').pop()?.toUpperCase()})
+                    <User size={16} /> TÀI KHOẢN ({userProfile.name ? (userProfile.name.split(' ').pop()?.toUpperCase() || '') : ''})
                   </a>
                 </div>
               )}

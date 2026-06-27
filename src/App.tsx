@@ -13,6 +13,7 @@ import {
   toggleUserVip,
   toggleUserStatus,
   adminDeleteUser,
+  getCurrentUser,
 } from "./services/api";
 import HomePage from "./components/HomePage";
 import BrandPage from "./components/BrandPage";
@@ -60,18 +61,14 @@ export default function App() {
     !!localStorage.getItem("techvie_token"),
   );
   const [userProfile, setUserProfile] = useState({
-    name: localStorage.getItem("techvie_token")
-      ? "ADMINISTRATOR"
-      : "Nguyễn Minh Tiến",
-    email: localStorage.getItem("techvie_token")
-      ? "admin@techvie.com"
-      : "mintzinfinity898@gmail.com",
+    name: "Nguyễn Minh Tiến",
+    email: "mintzinfinity898@gmail.com",
     phone: "0912 345 678",
     address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
     memberSince: "17-06-2026",
     techvieId: "TV-992-88X",
     shieldStatus: "Đang Kích Hoạt (Premium)",
-    role: localStorage.getItem("techvie_token") ? "admin" : "user",
+    role: "user" as "admin" | "user",
   });
 
   useEffect(() => {
@@ -81,6 +78,45 @@ export default function App() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      if (token === "Bearer mock_admin_token") {
+        setUserProfile({
+          name: "ADMINISTRATOR",
+          email: "admin@techvie.com",
+          phone: "0912 345 678",
+          address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
+          memberSince: "17-06-2026",
+          techvieId: "TV-992-88X",
+          shieldStatus: "Đang Kích Hoạt (Premium)",
+          role: "admin",
+        });
+        setIsLoggedIn(true);
+      } else {
+        getCurrentUser().then((res) => {
+          if (res.success && res.user) {
+            setUserProfile({
+              name: res.user.name || "",
+              email: res.user.email || "",
+              phone: res.user.phone || "",
+              address: res.user.address || "",
+              memberSince: res.user.created_at ? new Date(res.user.created_at).toLocaleDateString("vi-VN") : "Đang cập nhật",
+              techvieId: res.user.id ? `TV-${res.user.id.substring(0, 6).toUpperCase()}` : "TV-NEW-USR",
+              shieldStatus: res.user.vipStatus === "Premium" ? "Đang Kích Hoạt (Premium)" : "Standard",
+              role: res.user.role,
+            });
+            setIsLoggedIn(true);
+          } else {
+            // Token is invalid or expired
+            localStorage.removeItem("techvie_token");
+            setToken("");
+            setIsLoggedIn(false);
+          }
+        });
+      }
+    }
+  }, [token]);
 
   useEffect(() => {
     if (isLoggedIn && userProfile.role === "admin" && token) {

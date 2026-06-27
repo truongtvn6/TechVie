@@ -15,6 +15,7 @@ import backgroundImage from '/image/huum-8fSitumSVw8-unsplash.jpg';
 
 // Import default mock data
 import { defaultUserProfile, mockOrders } from './_mockdata';
+import { getUserOrders } from '../../services/api';
 
 interface AccountPageProps {
   onNavigate: (tab: any) => void;
@@ -55,8 +56,20 @@ export default function AccountPage({
   const userProfile = externalUserProfile !== undefined ? externalUserProfile : localUserProfile;
   const setUserProfile = externalSetUserProfile !== undefined ? externalSetUserProfile : localSetUserProfile;
 
-  // Mock Orders with vivid real-time phase updates
-  const [orders] = useState(mockOrders);
+  // Dynamic Orders loaded from backend matching the user's email
+  const [orders, setOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isLoggedIn && userProfile?.email) {
+      getUserOrders(userProfile.email).then((res) => {
+        if (res.success && res.orders) {
+          setOrders(res.orders);
+        }
+      });
+    } else {
+      setOrders([]);
+    }
+  }, [isLoggedIn, userProfile?.email]);
 
   const handleLogout = () => {
     setIsLoggedIn(false);

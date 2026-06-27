@@ -19,6 +19,57 @@ function getAuthHeaders() {
   return headers;
 }
 
+// Lấy thông tin người dùng hiện tại (dùng cho Google Login và Phiên đăng nhập Cookie/JWT)
+export async function getCurrentUser(): Promise<{ success: boolean; user?: any; message?: string }> {
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/me', {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error('Phiên đăng nhập không hợp lệ hoặc đã hết hạn.');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi lấy thông tin người dùng:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+// Cập nhật hồ sơ thông tin người dùng hiện tại (Họ tên, SĐT, Địa chỉ)
+export async function updateUserProfile(profile: { name: string; phone: string; address: string }): Promise<{ success: boolean; user?: any; message?: string }> {
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/profile', {
+      method: 'PUT',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(profile),
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Không thể cập nhật hồ sơ.');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi cập nhật hồ sơ:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+// Lấy danh sách đơn hàng của người dùng hiện tại theo Email
+export async function getUserOrders(email: string): Promise<{ success: boolean; orders: any[] }> {
+  try {
+    const response = await fetch(`http://localhost:5000/api/my-orders?email=${encodeURIComponent(email)}`);
+    if (!response.ok) throw new Error('Không thể tải danh sách đơn hàng!');
+    return await response.json();
+  } catch (error) {
+    console.error('Lỗi lấy danh sách đơn hàng:', error);
+    return { success: false, orders: [] };
+  }
+}
+
 // Đăng ký nhận bản tin khuyến mãi (Newsletter Subscription)
 export async function subscribeNewsletter(email: string): Promise<{ success: boolean; message: string }> {
   try {
