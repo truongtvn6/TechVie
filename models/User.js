@@ -36,6 +36,16 @@ const userSchema = new mongoose.Schema({
     enum: ["active", "blocked"],
     default: "active",
   },
+  // === THÊM MỚI: Trường hỗ trợ tính năng Quên Mật Khẩu ===
+  resetPasswordToken: {
+    type: String,
+    default: null,
+  },
+  resetPasswordExpire: {
+    type: Date,
+    default: null,
+  },
+  // =========================================================
   created_at: {
     type: Date,
     default: Date.now,
@@ -63,6 +73,8 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      resetPasswordToken: doc.resetPasswordToken,
+      resetPasswordExpire: doc.resetPasswordExpire,
     };
   },
 
@@ -84,12 +96,26 @@ const User = {
     };
   },
 
+  // Tìm người dùng qua Reset Token
+  findByResetToken: async (token) => {
+    const doc = await UserModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpire: { $gt: Date.now() }, // Token còn hạn
+    });
+    if (!doc) return null;
+    return {
+      id: doc._id.toString(),
+      username: doc.username,
+      email: doc.email,
+      resetPasswordToken: doc.resetPasswordToken,
+      resetPasswordExpire: doc.resetPasswordExpire,
+    };
+  },
+
   // Lấy tất cả người dùng
-  findAll: async (includeDeleted = false) => {
-    let query = {};
-    if (!includeDeleted) query.isDeleted = { $ne: true };
-    const docs = await UserModel.find(query).sort({ created_at: -1 });
-    return docs.map(doc => ({
+  findAll: async () => {
+    const docs = await UserModel.find().sort({ created_at: -1 });
+    return docs.map((doc) => ({
       id: doc._id.toString(),
       username: doc.username,
       email: doc.email,
@@ -103,14 +129,14 @@ const User = {
 
   // Tạo người dùng mới
   create: async ({ username, email, password, phone, role, vipStatus, status }) => {
-    const doc = await UserModel.create({ 
-      username, 
-      email, 
+    const doc = await UserModel.create({
+      username,
+      email,
       password,
       phone: phone || "Chưa cung cấp",
       role: role || "user",
       vipStatus: vipStatus || "Normal",
-      status: status || "active"
+      status: status || "active",
     });
     return {
       id: doc._id.toString(),
@@ -144,7 +170,7 @@ const User = {
   deleteById: async (id) => {
     const result = await UserModel.findByIdAndUpdate(id, { isDeleted: true, status: 'blocked' });
     return !!result;
-  }
+  },
 };
 
 module.exports = User;
