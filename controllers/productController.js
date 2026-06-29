@@ -20,18 +20,20 @@ const productController = {
   // 1. Lấy danh sách sản phẩm (Hỗ trợ tìm kiếm thông qua query parameter 'search')
   getProducts: async (req, res) => {
     try {
-      const { search } = req.query;
+      const { search, includeDeleted } = req.query;
       let query = {};
+      
+      if (includeDeleted !== 'true') {
+        query.isDeleted = { $ne: true };
+      }
       
       if (search) {
         const searchRegex = new RegExp(search.trim(), "i");
-        query = {
-          $or: [
-            { name: searchRegex },
-            { category: searchRegex },
-            { description: searchRegex }
-          ]
-        };
+        query.$or = [
+          { name: searchRegex },
+          { category: searchRegex },
+          { description: searchRegex }
+        ];
 
         // Ghi log tìm kiếm để tính phổ biến & lịch sử gần đây
         try {
@@ -209,23 +211,14 @@ const productController = {
         });
       }
 
-      // Xóa ảnh trên Cloudinary nếu có
-      if (product.image) {
-        const publicId = getPublicIdFromUrl(product.image);
-        if (publicId) {
-          console.log(`[CLOUDINARY] Bắt đầu xóa ảnh sản phẩm: ${publicId}`);
-          await deleteFromCloudinary(publicId).catch(err => 
-            console.error("Lỗi khi xóa ảnh trên Cloudinary:", err)
-          );
-        }
-      }
-
-      // Thực hiện xóa khỏi MongoDB
-      await Product.findByIdAndDelete(id);
+      // Thực hiện xóa mềm
+      product.isDeleted = true;
+      product.status = "DISCONTINUED";
+      await product.save();
 
       return res.status(200).json({
         success: true,
-        message: "Xóa sản phẩm thành công khỏi MongoDB & Cloudinary!",
+        message: "Xóa mềm sản phẩm thành công (chuyển sang Ngừng kinh doanh)!",
         deletedProduct: product,
       });
     } catch (error) {
@@ -233,6 +226,38 @@ const productController = {
       return res.status(500).json({
         success: false,
         message: "Có lỗi xảy ra khi xóa sản phẩm!",
+        error: error.message,
+      });
+    }
+  },
+
+  // 5. Khôi phục sản phẩm
+  restoreProduct: async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const product = await Product.findById(id);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy sản phẩm cần khôi phục!",
+        });
+      }
+
+      product.isDeleted = false;
+      product.status = "AVAILABLE";
+      await product.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Khôi phục sản phẩm thành công!",
+        restoredProduct: product,
+      });
+    } catch (error) {
+      console.error("Lỗi khôi phục sản phẩm:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Có lỗi xảy ra khi khôi phục sản phẩm!",
         error: error.message,
       });
     }

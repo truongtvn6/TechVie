@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const UserModel = mongoose.model("User", userSchema);
@@ -47,7 +51,7 @@ const UserModel = mongoose.model("User", userSchema);
 const User = {
   // Tìm người dùng qua Email
   findByEmail: async (email) => {
-    const doc = await UserModel.findOne({ email });
+    const doc = await UserModel.findOne({ email, isDeleted: { $ne: true } });
     if (!doc) return null;
     return {
       id: doc._id.toString(),
@@ -63,8 +67,10 @@ const User = {
   },
 
   // Tìm người dùng qua ID
-  findById: async (id) => {
-    const doc = await UserModel.findById(id);
+  findById: async (id, includeDeleted = false) => {
+    let query = { _id: id };
+    if (!includeDeleted) query.isDeleted = { $ne: true };
+    const doc = await UserModel.findOne(query);
     if (!doc) return null;
     return {
       id: doc._id.toString(),
@@ -79,8 +85,10 @@ const User = {
   },
 
   // Lấy tất cả người dùng
-  findAll: async () => {
-    const docs = await UserModel.find().sort({ created_at: -1 });
+  findAll: async (includeDeleted = false) => {
+    let query = {};
+    if (!includeDeleted) query.isDeleted = { $ne: true };
+    const docs = await UserModel.find(query).sort({ created_at: -1 });
     return docs.map(doc => ({
       id: doc._id.toString(),
       username: doc.username,
@@ -134,7 +142,7 @@ const User = {
 
   // Xóa người dùng theo ID
   deleteById: async (id) => {
-    const result = await UserModel.findByIdAndDelete(id);
+    const result = await UserModel.findByIdAndUpdate(id, { isDeleted: true, status: 'blocked' });
     return !!result;
   }
 };

@@ -65,16 +65,28 @@ const authController = {
       }
 
       // Kiểm tra người dùng tồn tại
-      const user = await User.findByEmail(email);
-      if (!user) {
+      // Kiểm tra người dùng tồn tại bằng UserModel gốc để lấy cả user đã xóa
+      const user = await User.findByEmail(email); // Vẫn dùng phương thức cũ nếu nó trả về null do bị khóa, nhưng ta cần sửa lại xíu
+      // Actually, to get deleted users, we should use UserModel directly or pass includeDeleted.
+      // But wait, the easiest way without importing UserModel again is:
+      const UserModel = require("../models/User").model ? require("../models/User").model("User") : require("mongoose").model("User");
+      const fullUser = await UserModel.findOne({ email });
+      if (!fullUser) {
         return res.status(401).json({
           success: false,
           message: "Email hoặc mật khẩu không chính xác!",
         });
       }
 
+      if (fullUser.isDeleted || fullUser.status === 'blocked') {
+        return res.status(403).json({
+          success: false,
+          message: "Tài khoản của bạn đã bị vô hiệu hóa hoặc khóa!",
+        });
+      }
+
       // So sánh mật khẩu
-      const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch = await bcrypt.compare(password, fullUser.password);
       if (!isMatch) {
         return res.status(401).json({
           success: false,
@@ -85,9 +97,9 @@ const authController = {
       // Tạo mã JWT Token
       const token = jwt.sign(
         { 
-          id: user.id, 
-          email: user.email, 
-          role: user.email === "admin@techvie.com" ? "admin" : "user" 
+          id: fullUser._id.toString(), 
+          email: fullUser.email, 
+          role: fullUser.email === "admin@techvie.com" ? "admin" : "user" 
         },
         process.env.JWT_SECRET || "techvie_jwt_secret_key_2026",
         { expiresIn: "24h" }
@@ -98,11 +110,11 @@ const authController = {
         message: "Đăng nhập thành công!",
         token: `Bearer ${token}`,
         user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          created_at: user.created_at,
-          role: user.email === "admin@techvie.com" ? "admin" : "user",
+          id: fullUser._id.toString(),
+          username: fullUser.username,
+          email: fullUser.email,
+          created_at: fullUser.created_at,
+          role: fullUser.email === "admin@techvie.com" ? "admin" : "user",
         },
       });
     } catch (error) {

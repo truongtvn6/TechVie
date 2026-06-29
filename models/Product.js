@@ -37,6 +37,15 @@ const productSchema = new mongoose.Schema({
     default: [],
     description: "Mảng JSON chứa thông số kỹ thuật",
   },
+  status: {
+    type: String,
+    enum: ["AVAILABLE", "OUT_OF_STOCK", "DISCONTINUED"],
+    default: "AVAILABLE",
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 }, {
   timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   toJSON: { virtuals: true },
