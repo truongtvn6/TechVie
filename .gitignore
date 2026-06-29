@@ -1,0 +1,19 @@
+.agents/
+.codex/
+
+node_modules/
+dist/
+build/
+coverage/
+
+.env
+.env.*
+!.env.example
+
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Contains MongoDB access details from setup screenshots.
+tailieu/mongodb.png
