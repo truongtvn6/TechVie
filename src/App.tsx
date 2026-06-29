@@ -12,7 +12,6 @@ import {
   toggleUserRole,
   toggleUserVip,
   toggleUserStatus,
-  toggleUserStatus,
   adminDeleteUser,
   restoreProduct,
   restoreUser,
