@@ -12,7 +12,10 @@ import {
   toggleUserRole,
   toggleUserVip,
   toggleUserStatus,
+  toggleUserStatus,
   adminDeleteUser,
+  restoreProduct,
+  restoreUser,
 } from "./services/api";
 import HomePage from "./components/HomePage";
 import BrandPage from "./components/BrandPage";
@@ -258,6 +261,22 @@ export default function App() {
     }
   };
 
+  const handleRestoreProduct = async (productId: string) => {
+    try {
+      const res = await restoreProduct(productId, token);
+      if (res.success) {
+        // Refresh products to get the restored product with its details
+        getProducts().then((data) => {
+          if (data.success) setProducts(data.products);
+        });
+        return { success: true, message: res.message };
+      }
+      return { success: false, message: res.message };
+    } catch (error: any) {
+      return { success: false, message: "Lỗi kết nối khi khôi phục sản phẩm." };
+    }
+  };
+
   // User Management Admin Handlers
   const handleAddUser = async (newUser: any) => {
     try {
@@ -378,6 +397,34 @@ export default function App() {
       return { success: false, message: res.message || "Lỗi kết nối." };
     } catch (error: any) {
       console.error("Lỗi xóa thành viên:", error);
+      return { success: false, message: "Lỗi kết nối mạng." };
+    }
+  };
+
+  const handleRestoreUser = async (id: string) => {
+    try {
+      const res = await restoreUser(id, token);
+      if (res.success) {
+        // Refresh users to get the restored user with its details
+        getSystemUsers(token).then((data) => {
+          if (data.success && data.users) {
+            const mapped = data.users.map((u: any) => ({
+              id: u.id || u._id,
+              name: u.username,
+              email: u.email,
+              phone: u.phone,
+              role: u.role,
+              vipStatus: u.vipStatus,
+              status: u.status,
+              joinedDate: new Date(u.created_at).toLocaleDateString("vi-VN"),
+            }));
+            setSystemUsers(mapped);
+          }
+        });
+        return { success: true, message: res.message };
+      }
+      return { success: false, message: res.message };
+    } catch (error: any) {
       return { success: false, message: "Lỗi kết nối mạng." };
     }
   };
@@ -734,10 +781,12 @@ export default function App() {
               className="w-full"
             >
               <AdminPage
+                token={token}
                 products={products}
                 onAddProduct={handleAddProduct}
                 onEditProduct={handleEditProduct}
                 onDeleteProduct={handleDeleteProduct}
+                onRestoreProduct={handleRestoreProduct}
                 onNavigate={(tab) => {
                   setActiveTab(tab);
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -748,6 +797,7 @@ export default function App() {
                 onToggleUserVip={handleToggleUserVip}
                 onToggleUserStatus={handleToggleUserStatus}
                 onDeleteUser={handleDeleteUser}
+                onRestoreUser={handleRestoreUser}
               />
             </motion.div>
           )}

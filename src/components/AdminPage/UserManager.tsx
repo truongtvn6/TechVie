@@ -19,6 +19,7 @@ interface UserManagerProps {
   onToggleUserVip: (id: string) => void;
   onToggleUserStatus: (id: string) => void;
   onDeleteUser: (id: string) => void;
+  onRestoreUser?: (id: string) => void;
   isDarkMode?: boolean;
 }
 
@@ -29,6 +30,7 @@ export default function UserManager({
   onToggleUserVip,
   onToggleUserStatus,
   onDeleteUser,
+  onRestoreUser,
   isDarkMode = false,
 }: UserManagerProps) {
   const [userQuery, setUserQuery] = useState('');
@@ -150,7 +152,16 @@ export default function UserManager({
                           {usr.name.charAt(0)}
                         </div>
                         <div className="text-left">
-                            <span className={`font-extrabold text-sm block tracking-tight transition-colors duration-300 ${d ? 'text-gray-50' : 'text-gray-900'}`}>{usr.name}</span>
+                            <span className={`font-extrabold text-sm flex items-center gap-2 tracking-tight transition-colors duration-300 ${d ? 'text-gray-50' : 'text-gray-900'}`}>
+                              {usr.name}
+                              {(usr as any).isDeleted && (
+                                <span className={`px-1.5 py-0.5 text-[8px] uppercase tracking-wider rounded font-black border ${
+                                  d ? 'bg-rose-950/40 text-rose-400 border-rose-900/40' : 'bg-rose-50 text-rose-600 border-rose-200'
+                                }`}>
+                                  Đã xóa
+                                </span>
+                              )}
+                            </span>
                             <span className={`text-[10px] font-mono block mt-0.5 transition-colors duration-300 ${d ? 'text-slate-400' : 'text-gray-500'}`}>{usr.email}</span>
                         </div>
                       </div>
@@ -227,33 +238,49 @@ export default function UserManager({
 
                     {/* Options button */}
                     <td className="py-5 px-6 text-right space-x-2 whitespace-nowrap">
-                      <button
-                        type="button"
-                        onClick={() => onToggleUserStatus(usr.id)}
-                        className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider border transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
-                          usr.status === 'active' 
-                            ? d
-                              ? 'border-amber-900/30 bg-amber-950/20 text-amber-455 hover:bg-amber-900/35'
-                              : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
-                            : d
-                              ? 'border-emerald-900/30 bg-emerald-950/20 text-emerald-400 hover:bg-emerald-900/35'
-                              : 'border-emerald-250 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                        }`}
-                      >
-                        {usr.status === 'active' ? 'Khóa' : 'Mở khóa'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDeleteUser(usr.id)}
-                        disabled={usr.email === 'admin@techvie.com'}
-                        className={`px-3 py-1.5 disabled:opacity-40 rounded-lg text-[9px] font-bold uppercase transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
-                          d 
-                            ? 'bg-rose-955/20 border border-rose-900/30 text-rose-400 hover:bg-rose-600 hover:text-white hover:border-rose-600' 
-                            : 'bg-rose-50 border border-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500'
-                        }`}
-                      >
-                        Gỡ bỏ
-                      </button>
+                      {(usr as any).isDeleted ? (
+                        <button
+                          type="button"
+                          onClick={() => onRestoreUser && onRestoreUser(usr.id)}
+                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center justify-center transition-colors border ${
+                            d 
+                              ? 'border-emerald-900/30 text-emerald-400 bg-emerald-950/20 hover:bg-emerald-950/40 hover:text-emerald-300' 
+                              : 'border-emerald-200 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-700'
+                          }`}
+                        >
+                          Khôi phục
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => onToggleUserStatus(usr.id)}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider border transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
+                              usr.status === 'active' 
+                                ? d
+                                  ? 'border-amber-900/30 bg-amber-950/20 text-amber-455 hover:bg-amber-900/35'
+                                  : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
+                                : d
+                                  ? 'border-emerald-900/30 bg-emerald-950/20 text-emerald-400 hover:bg-emerald-900/35'
+                                  : 'border-emerald-250 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                            }`}
+                          >
+                            {usr.status === 'active' ? 'Khóa' : 'Mở khóa'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDeleteUser(usr.id)}
+                            disabled={usr.email === 'admin@techvie.com'}
+                            className={`px-3 py-1.5 disabled:opacity-40 rounded-lg text-[9px] font-bold uppercase transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
+                              d 
+                                ? 'bg-rose-955/20 border border-rose-900/30 text-rose-400 hover:bg-rose-600 hover:text-white hover:border-rose-600' 
+                                : 'bg-rose-50 border border-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500'
+                            }`}
+                          >
+                            Gỡ bỏ
+                          </button>
+                        </>
+                      )}
                     </td>
 
                   </tr>

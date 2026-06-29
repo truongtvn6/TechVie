@@ -5,9 +5,11 @@ import {
   getAdminOrders,
   updateOrderStatus,
   seedDummyOrder,
-  clearAllOrdersFromServer
+  clearAllOrdersFromServer,
+  getProducts,
+  getSystemUsers
 } from '../../services/api';
-import { Plus, Package, Trash2 } from 'lucide-react';
+import { Plus, Package, Trash2, Eye } from 'lucide-react';
 import AdminSidebar from './AdminSidebar';
 
 // Sub-components imports
@@ -32,6 +34,9 @@ interface AdminPageProps {
   onToggleUserVip: (id: string) => Promise<{ success: boolean; message: string; user?: any }>;
   onToggleUserStatus: (id: string) => Promise<{ success: boolean; message: string; user?: any }>;
   onDeleteUser: (id: string) => Promise<{ success: boolean; message: string }>;
+  token: string;
+  onRestoreProduct: (id: string) => Promise<{ success: boolean; message: string }>;
+  onRestoreUser: (id: string) => Promise<{ success: boolean; message: string }>;
 }
 
 export default function AdminPage({ 
@@ -45,7 +50,10 @@ export default function AdminPage({
   onToggleUserRole,
   onToggleUserVip,
   onToggleUserStatus,
-  onDeleteUser
+  onDeleteUser,
+  token,
+  onRestoreProduct,
+  onRestoreUser
 }: AdminPageProps) {
   // Persistent Dark Mode state
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -64,6 +72,93 @@ export default function AdminPage({
       console.error(e);
     }
   }, [isDarkMode]);
+
+  // Soft Delete Toggle & State
+  const [showDeletedItems, setShowDeletedItems] = useState(false);
+  const [adminProducts, setAdminProducts] = useState<Product[]>(products);
+  const [adminUsers, setAdminUsers] = useState<any[]>(systemUsers);
+
+  // Sync initial props
+  useEffect(() => {
+    if (!showDeletedItems) {
+      setAdminProducts(products);
+    }
+  }, [products, showDeletedItems]);
+
+  useEffect(() => {
+    if (!showDeletedItems) {
+      setAdminUsers(systemUsers);
+    }
+  }, [systemUsers, showDeletedItems]);
+
+  // Fetch data when toggle changes
+  useEffect(() => {
+    if (showDeletedItems) {
+      getProducts("", true).then(res => {
+        if (res.success) setAdminProducts(res.products);
+      });
+      getSystemUsers(token, true).then(res => {
+        if (res.success && res.users) {
+          const mapped = res.users.map((u: any) => ({
+            id: u.id || u._id,
+            name: u.username,
+            email: u.email,
+            phone: u.phone,
+            role: u.role,
+            vipStatus: u.vipStatus,
+            status: u.status,
+            joinedDate: new Date(u.created_at).toLocaleDateString('vi-VN'),
+            isDeleted: u.isDeleted
+          }));
+          setAdminUsers(mapped);
+        }
+      });
+    }
+  }, [showDeletedItems, token]);
+
+  // Restore handlers with logging
+  const handleRestoreProductWrapper = async (id: string) => {
+    const res = await onRestoreProduct(id);
+    if (res.success) {
+      addLog(`Khôi phục sản phẩm thành công: ${id}`);
+      // Refresh list if toggle is on
+      if (showDeletedItems) {
+        getProducts("", true).then(res => {
+          if (res.success) setAdminProducts(res.products);
+        });
+      }
+    } else {
+      addLog(`Lỗi khôi phục sản phẩm: ${res.message}`);
+    }
+  };
+
+  const handleRestoreUserWrapper = async (id: string) => {
+    const res = await onRestoreUser(id);
+    if (res.success) {
+      addLog(`Khôi phục tài khoản thành công: ${id}`);
+      // Refresh list if toggle is on
+      if (showDeletedItems) {
+        getSystemUsers(token, true).then(data => {
+          if (data.success && data.users) {
+            const mapped = data.users.map((u: any) => ({
+              id: u.id || u._id,
+              name: u.username,
+              email: u.email,
+              phone: u.phone,
+              role: u.role,
+              vipStatus: u.vipStatus,
+              status: u.status,
+              joinedDate: new Date(u.created_at).toLocaleDateString('vi-VN'),
+              isDeleted: u.isDeleted
+            }));
+            setAdminUsers(mapped);
+          }
+        });
+      }
+    } else {
+      addLog(`Lỗi khôi phục tài khoản: ${res.message}`);
+    }
+  };
 
   // Admin active sub tab
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'products' | 'orders' | 'messages' | 'promos' | 'users'>('overview');
@@ -418,6 +513,23 @@ export default function AdminPage({
                 {activeSubTab === 'users' && 'Điều chỉnh phân quyền cán bộ nhân viên, xem thông tin số điện thoại email và trạng thái khoá tài khoản.'}
               </p>
             </div>
+            {(activeSubTab === 'products' || activeSubTab === 'users') && (
+              <button
+                onClick={() => setShowDeletedItems(!showDeletedItems)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] uppercase font-black tracking-wider transition-colors border ${
+                  showDeletedItems
+                    ? isDarkMode 
+                      ? 'bg-amber-950/40 text-amber-500 border-amber-900/50' 
+                      : 'bg-amber-50 text-amber-600 border-amber-200'
+                    : isDarkMode
+                      ? 'bg-[#161b22] text-gray-400 border-[#30363d] hover:bg-[#21262d]'
+                      : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <Eye size={14} />
+                {showDeletedItems ? 'Đang hiển thị mục đã xóa' : 'Xem các mục đã xóa'}
+              </button>
+            )}
           </div>
 
           {/* DYNAMIC SUBTAB VIEWS */}
@@ -481,10 +593,11 @@ export default function AdminPage({
 
           {activeSubTab === 'products' && (
             <ProductManager
-              products={products}
+              products={adminProducts}
               onOpenCreateForm={openCreateForm}
               onOpenEditForm={openEditForm}
               onDelete={handleDelete}
+              onRestore={handleRestoreProductWrapper}
               isDarkMode={isDarkMode}
             />
           )}
@@ -522,12 +635,13 @@ export default function AdminPage({
 
           {activeSubTab === 'users' && (
             <UserManager
-              systemUsers={systemUsers}
+              systemUsers={adminUsers}
               onAddUser={handleAddUser}
               onToggleUserRole={handleToggleUserRole}
               onToggleUserVip={handleToggleUserVip}
               onToggleUserStatus={handleToggleUserStatus}
               onDeleteUser={handleDeleteUser}
+              onRestoreUser={handleRestoreUserWrapper}
               isDarkMode={isDarkMode}
             />
           )}

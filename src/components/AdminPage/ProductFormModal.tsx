@@ -1,29 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Product } from '../../types';
-import { Trash2, Plus, UploadCloud, Smartphone, Laptop, Watch, Volume2, Keyboard } from 'lucide-react';
+import { Trash2, Plus, UploadCloud, Smartphone, Laptop, Watch, Volume2, Keyboard, Package } from 'lucide-react';
 
-const categoriesList = [
-  {
-    name: "Điện thoại",
-    icon: <Smartphone className="w-4 h-4" strokeWidth={1.5} />
-  },
-  {
-    name: "Laptop",
-    icon: <Laptop className="w-4 h-4" strokeWidth={1.5} />
-  },
-  {
-    name: "Đồng hồ",
-    icon: <Watch className="w-4 h-4" strokeWidth={1.5} />
-  },
-  {
-    name: "Âm thanh",
-    icon: <Volume2 className="w-4 h-4" strokeWidth={1.5} />
-  },
-  {
-    name: "Bàn phím",
-    icon: <Keyboard className="w-4 h-4" strokeWidth={1.5} />
-  }
-];
+const categoryIconMap: Record<string, React.ReactNode> = {
+  "Điện thoại": <Smartphone className="w-4 h-4" strokeWidth={1.5} />,
+  "Laptop": <Laptop className="w-4 h-4" strokeWidth={1.5} />,
+  "Đồng hồ": <Watch className="w-4 h-4" strokeWidth={1.5} />,
+  "Âm thanh": <Volume2 className="w-4 h-4" strokeWidth={1.5} />,
+  "Bàn phím": <Keyboard className="w-4 h-4" strokeWidth={1.5} />
+};
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -43,10 +28,11 @@ export default function ProductFormModal({
   // Input fields local states
   const [prodName, setProdName] = useState('');
   const [prodPrice, setProdPrice] = useState<number>(0);
-  const [prodCategory, setProdCategory] = useState('Điện thoại');
+  const [prodCategory, setProdCategory] = useState('');
   const [prodImage, setProdImage] = useState('');
   const [prodDesc, setProdDesc] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [categoriesList, setCategoriesList] = useState<{name: string; icon: React.ReactNode}[]>([]);
 
   const d = isDarkMode;
 
@@ -104,6 +90,34 @@ export default function ProductFormModal({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/categories');
+        const data = await response.json();
+        if (data.success && data.categories) {
+          const fetchedCategories = data.categories.map((cat: any) => ({
+            name: cat.name,
+            icon: categoryIconMap[cat.name] || <Package className="w-4 h-4" strokeWidth={1.5} />
+          }));
+          setCategoriesList(fetchedCategories);
+          
+          // Set default category if none selected and not editing
+          if (!prodCategory && fetchedCategories.length > 0 && !editingProduct) {
+            setProdCategory(fetchedCategories[0].name);
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi lấy danh mục:", error);
+      }
+    };
+    
+    if (isOpen) {
+      fetchCategories();
+    }
+  }, [isOpen, editingProduct, prodCategory]);
 
   // Initialize fields on open or change in editingProduct
   // useEffect(() => {
@@ -277,7 +291,7 @@ export default function ProductFormModal({
                         ? d ? 'bg-[#21262d] text-white' : 'bg-slate-100 text-black' 
                         : d ? 'bg-[#0d1117] text-gray-400' : 'bg-slate-50 text-slate-500'
                     }`}>
-                      {(categoriesList.find(c => c.name === prodCategory) || categoriesList[0]).icon}
+                      {(categoriesList.find(c => c.name === prodCategory) || categoriesList[0] || {icon: <Package className="w-4 h-4" strokeWidth={1.5} />}).icon}
                     </span>
                     <span className={`font-bold text-xs ${d ? 'text-white' : 'text-gray-900'}`}>
                       {prodCategory}

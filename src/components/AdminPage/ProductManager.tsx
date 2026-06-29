@@ -6,6 +6,7 @@ interface ProductManagerProps {
   onOpenCreateForm: () => void;
   onOpenEditForm: (product: Product) => void;
   onDelete: (id: string, name: string) => void;
+  onRestore?: (id: string) => void;
   isDarkMode?: boolean;
 }
 
@@ -14,6 +15,7 @@ export default function ProductManager({
   onOpenCreateForm,
   onOpenEditForm,
   onDelete,
+  onRestore,
   isDarkMode = false,
 }: ProductManagerProps) {
   const d = isDarkMode;
@@ -79,7 +81,16 @@ export default function ProductManager({
                         />
                       </div>
                       <div className="min-w-0">
-                        <span className={`block font-extrabold text-sm truncate ${d ? 'text-white' : 'text-gray-900'}`}>{p.name}</span>
+                        <span className={`block font-extrabold text-sm truncate flex items-center gap-2 ${d ? 'text-white' : 'text-gray-900'}`}>
+                          {p.name}
+                          {((p as any).isDeleted || (p as any).status === 'DISCONTINUED') && (
+                            <span className={`px-1.5 py-0.5 text-[8px] uppercase tracking-wider rounded font-black border ${
+                              d ? 'bg-rose-950/40 text-rose-400 border-rose-900/40' : 'bg-rose-50 text-rose-600 border-rose-200'
+                            }`}>
+                              Đã xóa
+                            </span>
+                          )}
+                        </span>
                         <span className={`font-mono text-[9px] block truncate ${d ? 'text-gray-500' : 'text-gray-400'}`}>{p.id}</span>
                       </div>
                     </div>
@@ -117,24 +128,40 @@ export default function ProductManager({
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
-                      <button
-                        onClick={() => onOpenEditForm(p)}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-                          d ? 'text-gray-400 hover:text-white hover:bg-[#30363d]' : 'text-gray-500 hover:text-black hover:bg-gray-100'
-                        }`}
-                        title="Sửa thông tin"
-                      >
-                        <Edit3 size={13} />
-                      </button>
-                      <button
-                        onClick={() => onDelete(p.id, p.name)}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-                          d ? 'text-rose-500 hover:bg-rose-950/30 text-rose-400' : 'text-rose-500 hover:bg-rose-50'
-                        }`}
-                        title="Xóa thiết bị"
-                      >
-                        <Trash2 size={13} />
-                      </button>
+                      {((p as any).isDeleted || (p as any).status === 'DISCONTINUED') ? (
+                        <button
+                          onClick={() => onRestore && onRestore(p.id)}
+                          className={`px-3 h-8 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center justify-center transition-colors border ${
+                            d 
+                              ? 'border-emerald-900/30 text-emerald-400 hover:bg-emerald-950/40 hover:text-emerald-300' 
+                              : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700'
+                          }`}
+                          title="Khôi phục thiết bị"
+                        >
+                          Khôi phục
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => onOpenEditForm(p)}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                              d ? 'text-gray-400 hover:text-white hover:bg-[#30363d]' : 'text-gray-500 hover:text-black hover:bg-gray-100'
+                            }`}
+                            title="Sửa thông tin"
+                          >
+                            <Edit3 size={13} />
+                          </button>
+                          <button
+                            onClick={() => onDelete(p.id, p.name)}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                              d ? 'text-rose-500 hover:bg-rose-950/30 text-rose-400' : 'text-rose-500 hover:bg-rose-50'
+                            }`}
+                            title="Xóa thiết bị"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>
