@@ -10,6 +10,7 @@ const authController = {
     try {
       const { username, email, password } = req.body;
 
+      // Validate thông tin
       if (!username || !email || !password) {
         return res.status(400).json({
           success: false,
@@ -17,6 +18,7 @@ const authController = {
         });
       }
 
+      // Kiểm tra email trùng lặp
       const existingUser = await User.findByEmail(email);
       if (existingUser) {
         return res.status(409).json({
@@ -25,9 +27,20 @@ const authController = {
         });
       }
 
+      // Kiểm tra username trùng lặp
+      const existingUsername = await User.findByUsername(username);
+      if (existingUsername) {
+        return res.status(409).json({
+          success: false,
+          message: "Tên đăng nhập này đã được sử dụng bởi tài khoản khác!",
+        });
+      }
+
+      // Mã hóa mật khẩu
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
+      // Lưu người dùng mới vào database
       const newUser = await User.create({
         username,
         email,
@@ -54,6 +67,7 @@ const authController = {
     try {
       const { email, password } = req.body;
 
+      // Validate thông tin
       if (!email || !password) {
         return res.status(400).json({
           success: false,
@@ -61,11 +75,18 @@ const authController = {
         });
       }
 
-      const user = await User.findByEmail(email);
-      if (!user) {
+      // Kiểm tra người dùng tồn tại bằng UserModel gốc để lấy cả user đã xóa
+      const UserModel = require("../models/User").model ? require("../models/User").model("User") : require("mongoose").model("User");
+      const fullUser = await UserModel.findOne({
+        $or: [
+          { email: email },
+          { username: email }
+        ]
+      });
+      if (!fullUser) {
         return res.status(401).json({
           success: false,
-          message: "Email hoặc mật khẩu không chính xác!",
+          message: "Tài khoản hoặc mật khẩu không chính xác!",
         });
       }
 
@@ -76,27 +97,21 @@ const authController = {
         });
       }
 
-      // Kiểm tra tài khoản có bị khóa không
-      if (user.status === "blocked") {
-        return res.status(403).json({
-          success: false,
-          message: "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên!",
-        });
-      }
-
-      const isMatch = await bcrypt.compare(password, user.password);
+      // So sánh mật khẩu
+      const isMatch = await bcrypt.compare(password, fullUser.password);
       if (!isMatch) {
         return res.status(401).json({
           success: false,
-          message: "Email hoặc mật khẩu không chính xác!",
+          message: "Tài khoản hoặc mật khẩu không chính xác!",
         });
       }
 
+      // Tạo mã JWT Token
       const token = jwt.sign(
-        {
-          id: user.id,
-          email: user.email,
-          role: user.email === "admin@techvie.com" ? "admin" : "user",
+        { 
+          id: fullUser._id.toString(), 
+          email: fullUser.email, 
+          role: fullUser.email === "admin@techvie.com" ? "admin" : "user" 
         },
         process.env.JWT_SECRET || "techvie_jwt_secret_key_2026",
         { expiresIn: "24h" }
@@ -192,35 +207,42 @@ const authController = {
       // Token gốc (chưa hash) được đặt trong URL để người dùng gửi lại
       const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
 
-      // Nội dung email HTML
+      // Nội dung email HTML (Thiết kế tối giản Trắng & Đen cao cấp của TechVie)
       const emailHtml = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
-          <div style="background-color: #1a1a2e; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-            <h1 style="color: #e94560; margin: 0;">TechVie</h1>
-            <p style="color: #aaa; margin: 5px 0 0;">Cửa hàng công nghệ hàng đầu</p>
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; color: #111111;">
+          <div style="text-align: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 30px; margin-bottom: 30px;">
+            <h1 style="font-size: 28px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin: 0; color: #000000;">TECHVIE</h1>
+            <p style="font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: #71717a; margin: 5px 0 0;">Refractive Excellence</p>
           </div>
-          <div style="background-color: #ffffff; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #e0e0e0;">
-            <h2 style="color: #1a1a2e;">Xin chào, ${user.username}!</h2>
-            <p style="color: #555; line-height: 1.6;">
-              Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại <strong>TechVie</strong>.
+          <div style="padding: 10px 0;">
+            <h2 style="font-size: 18px; font-weight: 700; margin-top: 0; margin-bottom: 20px; color: #000000; text-transform: uppercase; letter-spacing: 0.05em;">Yêu cầu đặt lại mật khẩu</h2>
+            <p style="font-size: 14px; line-height: 1.6; color: #3f3f46; margin-bottom: 20px;">
+              Xin chào <strong>${user.username}</strong>,
             </p>
-            <p style="color: #555; line-height: 1.6;">
-              Nhấn vào nút bên dưới để đặt lại mật khẩu. Link này chỉ có hiệu lực trong <strong>15 phút</strong>.
+            <p style="font-size: 14px; line-height: 1.6; color: #3f3f46; margin-bottom: 30px;">
+              Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản liên kết với địa chỉ email này. Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.
             </p>
-            <div style="text-align: center; margin: 30px 0;">
+            
+            <div style="text-align: center; margin: 40px 0;">
               <a href="${resetUrl}"
-                style="background-color: #e94560; color: white; padding: 14px 32px; text-decoration: none;
-                       border-radius: 6px; font-size: 16px; font-weight: bold; display: inline-block;">
+                style="background-color: #000000; color: #ffffff; padding: 16px 40px; text-decoration: none;
+                       border-radius: 8px; font-size: 13px; font-weight: bold; display: inline-block;
+                       letter-spacing: 0.2em; text-transform: uppercase; transition: background 0.2s ease;">
                 Đặt lại mật khẩu
               </a>
             </div>
-            <p style="color: #888; font-size: 13px; line-height: 1.6;">
-              Nếu nút trên không hoạt động, hãy sao chép và dán đường dẫn sau vào trình duyệt:<br/>
-              <a href="${resetUrl}" style="color: #e94560; word-break: break-all;">${resetUrl}</a>
+            
+            <p style="font-size: 12px; line-height: 1.6; color: #71717a; margin-top: 40px; border-top: 1px solid #e5e5e5; padding-top: 20px;">
+              Đường dẫn này chỉ có hiệu lực trong vòng <strong>15 phút</strong>.
             </p>
-            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-            <p style="color: #aaa; font-size: 12px;">
-              Nếu bạn không yêu cầu đặt lại mật khẩu, hãy bỏ qua email này. Tài khoản của bạn vẫn an toàn.
+            <p style="font-size: 11px; line-height: 1.6; color: #a1a1aa; word-break: break-all;">
+              Nếu nút trên không hoạt động, bạn có thể sao chép liên kết dưới đây vào trình duyệt:<br/>
+              <a href="${resetUrl}" style="color: #000000; text-decoration: underline;">${resetUrl}</a>
+            </p>
+          </div>
+          <div style="text-align: center; margin-top: 50px; border-top: 1px solid #e5e5e5; padding-top: 20px;">
+            <p style="font-size: 10px; letter-spacing: 0.1em; color: #a1a1aa; text-transform: uppercase; margin: 0;">
+              © ${new Date().getFullYear()} TechVie Shop. All rights reserved.
             </p>
           </div>
         </div>

@@ -78,6 +78,26 @@ const User = {
     };
   },
 
+  // Tìm người dùng qua Username (Không phân biệt hoa thường)
+  findByUsername: async (username) => {
+    const doc = await UserModel.findOne({ 
+      username: { $regex: new RegExp(`^${username}$`, 'i') }, 
+      isDeleted: { $ne: true } 
+    });
+    if (!doc) return null;
+    return {
+      id: doc._id.toString(),
+      username: doc.username,
+      email: doc.email,
+      password: doc.password,
+      phone: doc.phone,
+      role: doc.role,
+      vipStatus: doc.vipStatus,
+      status: doc.status,
+      created_at: doc.created_at,
+    };
+  },
+
   // Tìm người dùng qua ID
   findById: async (id, includeDeleted = false) => {
     let query = { _id: id };
@@ -113,8 +133,9 @@ const User = {
   },
 
   // Lấy tất cả người dùng
-  findAll: async () => {
-    const docs = await UserModel.find().sort({ created_at: -1 });
+  findAll: async (includeDeleted = false) => {
+    const query = includeDeleted ? {} : { isDeleted: { $ne: true } };
+    const docs = await UserModel.find(query).sort({ created_at: -1 });
     return docs.map((doc) => ({
       id: doc._id.toString(),
       username: doc.username,

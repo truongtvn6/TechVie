@@ -202,7 +202,7 @@ const userController = {
         });
       }
 
-      const user = await User.findById(id);
+      const user = await User.findById(id, true);
 
       if (!user) {
         return res.status(404).json({
