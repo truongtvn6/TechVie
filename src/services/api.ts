@@ -169,9 +169,9 @@ export async function submitCheckoutOrder(orderData: {
 }
 
 // Tải danh sách phân loại sản phẩm (Categories) từ backend
-export async function getCategories(): Promise<{ success: boolean; categories: string[] }> {
+export async function getCategories(includeDeleted: boolean = false): Promise<{ success: boolean; categories: string[] }> {
   try {
-    const response = await fetch('http://localhost:5000/api/categories');
+    const response = await fetch(`http://localhost:5000/api/categories${includeDeleted ? '?includeDeleted=true' : ''}`);
     if (!response.ok) throw new Error('Không thể tải danh mục sản phẩm!');
     const data = await response.json();
     if (data && data.success && Array.isArray(data.categories)) {
@@ -193,11 +193,13 @@ export async function getCategories(): Promise<{ success: boolean; categories: s
 }
 
 // Tải danh sách sản phẩm (Products) từ backend (Hỗ trợ lọc theo từ khóa tìm kiếm)
-export async function getProducts(search?: string): Promise<{ success: boolean; products: Product[] }> {
+export async function getProducts(search?: string, includeDeleted: boolean = false): Promise<{ success: boolean; products: Product[] }> {
   try {
-    const url = search 
-      ? `http://localhost:5000/api/products?search=${encodeURIComponent(search.trim())}`
-      : 'http://localhost:5000/api/products';
+    const queryParams = [];
+    if (search) queryParams.push(`search=${encodeURIComponent(search.trim())}`);
+    if (includeDeleted) queryParams.push(`includeDeleted=true`);
+    const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+    const url = `http://localhost:5000/api/products${queryString}`;
     console.log(`[API getProducts] ➔ Bắt đầu gửi yêu cầu tải danh sách sản phẩm${search ? ` với từ khóa "${search}"` : ''} từ backend...`);
     const response = await fetch(url);
     if (!response.ok) throw new Error('Không thể tải danh sách sản phẩm!');
@@ -296,10 +298,11 @@ export async function deleteProduct(id: string, token: string): Promise<{ succes
 }
 
 // Tải danh sách thành viên hệ thống (Chỉ dành cho Admin)
-export async function getSystemUsers(token: string): Promise<{ success: boolean; users: any[] }> {
+export async function getSystemUsers(token: string, includeDeleted: boolean = false): Promise<{ success: boolean; users: any[] }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch('http://localhost:5000/api/users', {
+    const url = `http://localhost:5000/api/users${includeDeleted ? '?includeDeleted=true' : ''}`;
+    const response = await fetch(url, {
       headers: {
         'Authorization': cleanToken,
         'Content-Type': 'application/json',
@@ -420,6 +423,46 @@ export async function adminDeleteUser(id: string, token: string): Promise<{ succ
     return await response.json();
   } catch (error: any) {
     console.error('Lỗi gỡ bỏ tài khoản thành viên:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối.' };
+  }
+}
+
+// Khôi phục tài khoản thành viên đã xóa (Chỉ dành cho Admin)
+export async function restoreUser(id: string, token: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/users/${id}/restore`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || 'Không thể khôi phục tài khoản thành viên!');
+    return { success: true, message: data.message || 'Khôi phục tài khoản thành công!' };
+  } catch (error: any) {
+    console.error('Lỗi khôi phục tài khoản thành viên:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối.' };
+  }
+}
+
+// Khôi phục sản phẩm đã xóa (Chỉ dành cho Admin)
+export async function restoreProduct(id: string, token: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/products/${id}/restore`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || 'Không thể khôi phục sản phẩm!');
+    return { success: true, message: data.message || 'Khôi phục sản phẩm thành công!' };
+  } catch (error: any) {
+    console.error('Lỗi khôi phục sản phẩm:', error);
     return { success: false, message: error.message || 'Lỗi kết nối.' };
   }
 }

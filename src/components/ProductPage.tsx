@@ -1,7 +1,7 @@
 import { useState, MouseEvent, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Product } from '../types';
-import { Plus, Minus, Check, SlidersHorizontal, Eye, ShieldCheck, Cpu, Search, ArrowUpDown, X, Laptop, Smartphone, Watch, Headphones, Keyboard, LayoutGrid } from 'lucide-react';
+import { Product, TabType } from '../types';
+import { Plus, Minus, Check, SlidersHorizontal, Eye, ShieldCheck, Cpu, Search, ArrowUpDown, X, Laptop, Smartphone, Watch, Headphones, Keyboard, LayoutGrid, MessageSquare, Star, Send } from 'lucide-react';
 import { getCategories, getProducts } from '../services/api';
 
 const normalizeProduct = (p: any): Product => {
@@ -34,12 +34,22 @@ const normalizeProduct = (p: any): Product => {
   };
 };
 
+interface Review {
+  id: string;
+  productId: string;
+  user: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
 interface ProductPageProps {
   products?: Product[];
   onAddToCart: (product: Product) => void;
+  onNavigate: (tab: TabType) => void;
 }
 
-export default function ProductPage({ products, onAddToCart }: ProductPageProps) {
+export default function ProductPage({ products, onAddToCart, onNavigate }: ProductPageProps) {
   const [dbProducts, setDbProducts] = useState<Product[]>([]);
   const allProducts = dbProducts.length > 0 ? dbProducts : (products || []).map(normalizeProduct);
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
@@ -48,6 +58,15 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [isSortOpen, setIsSortOpen] = useState(false);
+
+  // Reviews and Comments State
+  const [reviews, setReviews] = useState<Review[]>([
+    { id: '1', productId: 'p1', user: 'Nguyễn Văn A', rating: 5, comment: 'Sản phẩm quá tuyệt vời, rất đáng tiền!', date: '20-06-2026' },
+    { id: '2', productId: 'p1', user: 'Trần B', rating: 4, comment: 'Dùng ổn nhưng giao hàng hơi chậm.', date: '22-06-2026' }
+  ]);
+  const [newComment, setNewComment] = useState('');
+  const [newRating, setNewRating] = useState(5);
+  const isLoggedIn = !!localStorage.getItem("techvie_token");
 
   // Magnetic Ripple and Attraction state managers
   const [ripples, setRipples] = useState<{ id: number; productId: string; x: number; y: number }[]>([]);
@@ -549,6 +568,106 @@ export default function ProductPage({ products, onAddToCart }: ProductPageProps)
                       Thành lập liên kết & Thêm vào giỏ
                     </button>
                   </div>
+                </div>
+              </div>
+
+              {/* Product Reviews & Comments Section */}
+              <div className="mt-12 pt-8 border-t border-gray-200">
+                <span className="text-xs uppercase tracking-[0.2em] text-secondary font-bold mb-3 block">
+                  COMMENT & REVIEW PRODUCT
+                </span>
+                <h3 className="text-2xl font-sans tracking-tighter text-gray-950 font-extrabold mb-8 flex items-center gap-3">
+                  {/* <MessageSquare size={36} className="text-gray-950" /> */}
+                  Đánh giá & Bình luận
+                </h3>
+                
+                {/* List of reviews for this product */}
+                <div className="space-y-4 mb-8">
+                  {reviews.filter(r => r.productId === selectedProduct.id || r.productId === 'p1').map(review => (
+                    <div key={review.id} className="bg-gray-50 rounded-2xl p-5 border border-gray-100 hover:-translate-y-2 transition-all duration-300 ease-in-out">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-bold text-sm text-gray-900">{review.user}</span>
+                        <span className="text-xs text-gray-400 font-mono">{review.date}</span>
+                      </div>
+                      <div className="flex gap-1 mb-3">
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <Star key={star} size={12} className={star <= review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} />
+                        ))}
+                      </div>
+                      <p className="text-sm text-gray-700 font-sans">{review.comment}</p>
+                    </div>
+                  ))}
+                  {reviews.filter(r => r.productId === selectedProduct.id || r.productId === 'p1').length === 0 && (
+                    <p className="text-sm text-gray-500 italic">Chưa có đánh giá nào cho sản phẩm này.</p>
+                  )}
+                </div>
+
+                {/* Add new review form */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xl">
+                  <h4 className="text-sm font-bold text-gray-900 mb-4">Viết đánh giá của bạn</h4>
+                  {!isLoggedIn ? (
+                    <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100 flex flex-col items-center">
+                      <p className="text-sm text-gray-600 mb-4">Vui lòng đăng nhập để có thể đánh giá và bình luận sản phẩm.</p>
+                      <button 
+                        onClick={() => {
+                          setSelectedProduct(null);
+                          // window.scrollTo({ top: 0, behavior: 'smooth' });
+                          // alert('Vui lòng vào trang Đăng nhập để tiếp tục.');
+                          onNavigate("dang-nhap");
+                        }}
+                        className="px-6 py-2.5 bg-black text-white text-[11px] uppercase tracking-widest font-bold rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
+                      >
+                        Đăng nhập ngay
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Đánh giá:</span>
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <Star 
+                              key={star} 
+                              size={18} 
+                              onClick={() => setNewRating(star)}
+                              className={`cursor-pointer transition-colors ${star <= newRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300 hover:text-yellow-200"}`} 
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <textarea
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
+                          className="w-full text-sm font-sans bg-gray-50 rounded-xl px-4 py-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-black placeholder-gray-400 transition-all text-gray-800 border border-gray-200 min-h-[100px] resize-y"
+                        />
+                      </div>
+                      <div className="flex justify-end">
+                        <button 
+                          onClick={() => {
+                            if (!newComment.trim()) return;
+                            const newReview: Review = {
+                              id: Date.now().toString(),
+                              productId: selectedProduct.id,
+                              user: 'Người dùng (Bạn)',
+                              rating: newRating,
+                              comment: newComment,
+                              date: new Date().toLocaleDateString('vi-VN')
+                            };
+                            setReviews(prev => [newReview, ...prev]);
+                            setNewComment('');
+                            setNewRating(5);
+                          }}
+                          disabled={!newComment.trim()}
+                          className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 bg-black text-white hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-full font-sans text-xs uppercase tracking-widest font-black transition-colors cursor-pointer"
+                        >
+                          <Send size={14} />
+                          Gửi Đánh Giá
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
