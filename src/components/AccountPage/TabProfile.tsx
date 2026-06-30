@@ -1,5 +1,5 @@
-import React from 'react';
-import { MapPin, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, ArrowRight, Copy, Check } from 'lucide-react';
 
 interface TabProfileProps {
   userProfile: any;
@@ -7,6 +7,14 @@ interface TabProfileProps {
 }
 
 export default function TabProfile({ userProfile, setUserProfile }: TabProfileProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(userProfile.email || '');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="h-full bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm">
       {/* Top subtle glow */}
@@ -48,12 +56,22 @@ export default function TabProfile({ userProfile, setUserProfile }: TabProfilePr
         {/* Input: Email (Readonly) */}
         <div className="space-y-1.5 md:col-span-2">
           <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">EMAIL ĐĂNG BẠ</label>
-          <input
-            className="w-full bg-gray-100/50 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#4a5568] text-[15px] cursor-not-allowed shadow-sm mt-1.5"
-            readOnly
-            type="email"
-            value={userProfile.email}
-          />
+          <div className="relative mt-1.5 flex items-center">
+            <input
+              className="w-full bg-gray-100/50 border border-gray-200/50 rounded-lg pl-3.5 pr-12 py-2.5 text-[#4a5568] text-[15px] cursor-not-allowed shadow-sm"
+              readOnly
+              type="email"
+              value={userProfile.email}
+            />
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="absolute right-3 p-1.5 text-gray-400 hover:text-black rounded-md transition-colors cursor-pointer flex items-center justify-center"
+              title="Sao chép email"
+            >
+              {copied ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+            </button>
+          </div>
         </div>
 
         {/* Input: Address */}

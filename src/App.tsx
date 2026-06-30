@@ -30,13 +30,19 @@ import Footer from "./components/Footer";
 import SearchSidePanel from "./components/SearchSidePanel";
 import PolicyPage from "./components/PolicyPage";
 import CartSidePanel from "./components/CartSidePanel";
+import ResetPassword from "./components/AuthPage/ResetPassword";
 
 export default function App() {
   const appRef = useRef<HTMLDivElement>(null);
 
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     try {
+      const params = new URLSearchParams(window.location.search);
+      if (window.location.pathname === "/reset-password" && params.get("token")) {
+        return "reset-password" as any;
+      }
       const saved = localStorage.getItem("active_tab");
+      if (saved === "reset-password") return "home";
       return saved ? (saved as TabType) : "home";
     } catch {
       return "home";
@@ -108,7 +114,9 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem("active_tab", activeTab);
+      if (activeTab !== ("reset-password" as any)) {
+        localStorage.setItem("active_tab", activeTab);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -479,7 +487,8 @@ export default function App() {
   const showHeaderFooter =
     activeTab !== "dang-nhap" &&
     activeTab !== "dang-ky" &&
-    activeTab !== "admin";
+    activeTab !== "admin" &&
+    activeTab !== "reset-password";
 
   const navigationItems: { id: TabType; label: string }[] = [
     { id: "home", label: "TRANG CHỦ" },
@@ -743,6 +752,25 @@ export default function App() {
                   setIsLoggedIn(true);
                   setActiveTab("account");
                   window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              />
+            </motion.div>
+          )}
+
+          {activeTab === "reset-password" && (
+            <motion.div
+              key="reset-password-route"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35 }}
+              className="w-full"
+            >
+              <ResetPassword 
+                token={new URLSearchParams(window.location.search).get("token") || ""}
+                onNavigate={(tab) => {
+                  window.history.replaceState({}, document.title, "/");
+                  setActiveTab(tab);
                 }}
               />
             </motion.div>

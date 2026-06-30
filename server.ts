@@ -168,7 +168,9 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[TECHVIE EXPRESS SERVER] online at http://localhost:${PORT}`);
+    console.log(
+      `\x1b[1;35m[TECHVIE EXPRESS SERVER]\x1b[0m \x1b[32monline at\x1b[0m \x1b[1;4;36mhttp://localhost:${PORT}\x1b[0m`
+    );
   });
 }
 

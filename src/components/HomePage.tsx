@@ -245,9 +245,11 @@ export default function HomePage({
                 <span className="text-[10px] uppercase font-bold tracking-widest bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">
                   {product.category}
                 </span>
-                <span className="text-[10px] font-mono text-gray-400">
-                  {product.specs[0].label}: {product.specs[0].value}
-                </span>
+                {product.specs && product.specs[0] && (
+                  <span className="text-[10px] font-mono text-gray-400">
+                    {product.specs[0].label}: {product.specs[0].value}
+                  </span>
+                )}
               </div>
 
               {/* Large Product image centered and scaled on hover */}

@@ -6,9 +6,9 @@ import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import SocialConnect from './SocialConnect';
 import DemoLoginPanel from './DemoLoginPanel';
+import ForgotPassword from './ForgotPassword';
 
-// @ts-ignore
-import userImage from '/image/jakub-zerdzicki-VfZj-4H5D48-unsplash.jpg';
+const userImage = "https://res.cloudinary.com/dxrenbivs/image/upload/v1782828396/jakub-zerdzicki-VfZj-4H5D48-unsplash_jwnyq3.jpg";
 
 interface AuthPageProps {
   initialMode: 'login' | 'register';
@@ -23,7 +23,7 @@ export default function AuthPage({
   onLoginSuccess, 
   onRegisterSuccess 
 }: AuthPageProps) {
-  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(initialMode);
   
   // Login form states
   const [loginEmail, setLoginEmail] = useState('');
@@ -474,7 +474,13 @@ export default function AuthPage({
 
         {/* Layer 3: Chromatic light spectrum accent */}
         <div 
-          className="absolute inset-y-0 left-[100px] right-0 opacity-30 mix-blend-color-dodge bg-gradient-to-r from-amber-400/20 via-blue-500/20 to-transparent"
+          className={`absolute inset-y-0 left-[100px] right-0 opacity-35 mix-blend-color-dodge bg-gradient-to-r transition-all duration-1000 ${
+            mode === 'login' 
+              ? 'from-amber-400/25 via-blue-500/25 to-transparent' 
+              : mode === 'register'
+                ? 'from-emerald-400/25 via-cyan-500/25 to-transparent'
+                : 'from-rose-500/25 via-purple-500/25 to-transparent'
+          }`}
           style={{
             maskImage: 'linear-gradient(to right, transparent, black 40%, transparent 95%)',
             WebkitMaskImage: 'linear-gradient(to right, transparent, black 40%, transparent 95%)'
@@ -487,7 +493,7 @@ export default function AuthPage({
       </div>
 
       {/* Right Column: Unified Auth Panel with Refractive Frost Effect */}
-      <div className="w-full lg:w-[40vw] h-screen aurora-bg relative flex flex-col items-center justify-center font-jakarta p-4 sm:p-6 lg:p-8 overflow-hidden">
+      <div className="w-full lg:w-[40vw] h-screen aurora-bg relative flex flex-col items-center justify-center font-jakarta p-4 sm:p-6 lg:p-8 overflow-hidden z-40">
         {/* Highly blurred continuation background of the left image */}
         <div 
           className="absolute inset-0 bg-cover pointer-events-none scale-110 opacity-75"
@@ -512,36 +518,38 @@ export default function AuthPage({
           {/* Header Section */}
           <div className="mb-7 mt-3 relative z-10">
             <h2 className="font-sans text-3xl sm:text-4xl text-black font-extrabold tracking-tighter mb-7">
-              {mode === 'login' ? 'Chào mừng trở lại' : 'Mời Bạn Tham Gia TechVie'}
+              {mode === 'login' ? 'Chào mừng trở lại' : mode === 'register' ? 'Mời Bạn Tham Gia TechVie' : 'Khôi phục mật khẩu'}
             </h2>
 
             {/* Tab Switcher with Sleek Glassy Styling */}
-            <div className="flex border-b border-black/5 relative p-0.5">
-              <button 
-                type="button"
-                className={`flex-1 py-4 font-jakarta text-[13px] font-bold tracking-[0.15em] relative z-20 transition-all cursor-pointer ${
-                  mode === 'login' ? 'text-black border-b-2 border-black font-extrabold' : 'text-black/40 border-b-2 border-transparent hover:text-black/70'
-                }`}
-                onClick={() => {
-                  setMode('login');
-                  onNavigate('dang-nhap');
-                }}
-              >
-                ĐĂNG NHẬP
-              </button>
-              <button 
-                type="button"
-                className={`flex-1 py-4 font-jakarta text-[13px] font-bold tracking-[0.15em] relative z-20 transition-all cursor-pointer ${
-                  mode === 'register' ? 'text-black border-b-2 border-black font-extrabold' : 'text-black/40 border-b-2 border-transparent hover:text-black/70'
-                }`}
-                onClick={() => {
-                  setMode('register');
-                  onNavigate('dang-ky');
-                }}
-              >
-                ĐĂNG KÝ
-              </button>
-            </div>
+            {mode !== 'forgot' && (
+              <div className="flex border-b border-black/5 relative p-0.5">
+                <button 
+                  type="button"
+                  className={`flex-1 py-4 font-jakarta text-[13px] font-bold tracking-[0.15em] relative z-20 transition-all cursor-pointer ${
+                    mode === 'login' ? 'text-black border-b-2 border-black font-extrabold' : 'text-black/40 border-b-2 border-transparent hover:text-black/70'
+                  }`}
+                  onClick={() => {
+                    setMode('login');
+                    onNavigate('dang-nhap');
+                  }}
+                >
+                  ĐĂNG NHẬP
+                </button>
+                <button 
+                  type="button"
+                  className={`flex-1 py-4 font-jakarta text-[13px] font-bold tracking-[0.15em] relative z-20 transition-all cursor-pointer ${
+                    mode === 'register' ? 'text-black border-b-2 border-black font-extrabold' : 'text-black/40 border-b-2 border-transparent hover:text-black/70'
+                  }`}
+                  onClick={() => {
+                    setMode('register');
+                    onNavigate('dang-ky');
+                  }}
+                >
+                  ĐĂNG KÝ
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Form Switcher with slide animations */}
@@ -558,8 +566,9 @@ export default function AuthPage({
                   isLoggingIn={isLoggingIn}
                   loginError={loginError}
                   onSubmit={handleLoginSubmit}
+                  onForgotPassword={() => setMode('forgot')}
                 />
-              ) : (
+              ) : mode === 'register' ? (
                 <RegisterForm
                   regFullName={regFullName}
                   setRegFullName={setRegFullName}
@@ -579,16 +588,22 @@ export default function AuthPage({
                   registerError={registerError}
                   onSubmit={handleRegisterSubmit}
                 />
+              ) : (
+                <ForgotPassword
+                  onBackToLogin={() => setMode('login')}
+                />
               )}
             </AnimatePresence>
           </div>
 
           {/* Social Connect */}
-          <SocialConnect
-            mode={mode}
-            onLoginSuccess={(email) => onLoginSuccess(email, 'Bearer mock_user_token')}
-            onRegisterSuccess={onRegisterSuccess}
-          />
+          {mode !== 'forgot' && (
+            <SocialConnect
+              mode={mode}
+              onLoginSuccess={(email) => onLoginSuccess(email, 'Bearer mock_user_token')}
+              onRegisterSuccess={onRegisterSuccess}
+            />
+          )}
         </motion.div>
       </div>
 
