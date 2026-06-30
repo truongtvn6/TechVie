@@ -78,18 +78,8 @@ export default function AuthPage({
         }
       })
       .catch(err => {
-        console.warn('Backend login failed, using fallback mock login.', err);
-        // Fallback: If it's the admin demo, we'll pretend login succeeded
-        if (loginEmail === 'admin@techvie.com' && loginPassword === 'admin123') {
-          setIsLoggingIn(false);
-          onLoginSuccess(loginEmail, 'Bearer mock_admin_token');
-        } else if (loginEmail === 'mintzinfinity898@gmail.com' && loginPassword === '123456') {
-          setIsLoggingIn(false);
-          onLoginSuccess(loginEmail, 'Bearer mock_user_token');
-        } else {
-          setIsLoggingIn(false);
-          setLoginError(err.message || 'Lỗi kết nối máy chủ!');
-        }
+        setIsLoggingIn(false);
+        setLoginError(err.message || 'Lỗi kết nối máy chủ!');
       });
   };
 
@@ -102,18 +92,23 @@ export default function AuthPage({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(data => { throw new Error(data.message || 'Đăng nhập thất bại!'); });
+        }
+        return res.json();
+      })
       .then(data => {
         setIsLoggingIn(false);
         if (data.success && data.token) {
           onLoginSuccess(email, data.token);
         } else {
-          onLoginSuccess(email, email === 'admin@techvie.com' ? 'Bearer mock_admin_token' : 'Bearer mock_user_token');
+          setLoginError(data.message || 'Đăng nhập thất bại!');
         }
       })
-      .catch(() => {
+      .catch(err => {
         setIsLoggingIn(false);
-        onLoginSuccess(email, email === 'admin@techvie.com' ? 'Bearer mock_admin_token' : 'Bearer mock_user_token');
+        setLoginError(err.message || 'Lỗi kết nối máy chủ!');
       });
   };
 
@@ -155,7 +150,10 @@ export default function AuthPage({
       })
       .then(data => {
         setIsRegistering(false);
-        if (data.success) {
+        if (data.success && data.token) {
+          // Registration returns a real JWT token - use login flow to set token and fetch user from DB
+          onLoginSuccess(regEmail, data.token);
+        } else if (data.success) {
           onRegisterSuccess(regEmail, regFullName);
         } else {
           setRegisterError(data.message || 'Đăng ký thất bại!');
@@ -163,7 +161,6 @@ export default function AuthPage({
       })
       .catch(err => {
         setIsRegistering(false);
-        console.warn('Backend registration failed, using fallback mock.', err);
         setRegisterError(err.message || 'Lỗi kết nối máy chủ!');
       });
   };
@@ -506,7 +503,7 @@ export default function AuthPage({
         <motion.div 
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, cubicBezier: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="liquid-glass-slab glass-edge glass-sheen-container w-full h-full max-h-[850px] lg:max-h-full rounded-[28px] sm:rounded-[36px] lg:border-none px-6 py-8 sm:px-12 md:px-14 lg:px-10 xl:px-14 flex flex-col justify-center z-10 overflow-y-auto"
         >
           {/* Header Section */}
@@ -586,7 +583,7 @@ export default function AuthPage({
           {/* Social Connect */}
           <SocialConnect
             mode={mode}
-            onLoginSuccess={(email) => onLoginSuccess(email, 'Bearer mock_user_token')}
+            onLoginSuccess={(email) => onLoginSuccess(email)}
             onRegisterSuccess={onRegisterSuccess}
           />
         </motion.div>

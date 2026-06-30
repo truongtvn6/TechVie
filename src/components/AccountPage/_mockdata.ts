@@ -1,11 +1,11 @@
 export const defaultUserProfile = {
-  name: 'Nguyễn Minh Tiến',
-  email: 'mintzinfinity898@gmail.com',
-  phone: '0912 345 678',
-  address: '86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
-  memberSince: '17-06-2026',
-  techvieId: 'TV-992-88X',
-  shieldStatus: 'Đang Kích Hoạt (Premium)',
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  memberSince: '',
+  techvieId: '',
+  shieldStatus: 'Standard',
   role: 'user',
 };
 

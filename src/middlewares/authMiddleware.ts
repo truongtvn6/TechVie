@@ -16,8 +16,15 @@ declare global {
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   try {
-    // 1. Read token from the secure HttpOnly cookie
-    const token = req.cookies.techvie_session;
+    // 1. Read token from HttpOnly cookie first, then fall back to Authorization header
+    let token = req.cookies.techvie_session;
+
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.substring(7); // Remove "Bearer " prefix
+      }
+    }
 
     if (!token) {
       return res.status(401).json({

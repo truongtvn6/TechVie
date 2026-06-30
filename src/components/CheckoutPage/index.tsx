@@ -33,7 +33,7 @@ export default function CheckoutPage({
   const [step, setStep] = useState<'form' | 'processing' | 'success'>('form');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('bank');
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethodType>('standard');
-  const [serverOrderId, setServerOrderId] = useState<number | null>(null);
+  const [serverOrderId, setServerOrderId] = useState<number | string | null>(null);
   const [apiError, setApiError] = useState<string>('');
   
   // Checkout Input States initialized from userProfile if available

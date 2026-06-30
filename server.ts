@@ -10,6 +10,8 @@ import Product from "./src/models/Product";
 import { upload, uploadToCloudinary } from "./src/config/cloudinary";
 import { products as mockProducts } from "./src/data_mockdata";
 import authRoutes from "./src/routes/authRoutes";
+import User from "./src/models/User";
+import jwt from "jsonwebtoken";
 
 // Use public DNS to resolve MongoDB Atlas SRV records correctly
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
@@ -234,40 +236,124 @@ async function startServer() {
   // AUTHENTICATION & USER MANAGEMENT API
   // ==========================================
 
-  // Auth: Login
-  app.post("/api/auth/login", (req, res) => {
-    const { email, password } = req.body;
-    if (email === "admin@techvie.com" && password === "admin123") {
-      return res.json({ success: true, token: "Bearer mock_admin_token" });
-    } else if (email === "mintzinfinity898@gmail.com" && password === "123456") {
-      return res.json({ success: true, token: "Bearer mock_user_token" });
+  // Auth: Login (Real Database Authentication)
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ success: false, message: "Vui lòng nhập email và mật khẩu." });
+      }
+
+      // Look up user in MongoDB
+      const user = await User.findOne({ email: email.toLowerCase() });
+
+      if (!user) {
+        return res.status(401).json({ success: false, message: "Email chưa được đăng ký trong hệ thống." });
+      }
+
+      if (user.status === "blocked") {
+        return res.status(403).json({ success: false, message: "Tài khoản của bạn đã bị khóa bởi quản trị viên." });
+      }
+
+      // For credentials-based accounts, verify password
+      if (user.auth_provider === "credentials" && user.password) {
+        if (password !== user.password) {
+          return res.status(401).json({ success: false, message: "Mật khẩu không chính xác." });
+        }
+      } else if (user.auth_provider === "google") {
+        return res.status(409).json({
+          success: false,
+          message: "Tài khoản này được đăng ký bằng Google. Vui lòng đăng nhập bằng Google."
+        });
+      }
+
+      // Create real JWT token
+      const jwtSecret = process.env.JWT_SECRET || "techvie_jwt_secret_key_2026";
+      const token = jwt.sign(
+        { userId: user._id.toString(), email: user.email, role: user.role },
+        jwtSecret,
+        { expiresIn: "24h" }
+      );
+
+      // Set HttpOnly session cookie
+      res.cookie("techvie_session", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000
+      });
+
+      return res.json({ success: true, token: `Bearer ${token}` });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      return res.status(500).json({ success: false, message: "Lỗi hệ thống khi đăng nhập." });
     }
-    // Find in systemUsers
-    const user = systemUsers.find(u => u.email === email);
-    if (user) {
-      return res.json({ success: true, token: `Bearer mock_token_${user.id}` });
-    }
-    res.status(401).json({ success: false, message: "Sai thông tin đăng nhập!" });
   });
 
-  // Auth: Register
-  app.post("/api/auth/register", (req, res) => {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) {
-      return res.status(400).json({ success: false, message: "Điền đầy đủ thông tin đăng ký!" });
+  // Auth: Register (Real Database Registration)
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { username, email, password } = req.body;
+      if (!username || !email || !password) {
+        return res.status(400).json({ success: false, message: "Điền đầy đủ thông tin đăng ký!" });
+      }
+
+      if (password.length < 6) {
+        return res.status(400).json({ success: false, message: "Mật khẩu phải có ít nhất 6 ký tự." });
+      }
+
+      // Check if email already exists
+      const existing = await User.findOne({ email: email.toLowerCase() });
+      if (existing) {
+        return res.status(409).json({ success: false, message: "Email này đã được đăng ký. Vui lòng đăng nhập." });
+      }
+
+      // Create new user in MongoDB
+      const newUser = new User({
+        _id: new mongoose.Types.ObjectId().toString(),
+        email: email.toLowerCase(),
+        password: password,
+        auth_provider: "credentials",
+        username: username,
+        role: "user",
+        vipStatus: "Standard",
+        status: "active"
+      });
+      await newUser.save();
+
+      // Create JWT and set cookie
+      const regJwtSecret = process.env.JWT_SECRET || "techvie_jwt_secret_key_2026";
+      const regToken = jwt.sign(
+        { userId: newUser._id.toString(), email: newUser.email, role: newUser.role },
+        regJwtSecret,
+        { expiresIn: "24h" }
+      );
+
+      res.cookie("techvie_session", regToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000
+      });
+
+      console.log(`[Registration] New credentials user created: ${email}`);
+      return res.json({
+        success: true,
+        token: `Bearer ${regToken}`,
+        user: {
+          id: newUser._id.toString(),
+          username: newUser.username,
+          email: newUser.email,
+          role: newUser.role,
+          vipStatus: newUser.vipStatus,
+          status: newUser.status,
+          created_at: newUser.created_at
+        }
+      });
+    } catch (error: any) {
+      console.error("Register error:", error);
+      return res.status(500).json({ success: false, message: "Lỗi hệ thống khi đăng ký." });
     }
-    const newUser = {
-      id: `usr-${Math.random().toString(36).substr(2, 9)}`,
-      username,
-      email,
-      phone: "0900 000 000",
-      role: "user",
-      vipStatus: false,
-      status: "active",
-      created_at: new Date().toISOString()
-    };
-    systemUsers.push(newUser);
-    res.json({ success: true, user: newUser });
   });
 
   // Auth: Change Password

@@ -14,6 +14,8 @@ import {
   toggleUserStatus,
   adminDeleteUser,
   getCurrentUser,
+  restoreProduct,
+  restoreUser,
 } from "./services/api";
 import HomePage from "./components/HomePage";
 import BrandPage from "./components/BrandPage";
@@ -61,13 +63,13 @@ export default function App() {
     !!localStorage.getItem("techvie_token"),
   );
   const [userProfile, setUserProfile] = useState({
-    name: "Nguyễn Minh Tiến",
-    email: "mintzinfinity898@gmail.com",
-    phone: "0912 345 678",
-    address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
-    memberSince: "17-06-2026",
-    techvieId: "TV-992-88X",
-    shieldStatus: "Đang Kích Hoạt (Premium)",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    memberSince: "",
+    techvieId: "",
+    shieldStatus: "Standard",
     role: "user" as "admin" | "user",
   });
 
@@ -85,11 +87,11 @@ export default function App() {
         setUserProfile({
           name: "ADMINISTRATOR",
           email: "admin@techvie.com",
-          phone: "0912 345 678",
-          address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
-          memberSince: "17-06-2026",
-          techvieId: "TV-992-88X",
-          shieldStatus: "Đang Kích Hoạt (Premium)",
+          phone: "",
+          address: "",
+          memberSince: new Date().toLocaleDateString("vi-VN"),
+          techvieId: "TV-ADMIN",
+          shieldStatus: "Premium",
           role: "admin",
         });
         setIsLoggedIn(true);
@@ -154,13 +156,13 @@ export default function App() {
       setToken("");
       localStorage.removeItem("techvie_token");
       setUserProfile({
-        name: "Nguyễn Minh Tiến",
-        email: "mintzinfinity898@gmail.com",
-        phone: "0912 345 678",
-        address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
-        memberSince: "17-06-2026",
-        techvieId: "TV-992-88X",
-        shieldStatus: "Đang Kích Hoạt (Premium)",
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        memberSince: "",
+        techvieId: "",
+        shieldStatus: "Standard",
         role: "user",
       });
     }
@@ -294,6 +296,22 @@ export default function App() {
     }
   };
 
+  const handleRestoreProduct = async (productId: string) => {
+    try {
+      const res = await restoreProduct(productId, token);
+      if (res.success) {
+        // Refresh products to get the restored product with its details
+        getProducts().then((data) => {
+          if (data.success) setProducts(data.products);
+        });
+        return { success: true, message: res.message };
+      }
+      return { success: false, message: res.message };
+    } catch (error: any) {
+      return { success: false, message: "Lỗi kết nối khi khôi phục sản phẩm." };
+    }
+  };
+
   // User Management Admin Handlers
   const handleAddUser = async (newUser: any) => {
     try {
@@ -414,6 +432,34 @@ export default function App() {
       return { success: false, message: res.message || "Lỗi kết nối." };
     } catch (error: any) {
       console.error("Lỗi xóa thành viên:", error);
+      return { success: false, message: "Lỗi kết nối mạng." };
+    }
+  };
+
+  const handleRestoreUser = async (id: string) => {
+    try {
+      const res = await restoreUser(id, token);
+      if (res.success) {
+        // Refresh users to get the restored user with its details
+        getSystemUsers(token).then((data) => {
+          if (data.success && data.users) {
+            const mapped = data.users.map((u: any) => ({
+              id: u.id || u._id,
+              name: u.username,
+              email: u.email,
+              phone: u.phone,
+              role: u.role,
+              vipStatus: u.vipStatus,
+              status: u.status,
+              joinedDate: new Date(u.created_at).toLocaleDateString("vi-VN"),
+            }));
+            setSystemUsers(mapped);
+          }
+        });
+        return { success: true, message: res.message };
+      }
+      return { success: false, message: res.message };
+    } catch (error: any) {
       return { success: false, message: "Lỗi kết nối mạng." };
     }
   };
@@ -560,9 +606,9 @@ export default function App() {
               transition={{ duration: 0.35 }}
               className="w-full"
             >
-              <ProductPage 
-                products={products} 
-                onAddToCart={handleAddToCart} 
+              <ProductPage
+                products={products}
+                onAddToCart={handleAddToCart}
                 onNavigate={(tab) => {
                   setActiveTab(tab);
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -655,14 +701,17 @@ export default function App() {
                     setToken(userToken);
                     localStorage.setItem("techvie_token", userToken);
                   }
-                  setUserProfile((prev) => ({
-                    ...prev,
+                  // Set temporary profile - real data will be loaded from DB via getCurrentUser() in token useEffect
+                  setUserProfile({
+                    name: isSystemAdmin ? "ADMINISTRATOR" : email.split("@")[0].toUpperCase(),
                     email: email,
-                    name: isSystemAdmin
-                      ? "ADMINISTRATOR"
-                      : email.split("@")[0].toUpperCase(),
+                    phone: "",
+                    address: "",
+                    memberSince: "",
+                    techvieId: "",
+                    shieldStatus: "Standard",
                     role: isSystemAdmin ? "admin" : "user",
-                  }));
+                  });
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
                     setActiveTab("admin");
@@ -672,12 +721,16 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 onRegisterSuccess={(email, name) => {
-                  setUserProfile((prev) => ({
-                    ...prev,
-                    email: email,
+                  setUserProfile({
                     name: name,
+                    email: email,
+                    phone: "",
+                    address: "",
+                    memberSince: new Date().toLocaleDateString("vi-VN"),
+                    techvieId: "",
+                    shieldStatus: "Standard",
                     role: "user",
-                  }));
+                  });
                   setIsLoggedIn(true);
                   setActiveTab("account");
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -707,14 +760,16 @@ export default function App() {
                     setToken(userToken);
                     localStorage.setItem("techvie_token", userToken);
                   }
-                  setUserProfile((prev) => ({
-                    ...prev,
+                  setUserProfile({
+                    name: isSystemAdmin ? "ADMINISTRATOR" : email.split("@")[0].toUpperCase(),
                     email: email,
-                    name: isSystemAdmin
-                      ? "ADMINISTRATOR"
-                      : email.split("@")[0].toUpperCase(),
+                    phone: "",
+                    address: "",
+                    memberSince: "",
+                    techvieId: "",
+                    shieldStatus: "Standard",
                     role: isSystemAdmin ? "admin" : "user",
-                  }));
+                  });
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
                     setActiveTab("admin");
@@ -724,12 +779,16 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 onRegisterSuccess={(email, name) => {
-                  setUserProfile((prev) => ({
-                    ...prev,
-                    email: email,
+                  setUserProfile({
                     name: name,
+                    email: email,
+                    phone: "",
+                    address: "",
+                    memberSince: new Date().toLocaleDateString("vi-VN"),
+                    techvieId: "",
+                    shieldStatus: "Standard",
                     role: "user",
-                  }));
+                  });
                   setIsLoggedIn(true);
                   setActiveTab("account");
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -770,10 +829,12 @@ export default function App() {
               className="w-full"
             >
               <AdminPage
+                token={token}
                 products={products}
                 onAddProduct={handleAddProduct}
                 onEditProduct={handleEditProduct}
                 onDeleteProduct={handleDeleteProduct}
+                onRestoreProduct={handleRestoreProduct}
                 onNavigate={(tab) => {
                   setActiveTab(tab);
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -784,6 +845,7 @@ export default function App() {
                 onToggleUserVip={handleToggleUserVip}
                 onToggleUserStatus={handleToggleUserStatus}
                 onDeleteUser={handleDeleteUser}
+                onRestoreUser={handleRestoreUser}
               />
             </motion.div>
           )}
@@ -823,22 +885,22 @@ export default function App() {
 
       {/* Back to Top Button */}
       <AnimatePresence>
-        {showScrollTop && 
-         activeTab !== 'account' && 
-         activeTab !== 'admin' && 
-         activeTab !== 'dang-nhap' && 
-         activeTab !== 'dang-ky' && (
-          <motion.button
-            initial={{ opacity: 0, y: 20, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.8 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="fixed bottom-8 right-8 z-[40] w-12 h-12 bg-black text-white rounded-full flex items-center justify-center shadow-2xl hover:bg-gray-800 transition-colors cursor-pointer group"
-            title="Lên đầu trang"
-          >
-            <ChevronUp size={24} className="group-hover:-translate-y-1 transition-transform" />
-          </motion.button>
-        )}
+        {showScrollTop &&
+          activeTab !== 'account' &&
+          activeTab !== 'admin' &&
+          activeTab !== 'dang-nhap' &&
+          activeTab !== 'dang-ky' && (
+            <motion.button
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.8 }}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="fixed bottom-8 right-8 z-[40] w-12 h-12 bg-black text-white rounded-full flex items-center justify-center shadow-2xl hover:bg-gray-800 transition-colors cursor-pointer group"
+              title="Lên đầu trang"
+            >
+              <ChevronUp size={24} className="group-hover:-translate-y-1 transition-transform" />
+            </motion.button>
+          )}
       </AnimatePresence>
     </div>
   );
