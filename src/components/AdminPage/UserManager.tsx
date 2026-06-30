@@ -213,12 +213,12 @@ export default function UserManager({
                     <td className="py-5 px-6 text-left">
                       <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-extrabold transition-colors duration-300 ${
                         usr.status === 'active'
-                          ? d
+                          ? (d
                             ? 'text-emerald-400 bg-emerald-950/30 border border-emerald-900/40 px-2 py-0.5 rounded-lg'
-                            : 'text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg'
-                          : d
-                            ? 'text-rose-400 bg-rose-955/20 border border-rose-900/40 px-2 py-0.5 rounded-lg'
-                            : 'text-rose-700 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-lg'
+                            : 'text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg')
+                          : (d
+                            ? 'text-rose-400 bg-rose-950/20 border border-rose-900/40 px-2 py-0.5 rounded-lg'
+                            : 'text-rose-700 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-lg')
                       }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${usr.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
                         {usr.status === 'active' ? 'Hoạt động' : 'Đã Khóa'}
@@ -232,12 +232,12 @@ export default function UserManager({
                         onClick={() => onToggleUserStatus(usr.id)}
                         className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider border transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
                           usr.status === 'active' 
-                            ? d
-                              ? 'border-amber-900/30 bg-amber-950/20 text-amber-455 hover:bg-amber-900/35'
-                              : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
-                            : d
+                            ? (d
+                              ? 'border-amber-900/30 bg-amber-950/20 text-amber-400 hover:bg-amber-900/35'
+                              : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100')
+                            : (d
                               ? 'border-emerald-900/30 bg-emerald-950/20 text-emerald-400 hover:bg-emerald-900/35'
-                              : 'border-emerald-250 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                              : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100')
                         }`}
                       >
                         {usr.status === 'active' ? 'Khóa' : 'Mở khóa'}
@@ -248,7 +248,7 @@ export default function UserManager({
                         disabled={usr.email === 'admin@techvie.com'}
                         className={`px-3 py-1.5 disabled:opacity-40 rounded-lg text-[9px] font-bold uppercase transition-all duration-200 hover:scale-95 active:scale-90 cursor-pointer ${
                           d 
-                            ? 'bg-rose-955/20 border border-rose-900/30 text-rose-400 hover:bg-rose-600 hover:text-white hover:border-rose-600' 
+                            ? 'bg-rose-950/20 border border-rose-900/30 text-rose-400 hover:bg-rose-600 hover:text-white hover:border-rose-600' 
                             : 'bg-rose-50 border border-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500'
                         }`}
                       >
