@@ -22,7 +22,7 @@ function getAuthHeaders() {
 // Lấy thông tin người dùng hiện tại (dùng cho Google Login và Phiên đăng nhập Cookie/JWT)
 export async function getCurrentUser(): Promise<{ success: boolean; user?: any; message?: string }> {
   try {
-    const response = await fetch('http://localhost:5000/api/auth/me', {
+    const response = await fetch('/api/auth/me', {
       method: 'GET',
       headers: getAuthHeaders(),
     });
@@ -39,7 +39,7 @@ export async function getCurrentUser(): Promise<{ success: boolean; user?: any; 
 // Cập nhật hồ sơ thông tin người dùng hiện tại (Họ tên, SĐT, Địa chỉ)
 export async function updateUserProfile(profile: { name: string; phone: string; address: string }): Promise<{ success: boolean; user?: any; message?: string }> {
   try {
-    const response = await fetch('http://localhost:5000/api/auth/profile', {
+    const response = await fetch('/api/auth/profile', {
       method: 'PUT',
       headers: {
         ...getAuthHeaders(),
@@ -61,7 +61,7 @@ export async function updateUserProfile(profile: { name: string; phone: string; 
 // Lấy danh sách đơn hàng của người dùng hiện tại theo Email
 export async function getUserOrders(email: string): Promise<{ success: boolean; orders: any[] }> {
   try {
-    const response = await fetch(`http://localhost:5000/api/my-orders?email=${encodeURIComponent(email)}`);
+    const response = await fetch(`/api/my-orders?email=${encodeURIComponent(email)}`);
     if (!response.ok) throw new Error('Không thể tải danh sách đơn hàng!');
     return await response.json();
   } catch (error) {
@@ -73,7 +73,7 @@ export async function getUserOrders(email: string): Promise<{ success: boolean; 
 // Đăng ký nhận bản tin khuyến mãi (Newsletter Subscription)
 export async function subscribeNewsletter(email: string): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch('http://localhost:5000/api/contacts', {
+    const response = await fetch('/api/contacts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -103,7 +103,7 @@ export async function sendContactInquiry(payload: {
   message: string;
 }): Promise<{ success: boolean; message: string; inquiry?: any }> {
   try {
-    const response = await fetch('http://localhost:5000/api/contacts', {
+    const response = await fetch('/api/contacts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -121,7 +121,7 @@ export async function sendContactInquiry(payload: {
 // Tải danh sách thư góp ý khách hàng (Chỉ dành cho Administrator)
 export async function getContactMessages(): Promise<{ success: boolean; contacts: any[] }> {
   try {
-    const response = await fetch('http://localhost:5000/api/contacts', {
+    const response = await fetch('/api/contacts', {
       headers: getAuthHeaders()
     });
     if (!response.ok) throw new Error('Không thể tải hòm thư!');
@@ -135,7 +135,7 @@ export async function getContactMessages(): Promise<{ success: boolean; contacts
 // Tải danh sách đơn đặt hàng từ Server (Chỉ dành cho Administrator)
 export async function getAdminOrders(): Promise<{ success: boolean; orders: any[] }> {
   try {
-    const response = await fetch('http://localhost:5000/api/orders', {
+    const response = await fetch('/api/orders', {
       headers: getAuthHeaders()
     });
     if (!response.ok) throw new Error('Không thể tải sổ đơn hàng!');
@@ -149,7 +149,7 @@ export async function getAdminOrders(): Promise<{ success: boolean; orders: any[
 // Cập nhật trạng thái bưu kiện đơn hàng (Chỉ dành cho Administrator)
 export async function updateOrderStatus(orderId: number | string, status: string, statusType: string): Promise<{ success: boolean; order?: any }> {
   try {
-    const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+    const response = await fetch(`/api/orders/${orderId}/status`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ status, statusType })
@@ -165,7 +165,7 @@ export async function updateOrderStatus(orderId: number | string, status: string
 // Khởi tạo một đơn hàng mẫu ngẫu nhiên (Dashboard Helper)
 export async function seedDummyOrder(payload: any): Promise<{ success: boolean; orderId?: number | string }> {
   try {
-    const response = await fetch('http://localhost:5000/api/checkout', {
+    const response = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -181,7 +181,7 @@ export async function seedDummyOrder(payload: any): Promise<{ success: boolean; 
 // Xoá sạch toàn bộ nhật ký đơn hàng trên Server (Chỉ dành cho Administrator)
 export async function clearAllOrdersFromServer(): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch('http://localhost:5000/api/orders', {
+    const response = await fetch('/api/orders', {
       method: 'DELETE',
       headers: getAuthHeaders()
     });
@@ -206,7 +206,7 @@ export async function submitCheckoutOrder(orderData: {
   finalTotal: string;
 }): Promise<{ success: boolean; orderId?: number | string; message?: string }> {
   try {
-    const response = await fetch('http://localhost:5000/api/checkout', {
+    const response = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderData)
@@ -222,7 +222,7 @@ export async function submitCheckoutOrder(orderData: {
 // Tải danh sách phân loại sản phẩm (Categories) từ backend
 export async function getCategories(includeDeleted: boolean = false): Promise<{ success: boolean; categories: string[] }> {
   try {
-    const response = await fetch(`http://localhost:5000/api/categories${includeDeleted ? '?includeDeleted=true' : ''}`);
+    const response = await fetch(`/api/categories${includeDeleted ? '?includeDeleted=true' : ''}`);
     if (!response.ok) throw new Error('Không thể tải danh mục sản phẩm!');
     const data = await response.json();
     if (data && data.success && Array.isArray(data.categories)) {
@@ -250,7 +250,7 @@ export async function getProducts(search?: string, includeDeleted: boolean = fal
     if (search) queryParams.push(`search=${encodeURIComponent(search.trim())}`);
     if (includeDeleted) queryParams.push(`includeDeleted=true`);
     const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
-    const url = `http://localhost:5000/api/products${queryString}`;
+    const url = `/api/products${queryString}`;
     console.log(`[API getProducts] ➔ Bắt đầu gửi yêu cầu tải danh sách sản phẩm${search ? ` với từ khóa "${search}"` : ''} từ backend...`);
     const response = await fetch(url);
     if (!response.ok) throw new Error('Không thể tải danh sách sản phẩm!');
@@ -278,7 +278,7 @@ export async function createProduct(formData: FormData, token: string): Promise<
   try {
     console.log('[API createProduct] ➔ Bắt đầu gửi yêu cầu tạo sản phẩm mới:', formData.get('name'));
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch('http://localhost:5000/api/products', {
+    const response = await fetch('/api/products', {
       method: 'POST',
       headers: {
         'Authorization': cleanToken,
@@ -303,7 +303,7 @@ export async function updateProduct(id: string, formData: FormData, token: strin
   try {
     console.log(`[API updateProduct] ➔ Bắt đầu gửi yêu cầu cập nhật sản phẩm #${id}:`, formData.get('name'));
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+    const response = await fetch(`/api/products/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': cleanToken,
@@ -328,7 +328,7 @@ export async function deleteProduct(id: string, token: string): Promise<{ succes
   try {
     console.log(`[API deleteProduct] ➔ Bắt đầu gửi yêu cầu xóa sản phẩm #${id}...`);
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+    const response = await fetch(`/api/products/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': cleanToken,
@@ -352,7 +352,7 @@ export async function deleteProduct(id: string, token: string): Promise<{ succes
 export async function getSystemUsers(token: string, includeDeleted: boolean = false): Promise<{ success: boolean; users: any[] }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const url = `http://localhost:5000/api/users${includeDeleted ? '?includeDeleted=true' : ''}`;
+    const url = `/api/users${includeDeleted ? '?includeDeleted=true' : ''}`;
     const response = await fetch(url, {
       headers: {
         'Authorization': cleanToken,
@@ -371,7 +371,7 @@ export async function getSystemUsers(token: string, includeDeleted: boolean = fa
 export async function adminCreateUser(userData: any, token: string): Promise<{ success: boolean; message: string; user?: any }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch('http://localhost:5000/api/users', {
+    const response = await fetch('/api/users', {
       method: 'POST',
       headers: {
         'Authorization': cleanToken,
@@ -394,7 +394,7 @@ export async function adminCreateUser(userData: any, token: string): Promise<{ s
 export async function toggleUserRole(id: string, token: string): Promise<{ success: boolean; message: string; user?: any }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch(`http://localhost:5000/api/users/${id}/role`, {
+    const response = await fetch(`/api/users/${id}/role`, {
       method: 'PUT',
       headers: {
         'Authorization': cleanToken,
@@ -416,7 +416,7 @@ export async function toggleUserRole(id: string, token: string): Promise<{ succe
 export async function toggleUserVip(id: string, token: string): Promise<{ success: boolean; message: string; user?: any }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch(`http://localhost:5000/api/users/${id}/vip`, {
+    const response = await fetch(`/api/users/${id}/vip`, {
       method: 'PUT',
       headers: {
         'Authorization': cleanToken,
@@ -438,7 +438,7 @@ export async function toggleUserVip(id: string, token: string): Promise<{ succes
 export async function toggleUserStatus(id: string, token: string): Promise<{ success: boolean; message: string; user?: any }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch(`http://localhost:5000/api/users/${id}/status`, {
+    const response = await fetch(`/api/users/${id}/status`, {
       method: 'PUT',
       headers: {
         'Authorization': cleanToken,
@@ -460,7 +460,7 @@ export async function toggleUserStatus(id: string, token: string): Promise<{ suc
 export async function adminDeleteUser(id: string, token: string): Promise<{ success: boolean; message: string }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+    const response = await fetch(`/api/users/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': cleanToken,
@@ -482,7 +482,7 @@ export async function adminDeleteUser(id: string, token: string): Promise<{ succ
 export async function restoreUser(id: string, token: string): Promise<{ success: boolean; message: string }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch(`http://localhost:5000/api/users/${id}/restore`, {
+    const response = await fetch(`/api/users/${id}/restore`, {
       method: 'PUT',
       headers: {
         'Authorization': cleanToken,
@@ -502,7 +502,7 @@ export async function restoreUser(id: string, token: string): Promise<{ success:
 export async function restoreProduct(id: string, token: string): Promise<{ success: boolean; message: string }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch(`http://localhost:5000/api/products/${id}/restore`, {
+    const response = await fetch(`/api/products/${id}/restore`, {
       method: 'PUT',
       headers: {
         'Authorization': cleanToken,
@@ -521,7 +521,7 @@ export async function restoreProduct(id: string, token: string): Promise<{ succe
 // Tải danh mục tìm kiếm phổ biến (Popular Searches) từ backend
 export async function getPopularSearches(): Promise<{ success: boolean; popular: string[] }> {
   try {
-    const response = await fetch('http://localhost:5000/api/search/popular');
+    const response = await fetch('/api/search/popular');
     if (!response.ok) throw new Error('Không thể tải tìm kiếm phổ biến!');
     return await response.json();
   } catch (error) {
@@ -536,7 +536,7 @@ export async function getPopularSearches(): Promise<{ success: boolean; popular:
 // Tải lịch sử tìm kiếm gần đây (Search History) từ backend
 export async function getSearchHistory(): Promise<{ success: boolean; history: string[] }> {
   try {
-    const response = await fetch('http://localhost:5000/api/search/history', {
+    const response = await fetch('/api/search/history', {
       headers: getAuthHeaders() // Tự động đính kèm token nếu đăng nhập để tải lịch sử cá nhân
     });
     if (!response.ok) throw new Error('Không thể tải lịch sử tìm kiếm!');
@@ -556,7 +556,7 @@ export async function changePassword(payload: {
   newPassword: string;
 }): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch('http://localhost:5000/api/auth/change-password', {
+    const response = await fetch('/api/auth/change-password', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(payload)

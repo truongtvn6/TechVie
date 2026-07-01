@@ -58,7 +58,7 @@ export default function AuthPage({
     }
 
     setIsLoggingIn(true);
-    fetch('http://localhost:5000/api/auth/login', {
+    fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: loginEmail, password: loginPassword })
@@ -87,7 +87,7 @@ export default function AuthPage({
     setLoginEmail(email);
     setLoginPassword(password);
     setIsLoggingIn(true);
-    fetch('http://localhost:5000/api/auth/login', {
+    fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -137,7 +137,7 @@ export default function AuthPage({
     }
 
     setIsRegistering(true);
-    fetch('http://localhost:5000/api/auth/register', {
+    fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: regFullName, email: regEmail, password: regPassword })

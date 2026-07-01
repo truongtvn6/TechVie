@@ -23,7 +23,7 @@ const { getCategories, getHeroImages } = require("./controllers/productControlle
 const { getMyOrders } = require("./controllers/orderController");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // 1. Cấu hình CORS (Cho phép frontend kết nối không bị chặn)
 app.use(cors({

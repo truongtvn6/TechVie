@@ -71,7 +71,7 @@ export default function HomePage({
     let intervalId: NodeJS.Timeout;
 
     const fetchImages = () => {
-      fetch("http://localhost:5000/api/hero-images")
+      fetch("/api/hero-images")
         .then((res) => {
           if (!res.ok) throw new Error("API server unreachable");
           return res.json();
