@@ -15,6 +15,7 @@ import {
   adminDeleteUser,
   restoreProduct,
   restoreUser,
+  getCurrentUser,
 } from "./services/api";
 import HomePage from "./components/HomePage";
 import BrandPage from "./components/BrandPage";
@@ -39,10 +40,9 @@ export default function App() {
     try {
       const params = new URLSearchParams(window.location.search);
       if (window.location.pathname === "/reset-password" && params.get("token")) {
-        return "reset-password" as any;
+        return "reset-password";
       }
       const saved = localStorage.getItem("active_tab");
-      if (saved === "reset-password") return "home";
       return saved ? (saved as TabType) : "home";
     } catch {
       return "home";
@@ -68,19 +68,37 @@ export default function App() {
     !!localStorage.getItem("techvie_token"),
   );
   const [userProfile, setUserProfile] = useState({
-    name: localStorage.getItem("techvie_token")
-      ? "ADMINISTRATOR"
-      : "Nguyễn Minh Tiến",
-    email: localStorage.getItem("techvie_token")
-      ? "admin@techvie.com"
-      : "mintzinfinity898@gmail.com",
-    phone: "0912 345 678",
-    address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
-    memberSince: "17-06-2026",
-    techvieId: "TV-992-88X",
-    shieldStatus: "Đang Kích Hoạt (Premium)",
-    role: localStorage.getItem("techvie_token") ? "admin" : "user",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    memberSince: "",
+    techvieId: "",
+    shieldStatus: "Standard",
+    role: "user",
   });
+
+  useEffect(() => {
+    if (token && isLoggedIn) {
+      getCurrentUser(token).then((res) => {
+        if (res.success && res.user) {
+          setUserProfile({
+            name: res.user.username || "",
+            email: res.user.email || "",
+            phone: res.user.phone || "",
+            address: res.user.address || "",
+            memberSince: new Date(res.user.created_at).toLocaleDateString("vi-VN") || "",
+            techvieId: `TV-${(res.user._id || res.user.id || "").substring(0, 6).toUpperCase()}`,
+            shieldStatus: res.user.vipStatus === "Premium" ? "Đang Kích Hoạt (Premium)" : (res.user.vipStatus || "Standard"),
+            role: res.user.role || "user",
+          });
+        } else {
+          // Token might be invalid
+          handleSetIsLoggedIn(false);
+        }
+      });
+    }
+  }, [token, isLoggedIn]);
 
   useEffect(() => {
     getProducts().then((res) => {

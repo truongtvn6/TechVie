@@ -67,6 +67,47 @@ export async function sendContactInquiry(payload: {
   }
 }
 
+export async function getCurrentUser(token: string): Promise<{ success: boolean; user?: any; message?: string }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch('/api/auth/profile', {
+      method: 'GET',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Phiên đăng nhập không hợp lệ hoặc đã hết hạn.');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi lấy thông tin người dùng:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updateUserProfile(profile: { name: string; phone: string; address: string }): Promise<{ success: boolean; user?: any; message?: string }> {
+  try {
+    const response = await fetch('/api/auth/profile', {
+      method: 'PUT',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(profile),
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Không thể cập nhật hồ sơ.');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi cập nhật hồ sơ:', error);
+    return { success: false, message: error.message };
+  }
+}
+
 // Tải danh sách thư góp ý khách hàng (Chỉ dành cho Administrator)
 export async function getContactMessages(): Promise<{ success: boolean; contacts: any[] }> {
   try {

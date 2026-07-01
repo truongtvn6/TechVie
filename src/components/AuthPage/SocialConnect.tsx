@@ -11,11 +11,18 @@ export default function SocialConnect({
   onLoginSuccess,
   onRegisterSuccess
 }: SocialConnectProps) {
-  const handleGoogleClick = () => {
-    if (mode === 'login') {
-      onLoginSuccess('google-user@gmail.com');
-    } else {
-      onRegisterSuccess('google-user@gmail.com', 'Google User');
+  const handleGoogleClick = async () => {
+    try {
+      const response = await fetch('/api/auth/google');
+      const data = await response.json();
+      if (data.success && data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Không thể khởi tạo phiên kết nối OAuth2 với Google.");
+      }
+    } catch (error) {
+      console.error("Lỗi chuyển hướng Google OAuth:", error);
+      alert("Lỗi kết nối máy chủ Google OAuth.");
     }
   };
 

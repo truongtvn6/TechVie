@@ -73,8 +73,12 @@ export default function AccountSidebar({
           </div>
           <div className="flex justify-between items-center">
             <span className="text-[#4a5568]">Đặc quyền:</span>
-            <span className="font-tech-label text-tech-label text-black px-2 py-1 bg-gray-150 border border-gray-200 rounded !text-sm">
-              PREMIUM
+            <span className={`font-tech-label text-tech-label px-2 py-1 rounded !text-sm ${
+              userProfile.shieldStatus === 'Standard' 
+                ? 'text-gray-600 bg-gray-100 border border-gray-200' 
+                : 'text-black bg-gray-150 border border-gray-200'
+            }`}>
+              {userProfile.shieldStatus || 'Standard'}
             </span>
           </div>
         </div>
