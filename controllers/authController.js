@@ -54,18 +54,12 @@ const authController = {
 
       let user = await User.findByEmail(email.toLowerCase());
       if (user) {
-        if (user.auth_provider === "credentials") {
-          return res.status(409).json({
-            success: false,
-            code: "ACCOUNT_EXISTS_TRADITIONAL",
-            message: "Email này đã được đăng ký bằng tài khoản mật khẩu. Vui lòng đăng nhập bằng mật khẩu."
-          });
-        }
         if (user.status === "blocked") {
           return res.status(403).json({ success: false, message: "Tài khoản của bạn đã bị khóa." });
         }
         if (!user.google_id) {
-          user = await User.updateById(user.id, { google_id: googleId });
+          // Tự động liên kết Google ID và cập nhật nhà cung cấp
+          user = await User.updateById(user.id, { google_id: googleId, auth_provider: "google" });
         }
       } else {
         user = await User.create({

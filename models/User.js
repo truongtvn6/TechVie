@@ -231,7 +231,7 @@ const User = {
 
   // Cập nhật người dùng theo ID
   updateById: async (id, updates) => {
-    const doc = await UserModel.findByIdAndUpdate(id, updates, { new: true });
+    const doc = await UserModel.findByIdAndUpdate(id, updates, { returnDocument: 'after' });
     if (!doc) return null;
     return {
       id: doc._id.toString(),
