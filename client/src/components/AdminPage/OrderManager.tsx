@@ -23,9 +23,13 @@ interface OrderManagerProps {
   onRefreshOrders: () => void;
   onSeedOrder: () => void;
   onUpdateOrderStatus: (
-    orderId: number,
+    orderId: number | string,
     status: string,
     statusType: string,
+  ) => void;
+  onUpdatePaymentStatus: (
+    orderId: number | string,
+    paymentStatus: "pending" | "paid" | "failed" | "cancelled",
   ) => void;
   isDarkMode?: boolean;
   products?: Product[];
@@ -132,6 +136,7 @@ export default function OrderManager({
   onRefreshOrders,
   onSeedOrder,
   onUpdateOrderStatus,
+  onUpdatePaymentStatus,
   isDarkMode = false,
   products = [],
 }: OrderManagerProps) {
@@ -309,6 +314,23 @@ export default function OrderManager({
                   >
                     {ord.status}
                   </span>
+                  <span
+                    className={`px-2.5 py-1 text-[9px] font-black uppercase rounded-full border ${
+                      ord.paymentStatus === "paid"
+                        ? d
+                          ? "bg-emerald-950/30 text-emerald-400 border-emerald-900/40"
+                          : "bg-emerald-50 text-emerald-700 border-emerald-200/50"
+                        : ord.paymentStatus === "failed" || ord.paymentStatus === "cancelled"
+                          ? d
+                            ? "bg-rose-950/30 text-rose-400 border-rose-900/40"
+                            : "bg-rose-50 text-rose-700 border-rose-200/50"
+                          : d
+                            ? "bg-amber-950/30 text-amber-400 border-amber-900/40"
+                            : "bg-amber-50 text-amber-700 border-amber-200/50"
+                    }`}
+                  >
+                    {ord.paymentStatusLabel || "Chờ thanh toán"}
+                  </span>
                 </div>
               </div>
 
@@ -361,6 +383,28 @@ export default function OrderManager({
                       >
                         " {ord.notes} "
                       </p>
+                    )}
+                    {(ord.paymentMethod || ord.paymentReference || ord.paymentNote) && (
+                      <div className={`mt-3 rounded-xl border p-3 text-[10px] space-y-1 ${
+                        d ? "bg-[#0d1117]/40 border-[#30363d] text-gray-300" : "bg-white border-gray-150 text-gray-650"
+                      }`}>
+                        <p>
+                          <strong className={d ? "text-gray-100" : "text-gray-900"}>Thanh toán:</strong>{" "}
+                          {ord.paymentMethod || "Chưa xác định"}
+                        </p>
+                        {ord.paymentReference && (
+                          <p>
+                            <strong className={d ? "text-gray-100" : "text-gray-900"}>Mã đối soát:</strong>{" "}
+                            <span className="font-mono">{ord.paymentReference}</span>
+                          </p>
+                        )}
+                        {ord.paymentNote && (
+                          <p>
+                            <strong className={d ? "text-gray-100" : "text-gray-900"}>Nội dung:</strong>{" "}
+                            <span className="font-mono">{ord.paymentNote}</span>
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

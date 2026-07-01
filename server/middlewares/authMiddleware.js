@@ -44,4 +44,15 @@ const requireAuth = (req, res, next) => {
   }
 };
 
-module.exports = { requireAuth };
+const adminOnly = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Bạn không có quyền truy cập chức năng quản trị.",
+    });
+  }
+
+  next();
+};
+
+module.exports = { requireAuth, adminOnly };

@@ -1,20 +1,16 @@
 const { Router } = require("express");
-const { createContact, getContacts } = require("../controllers/contactController");
+const contactController = require("../controllers/contactController");
+const { requireAuth, adminOnly } = require("../middlewares/authMiddleware");
 
 const router = Router();
 
-/**
- * @route   GET /api/contacts
- * @desc    Lấy toàn bộ liên hệ (Admin)
- * @access  Private (Admin)
- */
-router.get("/", getContacts);
+router.post("/", contactController.createContactInquiry);
 
-/**
- * @route   POST /api/contacts
- * @desc    Gửi liên hệ mới
- * @access  Public
- */
-router.post("/", createContact);
+router.use(requireAuth);
+router.use(adminOnly);
+
+router.get("/", contactController.getContactMessages);
+router.delete("/:id", contactController.deleteContactMessage);
+router.post("/:id/reply", contactController.replyContactMessage);
 
 module.exports = router;

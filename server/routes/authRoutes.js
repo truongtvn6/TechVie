@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { getGoogleAuthUrl, googleCallback, getMe, logout, updateProfile, login, register, changePassword } = require("../controllers/authController");
+const { getGoogleAuthUrl, googleCallback, getMe, logout, checkEmail, updateProfile, login, register, changePassword } = require("../controllers/authController");
 const { requireAuth } = require("../middlewares/authMiddleware");
 
 const router = Router();
@@ -31,6 +31,8 @@ router.post("/login", login);
  * @access  Public
  */
 router.post("/register", register);
+
+router.get("/check-email", checkEmail);
 
 /**
  * @route   POST /api/auth/change-password

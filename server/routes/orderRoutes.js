@@ -1,27 +1,20 @@
 const { Router } = require("express");
-const { getOrders, getMyOrders, updateOrderStatus, deleteAllOrders } = require("../controllers/orderController");
+const orderController = require("../controllers/orderController");
+const { requireAuth, adminOnly } = require("../middlewares/authMiddleware");
 
 const router = Router();
 
-/**
- * @route   GET /api/orders
- * @desc    Lấy toàn bộ đơn hàng (Admin)
- * @access  Private (Admin)
- */
-router.get("/", getOrders);
+router.use(requireAuth);
 
-/**
- * @route   POST /api/orders/:id/status
- * @desc    Cập nhật trạng thái đơn hàng (Admin)
- * @access  Private (Admin)
- */
-router.post("/:id/status", updateOrderStatus);
+// User can view only their own order history.
+router.get("/user", orderController.getUserOrders);
 
-/**
- * @route   DELETE /api/orders
- * @desc    Xóa toàn bộ đơn hàng (Admin)
- * @access  Private (Admin)
- */
-router.delete("/", deleteAllOrders);
+router.use(adminOnly);
+
+// Admin order management.
+router.get("/", orderController.getOrders);
+router.post("/:id/status", orderController.updateOrderStatus);
+router.post("/:id/payment-status", orderController.updatePaymentStatus);
+router.delete("/", orderController.clearAllOrders);
 
 module.exports = router;

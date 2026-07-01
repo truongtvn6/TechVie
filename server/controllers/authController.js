@@ -252,6 +252,33 @@ const logout = async (req, res) => {
 /**
  * 5. Cập nhật thông tin profile của người dùng hiện tại (Họ tên, SĐT, Địa chỉ)
  */
+const checkEmail = async (req, res) => {
+  try {
+    const email = String(req.query.email || "").trim().toLowerCase();
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        exists: false,
+        message: "Thiếu email để kiểm tra.",
+      });
+    }
+
+    const existingUser = await User.findOne({ email });
+    return res.status(200).json({
+      success: true,
+      exists: !!existingUser,
+      message: existingUser ? "Email này đã được sử dụng bởi tài khoản khác." : "Email khả dụng.",
+    });
+  } catch (error) {
+    console.error("Error in checkEmail controller:", error);
+    return res.status(500).json({
+      success: false,
+      exists: false,
+      message: "Không thể kiểm tra email lúc này.",
+    });
+  }
+};
+
 const updateProfile = async (req, res) => {
   try {
     if (!req.user) {
@@ -438,6 +465,7 @@ module.exports = {
   googleCallback,
   getMe,
   logout,
+  checkEmail,
   updateProfile,
   login,
   register,
