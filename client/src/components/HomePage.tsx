@@ -46,12 +46,16 @@ interface HomePageProps {
   products?: Product[];
   onNavigate: (tab: TabType) => void;
   onAddToCart: (product: Product) => void;
+  isLoggedIn?: boolean;
+  userEmail?: string;
 }
 
 export default function HomePage({
   products,
   onNavigate,
   onAddToCart,
+  isLoggedIn = false,
+  userEmail = "",
 }: HomePageProps) {
   const allProducts = (products || []).map(normalizeProduct);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -115,10 +119,11 @@ export default function HomePage({
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newsletterEmail.trim() === "" || isSubmittingSubscription) return;
+    const emailToSubscribe = isLoggedIn && userEmail ? userEmail : newsletterEmail;
+    if (emailToSubscribe.trim() === "" || isSubmittingSubscription) return;
     setIsSubmittingSubscription(true);
     try {
-      const res = await subscribeNewsletter(newsletterEmail);
+      const res = await subscribeNewsletter(emailToSubscribe);
       if (res.success) {
         setShowSubscriptionSuccess(true);
         setNewsletterEmail("");
@@ -404,19 +409,27 @@ export default function HomePage({
                   onSubmit={handleSubscribe}
                   className="flex flex-col gap-4 max-w-md w-full"
                 >
-                  <label htmlFor="newsletter-email" className="sr-only">
-                    Địa chỉ Email
-                  </label>
-                  <input
-                    id="newsletter-email"
-                    type="email"
-                    placeholder="email@techvie.com"
-                    value={newsletterEmail}
-                    onChange={(e) => setNewsletterEmail(e.target.value)}
-                    required
-                    disabled={isSubmittingSubscription}
-                    className="bg-white/50 backdrop-blur-md border border-gray-300 focus:border-black rounded-2xl px-6 py-4 outline-none font-sans text-base placeholder:text-gray-400 transition-colors disabled:opacity-60"
-                  />
+                  {!isLoggedIn ? (
+                    <>
+                      <label htmlFor="newsletter-email" className="sr-only">
+                        Địa chỉ Email
+                      </label>
+                      <input
+                        id="newsletter-email"
+                        type="email"
+                        placeholder="email@techvie.com"
+                        value={newsletterEmail}
+                        onChange={(e) => setNewsletterEmail(e.target.value)}
+                        required
+                        disabled={isSubmittingSubscription}
+                        className="bg-white/50 backdrop-blur-md border border-gray-300 focus:border-black rounded-2xl px-6 py-4 outline-none font-sans text-base placeholder:text-gray-400 transition-colors disabled:opacity-60"
+                      />
+                    </>
+                  ) : (
+                    <div className="bg-white/40 backdrop-blur-md border border-gray-200/50 rounded-2xl px-6 py-4 font-sans text-sm text-gray-800">
+                      Đăng ký bằng tài khoản: <strong className="text-black font-extrabold">{userEmail}</strong>
+                    </div>
+                  )}
                   <button
                     type="submit"
                     disabled={isSubmittingSubscription}

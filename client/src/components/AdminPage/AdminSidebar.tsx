@@ -61,7 +61,7 @@ export default function AdminSidebar({
   }, []);
 
   return (
-    <aside className="relative w-full md:w-64 lg:w-72 xl:w-80 bg-transparent border-b md:border-b-0 md:border-r border-gray-250/20 flex flex-col justify-between md:sticky md:top-0 md:h-screen p-6 md:p-8 shrink-0 z-40 overflow-hidden">
+    <aside className="relative w-full h-full bg-transparent border-r border-gray-250/20 flex flex-col justify-between p-6 md:p-8 shrink-0 z-40 overflow-hidden">
       {/* Liquid Glass Background Image Layer */}
       <div 
         className="absolute inset-0 -z-10 transition-all duration-500 scale-100"

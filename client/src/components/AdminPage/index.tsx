@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Product } from '../../types';
 import { 
   getContactMessages,
+  deleteContactMessage,
+  replyContactMessage,
   getAdminOrders,
   updateOrderStatus,
   seedDummyOrder,
@@ -75,6 +77,7 @@ export default function AdminPage({
 
   // Soft Delete Toggle & State
   const [showDeletedItems, setShowDeletedItems] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [adminProducts, setAdminProducts] = useState<Product[]>(products);
   const [adminUsers, setAdminUsers] = useState<any[]>(systemUsers);
 
@@ -328,6 +331,29 @@ export default function AdminPage({
       });
   };
 
+  const handleDeleteContactMessage = (id: string) => {
+    deleteContactMessage(id)
+      .then(data => {
+        if (data.success) {
+          addLog(`Đã xóa thư phản hồi khách hàng thành công.`);
+          fetchMessages();
+        }
+      })
+      .catch(err => {
+        console.error('Error deleting contact message:', err);
+      });
+  };
+
+  const handleReplyContactMessage = (id: string, subject: string, content: string) => {
+    return replyContactMessage(id, subject, content)
+      .then(data => {
+        if (data.success) {
+          addLog(`Đã gửi email phản hồi SMTP cho khách hàng.`);
+        }
+        return data;
+      });
+  };
+
   useEffect(() => {
     fetchOrders();
     fetchMessages();
@@ -469,23 +495,54 @@ export default function AdminPage({
 
   return (
     <div className={`admin-dashboard-root min-h-screen bg-[#f7f9fb] text-gray-900 w-full flex flex-col md:flex-row ${isDarkMode ? 'dark' : ''}`}>
-      {/* Left Sidebar (Decoupled modular component) */}
-      <AdminSidebar
-        activeSubTab={activeSubTab}
-        setActiveSubTab={(tab) => {
-          setActiveSubTab(tab);
-          if (tab === 'overview' || tab === 'orders') fetchOrders();
-          if (tab === 'overview' || tab === 'messages') fetchMessages();
-        }}
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
-        productsCount={products.length}
-        ordersCount={orders.length}
-        messagesCount={messages.length}
-        promosCount={promos.length}
-        usersCount={systemUsers.length}
-        onNavigate={onNavigate}
-      />
+      {/* Mobile Sticky Navbar */}
+      <div className={`md:hidden w-full flex items-center justify-between p-4 border-b ${isDarkMode ? 'bg-[#0d1117] border-[#30363d] text-white' : 'bg-white border-gray-200 text-gray-900'} sticky top-0 z-30 backdrop-blur-md bg-opacity-90 dark:bg-opacity-90`}>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 hover:bg-gray-200/20 rounded-lg cursor-pointer"
+            title="Mở menu quản trị"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <strong className="text-sm font-black uppercase tracking-tighter">TechVie Admin</strong>
+        </div>
+        <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-extrabold">Live</span>
+      </div>
+
+      {/* Sidebar Responsive Container */}
+      <div className={`fixed inset-0 z-50 md:relative md:inset-auto md:z-auto flex ${isSidebarOpen ? 'pointer-events-auto' : 'pointer-events-none md:pointer-events-auto'}`}>
+        {/* Backdrop for mobile */}
+        {isSidebarOpen && (
+          <div 
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs md:hidden transition-opacity"
+          />
+        )}
+        
+        {/* Sidebar Drawer container */}
+        <div className={`w-64 lg:w-72 xl:w-80 h-full md:h-screen fixed md:sticky left-0 top-0 bottom-0 transform md:transform-none ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} transition-transform duration-300 ease-in-out z-50 md:z-auto bg-transparent`}>
+          <AdminSidebar
+            activeSubTab={activeSubTab}
+            setActiveSubTab={(tab) => {
+              setActiveSubTab(tab);
+              setIsSidebarOpen(false);
+              if (tab === 'overview' || tab === 'orders') fetchOrders();
+              if (tab === 'overview' || tab === 'messages') fetchMessages();
+            }}
+            isDarkMode={isDarkMode}
+            setIsDarkMode={setIsDarkMode}
+            productsCount={products.length}
+            ordersCount={orders.length}
+            messagesCount={messages.length}
+            promosCount={promos.length}
+            usersCount={systemUsers.length}
+            onNavigate={onNavigate}
+          />
+        </div>
+      </div>
 
       {/* Main Content Pane */}
       <main className="flex-1 min-w-0 p-6 md:p-10 lg:p-12">
@@ -619,6 +676,8 @@ export default function AdminPage({
               messages={messages}
               isLoadingMessages={isLoadingMessages}
               onRefreshMessages={fetchMessages}
+              onDeleteMessage={handleDeleteContactMessage}
+              onReplyMessage={handleReplyContactMessage}
               isDarkMode={isDarkMode}
             />
           )}
