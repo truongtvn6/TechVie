@@ -81,7 +81,8 @@ export default function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get("token");
-    if (urlToken) {
+    // Chỉ đánh chặn token đăng nhập nếu KHÔNG ở trang đặt lại mật khẩu (/reset-password)
+    if (urlToken && window.location.pathname !== "/reset-password") {
       localStorage.setItem("techvie_token", urlToken);
       localStorage.setItem("active_tab", "account");
       setToken(urlToken);
@@ -105,6 +106,7 @@ export default function App() {
             techvieId: `TV-${(res.user._id || res.user.id || "").substring(0, 6).toUpperCase()}`,
             shieldStatus: res.user.vipStatus === "Premium" ? "Đang Kích Hoạt (Premium)" : (res.user.vipStatus || "Standard"),
             role: res.user.role || "user",
+            authProvider: res.user.auth_provider || "credentials",
           });
         } else {
           // Token không hợp lệ hoặc tài khoản đã bị xóa (ví dụ sau khi seed lại database)

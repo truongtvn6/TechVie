@@ -305,7 +305,7 @@ export default function AccountPage({
                           transition={{ duration: 0.3 }}
                           className="w-full"
                         >
-                          <TabSecurity />
+                          <TabSecurity userProfile={userProfile} />
                         </motion.div>
                       )}
                     </AnimatePresence>
