@@ -11,9 +11,13 @@ coverage/
 !.env.example
 
 *.log
+.system_generated/
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
 desktop.ini
+scratch/
 
 # Contains MongoDB access details from setup screenshots.
 tailieu/mongodb.png
