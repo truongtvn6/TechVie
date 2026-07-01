@@ -3,8 +3,110 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
+const { oauthConfig } = require("../config/oauth");
+const { exchangeCodeForTokens, fetchGoogleUserProfile } = require("../services/oauthService");
 
 const authController = {
+  getGoogleAuthUrl: async (req, res) => {
+    try {
+      const state = crypto.randomBytes(32).toString("hex");
+      res.cookie("oauth_state", state, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 5 * 60 * 1000
+      });
+      const { clientId, redirectUri, authUrl, scopes } = oauthConfig.google;
+      const params = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: "code",
+        scope: scopes.join(" "),
+        state: state,
+        access_type: "offline",
+        prompt: "consent"
+      });
+      return res.status(200).json({ success: true, url: `${authUrl}?${params.toString()}` });
+    } catch (error) {
+      console.error("Error generating Google Auth URL:", error);
+      return res.status(500).json({ success: false, message: "Không thể tạo URL đăng nhập bằng Google." });
+    }
+  },
+
+  googleCallback: async (req, res) => {
+    try {
+      const { code, state } = req.query;
+      const storedState = req.cookies.oauth_state;
+      res.clearCookie("oauth_state");
+
+      if (!state || !storedState || state !== storedState) {
+        return res.status(403).json({ success: false, message: "Cảnh báo bảo mật: Yêu cầu không hợp lệ." });
+      }
+      if (!code) {
+        return res.status(400).json({ success: false, message: "Thiếu mã xác thực." });
+      }
+
+      const tokens = await exchangeCodeForTokens(code);
+      const googleProfile = await fetchGoogleUserProfile(tokens.access_token);
+      const { sub: googleId, email, name, picture: avatar } = googleProfile;
+
+      let user = await User.findByEmail(email.toLowerCase());
+      if (user) {
+        if (user.auth_provider === "credentials") {
+          return res.status(409).json({
+            success: false,
+            code: "ACCOUNT_EXISTS_TRADITIONAL",
+            message: "Email này đã được đăng ký bằng tài khoản mật khẩu. Vui lòng đăng nhập bằng mật khẩu."
+          });
+        }
+        if (user.status === "blocked") {
+          return res.status(403).json({ success: false, message: "Tài khoản của bạn đã bị khóa." });
+        }
+        if (!user.google_id) {
+          user = await User.updateById(user.id, { google_id: googleId });
+        }
+      } else {
+        user = await User.create({
+          email: email.toLowerCase(),
+          google_id: googleId,
+          auth_provider: "google",
+          username: name,
+          avatar: avatar || "",
+          role: "user",
+          vipStatus: "Normal",
+          status: "active"
+        });
+      }
+
+      const jwtSecret = process.env.JWT_SECRET || "techvie_jwt_secret_key_2026";
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        jwtSecret,
+        { expiresIn: "24h" }
+      );
+
+      res.cookie("techvie_session", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000
+      });
+
+      return res.send(`
+        <html><body>
+          <script>
+            localStorage.setItem("techvie_token", "Bearer ${token}");
+            localStorage.setItem("active_tab", "account");
+            window.location.href = "/";
+          </script>
+        </body></html>
+      `);
+    } catch (error) {
+      console.error("OAuth callback error:", error);
+      return res.status(500).json({ success: false, message: "Lỗi hệ thống khi đăng nhập Google OAuth2." });
+    }
+  },
+
   // 1. Đăng ký tài khoản
   register: async (req, res) => {
     try {
@@ -94,6 +196,13 @@ const authController = {
         return res.status(403).json({
           success: false,
           message: "Tài khoản của bạn đã bị vô hiệu hóa hoặc khóa!",
+        });
+      }
+
+      if (fullUser.auth_provider === "google") {
+        return res.status(409).json({
+          success: false,
+          message: "Tài khoản này được đăng ký bằng Google. Vui lòng đăng nhập bằng Google.",
         });
       }
 

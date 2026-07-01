@@ -4,6 +4,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const chalk = require("chalk");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db"); // Trỏ đúng đến file db.js trong thư mục config
 const User = require("./models/User");
 const authRoutes = require("./routes/authRoutes");
@@ -22,9 +23,10 @@ const PORT = process.env.PORT || 5000;
 // 1. Cấu hình CORS (Cho phép giao diện kết nối không bị chặn)
 app.use(cors());
 
-// 2. Cấu hình đọc dữ liệu JSON & URL-encoded
+// 2. Cấu hình đọc dữ liệu JSON & URL-encoded & Cookies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // 3. Logger Middleware với Chalk để giao diện console chuyên nghiệp hơn
 app.use(

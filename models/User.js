@@ -36,6 +36,26 @@ const userSchema = new mongoose.Schema({
     enum: ["active", "blocked"],
     default: "active",
   },
+  google_id: {
+    type: String,
+    required: false,
+    sparse: true,
+    index: true
+  },
+  auth_provider: {
+    type: String,
+    enum: ["credentials", "google"],
+    default: "credentials",
+    required: true
+  },
+  avatar: {
+    type: String,
+    required: false
+  },
+  address: {
+    type: String,
+    required: false
+  },
   // === THÊM MỚI: Trường hỗ trợ tính năng Quên Mật Khẩu ===
   resetPasswordToken: {
     type: String,
@@ -75,6 +95,10 @@ const User = {
       created_at: doc.created_at,
       resetPasswordToken: doc.resetPasswordToken,
       resetPasswordExpire: doc.resetPasswordExpire,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     };
   },
 
@@ -95,6 +119,10 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     };
   },
 
@@ -113,6 +141,10 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     };
   },
 
@@ -145,19 +177,27 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     }));
   },
 
   // Tạo người dùng mới
-  create: async ({ username, email, password, phone, role, vipStatus, status }) => {
+  create: async ({ username, email, password, phone, role, vipStatus, status, google_id, auth_provider, avatar, address }) => {
     const doc = await UserModel.create({
       username,
       email,
-      password,
+      password: password || undefined,
       phone: phone || "Chưa cung cấp",
       role: role || "user",
       vipStatus: vipStatus || "Normal",
       status: status || "active",
+      google_id,
+      auth_provider: auth_provider || "credentials",
+      avatar,
+      address,
     });
     return {
       id: doc._id.toString(),
@@ -168,6 +208,10 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     };
   },
 
@@ -184,6 +228,10 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     };
   },
 

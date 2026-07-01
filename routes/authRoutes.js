@@ -3,6 +3,10 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
+// Route Google OAuth
+router.get("/google", authController.getGoogleAuthUrl);
+router.get("/google/callback", authController.googleCallback);
+
 // Route Đăng ký: POST /api/auth/register
 router.post("/register", authController.register);
 
