@@ -164,6 +164,25 @@ const authController = {
     }
   },
 
+  // 1.5 Kiểm tra email tồn tại
+  checkEmail: async (req, res) => {
+    try {
+      const { email } = req.query;
+      if (!email) {
+        return res.status(400).json({ success: false, message: "Thiếu email để kiểm tra!" });
+      }
+      const existingUser = await User.findByEmail(email.toLowerCase());
+      return res.status(200).json({
+        success: true,
+        exists: !!existingUser,
+        message: existingUser ? "Email này đã được sử dụng bởi tài khoản khác!" : "Email khả dụng."
+      });
+    } catch (error) {
+      console.error("Lỗi kiểm tra email:", error);
+      return res.status(500).json({ success: false, message: "Lỗi kết nối máy chủ khi kiểm tra email." });
+    }
+  },
+
   // 2. Đăng nhập tài khoản
   login: async (req, res) => {
     try {
@@ -268,6 +287,43 @@ const authController = {
       return res.status(500).json({
         success: false,
         message: "Có lỗi xảy ra!",
+        error: error.message,
+      });
+    }
+  },
+
+  // 3.5 Cập nhật thông tin cá nhân (Protected Route)
+  updateProfile: async (req, res) => {
+    try {
+      const { name, phone, address } = req.body;
+      const userId = req.user.id;
+
+      const updatedUser = await User.updateById(userId, {
+        username: name,
+        phone,
+        address
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy người dùng để cập nhật!",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Cập nhật hồ sơ thành công!",
+        user: {
+          ...updatedUser,
+          name: updatedUser.username // Ánh xạ username thành name để khớp cấu trúc Frontend
+        },
+      });
+    } catch (error) {
+      console.error("Lỗi cập nhật thông tin cá nhân:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Có lỗi xảy ra khi cập nhật hồ sơ!",
         error: error.message,
       });
     }

@@ -5,6 +5,10 @@ const authMiddleware = require("../middlewares/authMiddleware");
 
 // Áp dụng middleware bảo mật cho toàn bộ các API quản lý đơn hàng
 router.use(authMiddleware);
+
+// Lấy danh sách đơn hàng của người dùng hiện tại
+router.get("/user", orderController.getUserOrders);
+
 router.use(authMiddleware.adminOnly);
 
 // Lấy danh sách toàn bộ đơn hàng

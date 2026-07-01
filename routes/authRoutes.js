@@ -10,11 +10,17 @@ router.get("/google/callback", authController.googleCallback);
 // Route Đăng ký: POST /api/auth/register
 router.post("/register", authController.register);
 
+// Route Kiểm tra Email: GET /api/auth/check-email
+router.get("/check-email", authController.checkEmail);
+
 // Route Đăng nhập: POST /api/auth/login
 router.post("/login", authController.login);
 
 // Route Lấy Profile: GET /api/auth/profile (Yêu cầu đăng nhập)
 router.get("/profile", authMiddleware, authController.getProfile);
+
+// Route Cập Nhật Profile: PUT /api/auth/profile (Yêu cầu đăng nhập)
+router.put("/profile", authMiddleware, authController.updateProfile);
 
 // Route Quên Mật Khẩu: POST /api/auth/forgot-password
 // Body: { email }

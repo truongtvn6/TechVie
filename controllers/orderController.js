@@ -272,3 +272,43 @@ exports.clearAllOrders = async (req, res) => {
     });
   }
 };
+
+// @desc    Lấy danh sách đơn hàng của người dùng hiện tại
+// @route   GET /api/orders/user
+// @access  Private
+exports.getUserOrders = async (req, res) => {
+  try {
+    const email = req.user.email;
+    const orders = await Order.find({ email }).sort({ created_at: -1 });
+
+    const mappedOrders = orders.map((o) => {
+      const mappedCart = o.items.map((item) => ({
+        name: item.product_name,
+        qty: item.quantity,
+        type: "Thiết bị TechVie",
+      }));
+
+      return {
+        id: o._id.toString(),
+        date: o.created_at.toLocaleDateString("vi-VN"),
+        total: o.final_total,
+        status: o.status,
+        statusType: o.status_type,
+        items: mappedCart,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      orders: mappedOrders,
+    });
+  } catch (error) {
+    console.error("Lỗi lấy đơn hàng của người dùng:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi kết nối máy chủ khi tải đơn hàng.",
+      error: error.message,
+    });
+  }
+};

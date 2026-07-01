@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    default: "Chưa cung cấp",
+    // Nếu chưa cung cấp thì sao?
+    default: "",
   },
   role: {
     type: String,
