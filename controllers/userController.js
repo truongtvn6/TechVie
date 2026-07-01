@@ -43,7 +43,8 @@ const userController = {
       }
 
       // Tạo mật khẩu mặc định được mã hóa cho tài khoản mới cấp
-      const defaultPassword = "user123"; // Mật khẩu mặc định
+      // Mật khẩu mặc định
+      const defaultPassword = "123456"; 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(defaultPassword, salt);
 

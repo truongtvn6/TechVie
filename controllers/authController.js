@@ -2,6 +2,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const User = require("../models/User");
+const Order = require("../models/Order");
+const mongoose = require("mongoose");
 const sendEmail = require("../utils/sendEmail");
 const { oauthConfig } = require("../config/oauth");
 const { exchangeCodeForTokens, fetchGoogleUserProfile } = require("../services/oauthService");
@@ -92,15 +94,7 @@ const authController = {
         maxAge: 24 * 60 * 60 * 1000
       });
 
-      return res.send(`
-        <html><body>
-          <script>
-            localStorage.setItem("techvie_token", "Bearer ${token}");
-            localStorage.setItem("active_tab", "account");
-            window.location.href = "/";
-          </script>
-        </body></html>
-      `);
+      return res.redirect(`http://localhost:3000/?token=Bearer ${token}`);
     } catch (error) {
       console.error("OAuth callback error:", error);
       return res.status(500).json({ success: false, message: "Lỗi hệ thống khi đăng nhập Google OAuth2." });
@@ -505,6 +499,109 @@ const authController = {
         success: false,
         message: "Có lỗi xảy ra khi đặt lại mật khẩu!",
         error: error.message,
+      });
+    }
+  },
+
+  // 6. Đổi mật khẩu cho người dùng đang đăng nhập
+  changePassword: async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const userId = req.user.id;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Vui lòng nhập mật khẩu hiện tại và mật khẩu mới!",
+        });
+      }
+
+      // Tìm user trong DB
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy tài khoản người dùng!",
+        });
+      }
+
+      // So sánh mật khẩu hiện tại
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: "Mật khẩu hiện tại không chính xác!",
+        });
+      }
+
+      // Mã hóa mật khẩu mới
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      // Cập nhật
+      await User.updateById(userId, { password: hashedPassword });
+
+      return res.status(200).json({
+        success: true,
+        message: "Thay đổi mật khẩu thành công!",
+      });
+    } catch (error) {
+      console.error("Lỗi đổi mật khẩu:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Có lỗi xảy ra khi đổi mật khẩu!",
+        error: error.message,
+      });
+    }
+  },
+
+  // 7. Lấy danh sách thiết bị đã mua thành công của người dùng
+  getMyDevices: async (req, res) => {
+    try {
+      const email = req.user.email;
+      const orders = await Order.find({ 
+        email: { $regex: new RegExp("^" + email + "$", "i") }, 
+        status_type: "success" 
+      }).sort({ created_at: -1 });
+
+      const devices = [];
+      const ProductModel = mongoose.models.Product || mongoose.model("Product");
+
+      for (const order of orders) {
+        for (const item of order.items) {
+          // Lấy thông số gốc từ collection Product để vẽ ra specs thật
+          const productDoc = await ProductModel.findOne({ id: item.product_id });
+          const specs = productDoc ? productDoc.specs : [
+            { label: "Bảo hành", value: "24 tháng" },
+            { label: "Trạng thái", value: "Chính hãng TechVie" }
+          ];
+
+          const purchaseDate = new Date(order.created_at);
+          const warrantyDate = new Date(purchaseDate);
+          warrantyDate.setFullYear(warrantyDate.getFullYear() + 2); // Mặc định bảo hành 2 năm
+
+          devices.push({
+            id: item.product_id,
+            name: item.product_name,
+            price: item.product_price,
+            purchaseDate: purchaseDate.toLocaleDateString("vi-VN"),
+            warrantyDate: warrantyDate.toLocaleDateString("vi-VN"),
+            specs: specs,
+            image: productDoc ? productDoc.image : null
+          });
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        devices
+      });
+    } catch (error) {
+      console.error("Lỗi lấy danh sách thiết bị cá nhân:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Lỗi kết nối khi tải danh sách thiết bị.",
+        error: error.message
       });
     }
   },

@@ -41,21 +41,21 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false,
     sparse: true,
-    index: true
+    index: true,
   },
   auth_provider: {
     type: String,
     enum: ["credentials", "google"],
     default: "credentials",
-    required: true
+    required: true,
   },
   avatar: {
     type: String,
-    required: false
+    required: false,
   },
   address: {
     type: String,
-    required: false
+    required: false,
   },
   // === THÊM MỚI: Trường hỗ trợ tính năng Quên Mật Khẩu ===
   resetPasswordToken: {
@@ -105,9 +105,9 @@ const User = {
 
   // Tìm người dùng qua Username (Không phân biệt hoa thường)
   findByUsername: async (username) => {
-    const doc = await UserModel.findOne({ 
-      username: { $regex: new RegExp(`^${username}$`, 'i') }, 
-      isDeleted: { $ne: true } 
+    const doc = await UserModel.findOne({
+      username: { $regex: new RegExp(`^${username}$`, "i") },
+      isDeleted: { $ne: true },
     });
     if (!doc) return null;
     return {
@@ -137,6 +137,7 @@ const User = {
       id: doc._id.toString(),
       username: doc.username,
       email: doc.email,
+      password: doc.password,
       phone: doc.phone,
       role: doc.role,
       vipStatus: doc.vipStatus,
@@ -186,7 +187,19 @@ const User = {
   },
 
   // Tạo người dùng mới
-  create: async ({ username, email, password, phone, role, vipStatus, status, google_id, auth_provider, avatar, address }) => {
+  create: async ({
+    username,
+    email,
+    password,
+    phone,
+    role,
+    vipStatus,
+    status,
+    google_id,
+    auth_provider,
+    avatar,
+    address,
+  }) => {
     const doc = await UserModel.create({
       username,
       email,
@@ -238,7 +251,10 @@ const User = {
 
   // Xóa người dùng theo ID
   deleteById: async (id) => {
-    const result = await UserModel.findByIdAndUpdate(id, { isDeleted: true, status: 'blocked' });
+    const result = await UserModel.findByIdAndUpdate(id, {
+      isDeleted: true,
+      status: "blocked",
+    });
     return !!result;
   },
 };

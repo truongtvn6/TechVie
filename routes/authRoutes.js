@@ -33,4 +33,10 @@ router.post("/forgot-password", authController.forgotPassword);
 // → Xác thực token, cập nhật mật khẩu mới vào DB, xóa token
 router.post("/reset-password/:token", authController.resetPassword);
 
+// Route Đổi Mật Khẩu (Đã đăng nhập): POST /api/auth/change-password
+router.post("/change-password", authMiddleware, authController.changePassword);
+
+// Route Lấy Danh Sách Thiết Bị Của Người Dùng (Đã đăng nhập): GET /api/auth/my-devices
+router.get("/my-devices", authMiddleware, authController.getMyDevices);
+
 module.exports = router;
