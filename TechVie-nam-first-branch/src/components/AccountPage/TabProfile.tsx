@@ -1,5 +1,6 @@
-import React from 'react';
-import { MapPin, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, ArrowRight, Copy, Check, Loader2 } from 'lucide-react';
+import { updateUserProfile } from '../../services/api';
 
 interface TabProfileProps {
   userProfile: any;
@@ -7,6 +8,42 @@ interface TabProfileProps {
 }
 
 export default function TabProfile({ userProfile, setUserProfile }: TabProfileProps) {
+  const [copied, setCopied] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const res = await updateUserProfile({
+        name: userProfile.name || "",
+        phone: userProfile.phone || "",
+        address: userProfile.address || "",
+      });
+      if (res.success && res.user) {
+        setUserProfile({
+          ...userProfile,
+          name: res.user.name,
+          phone: res.user.phone,
+          address: res.user.address,
+        });
+        alert("Lưu thông tin hồ sơ cá nhân thành công!");
+      } else {
+        alert(res.message || "Lỗi lưu hồ sơ.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Lỗi kết nối khi lưu hồ sơ.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(userProfile.email || '');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="h-full bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm">
       {/* Top subtle glow */}
@@ -19,7 +56,7 @@ export default function TabProfile({ userProfile, setUserProfile }: TabProfilePr
       </div>
 
       {/* Form Grid */}
-      <form className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow">
+      <form className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow" onSubmit={(e) => e.preventDefault()}>
         {/* Input: Full Name */}
         <div className="space-y-1.5">
           <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">HỌ VÀ TÊN</label>
@@ -48,12 +85,22 @@ export default function TabProfile({ userProfile, setUserProfile }: TabProfilePr
         {/* Input: Email (Readonly) */}
         <div className="space-y-1.5 md:col-span-2">
           <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">EMAIL ĐĂNG BẠ</label>
-          <input
-            className="w-full bg-gray-100/50 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#4a5568] text-[15px] cursor-not-allowed shadow-sm mt-1.5"
-            readOnly
-            type="email"
-            value={userProfile.email}
-          />
+          <div className="relative mt-1.5 flex items-center">
+            <input
+              className="w-full bg-gray-100/50 border border-gray-200/50 rounded-lg pl-3.5 pr-12 py-2.5 text-[#4a5568] text-[15px] cursor-not-allowed shadow-sm"
+              readOnly
+              type="email"
+              value={userProfile.email}
+            />
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="absolute right-3 p-1.5 text-gray-400 hover:text-black rounded-md transition-colors cursor-pointer flex items-center justify-center"
+              title="Sao chép email"
+            >
+              {copied ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+            </button>
+          </div>
         </div>
 
         {/* Input: Address */}
@@ -70,12 +117,22 @@ export default function TabProfile({ userProfile, setUserProfile }: TabProfilePr
         {/* Submit Action */}
         <div className="md:col-span-2 pt-2">
           <button
-            className="px-5 py-3 bg-black hover:bg-gray-800 text-white font-tech-label text-tech-label rounded-lg transition-all duration-300 flex items-center gap-2 group shadow-md cursor-pointer float-right !text-[12px]"
+            className="px-5 py-3 bg-black hover:bg-gray-800 text-white font-tech-label text-tech-label rounded-lg transition-all duration-300 flex items-center gap-2 group shadow-md cursor-pointer float-right !text-[12px] disabled:opacity-50 disabled:cursor-not-allowed"
             type="button"
-            onClick={() => console.log('Cập nhật dữ liệu thông tin tài khoản thành công!')}
+            disabled={isSaving}
+            onClick={handleSave}
           >
-            <span>LƯU HỒ SƠ THÔNG TIN</span>
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            {isSaving ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                <span>ĐANG LƯU HỒ SƠ...</span>
+              </>
+            ) : (
+              <>
+                <span>LƯU HỒ SƠ THÔNG TIN</span>
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
           </button>
         </div>
       </form>

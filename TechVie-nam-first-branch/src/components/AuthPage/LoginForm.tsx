@@ -12,6 +12,7 @@ interface LoginFormProps {
   isLoggingIn: boolean;
   loginError: string;
   onSubmit: (e: React.FormEvent) => void;
+  onForgotPassword: () => void;
 }
 
 export default function LoginForm({
@@ -23,7 +24,8 @@ export default function LoginForm({
   setShowLoginPassword,
   isLoggingIn,
   loginError,
-  onSubmit
+  onSubmit,
+  onForgotPassword
 }: LoginFormProps) {
   return (
     <motion.div
@@ -47,12 +49,12 @@ export default function LoginForm({
         {/* Email Field with Frosted Glass look */}
         <div className="space-y-1.5">
           <label className="font-jakarta text-[12px] uppercase tracking-widest text-black/60 font-semibold small-caps block ml-0.5">
-            Email
+            Email hoặc tên đăng nhập
           </label>
           <input 
-            type="email"
+            type="text"
             required
-            placeholder="name@example.com"
+            placeholder="email@example.com hoặc username"
             value={loginEmail}
             onChange={(e) => setLoginEmail(e.target.value)}
             className="w-full glass-input px-4 py-3 rounded-xl font-jakarta text-sm outline-none placeholder-black/35"
@@ -99,7 +101,7 @@ export default function LoginForm({
             href="#forgot-password"
             onClick={(e) => {
               e.preventDefault();
-              console.log('Liên kết khôi phục mật khẩu đã được gửi đến email của bạn.');
+              onForgotPassword();
             }}
             className="font-jakarta text-[12px] font-semibold text-black hover:opacity-50 transition-opacity uppercase tracking-wider underline underline-offset-4"
           >

@@ -13,6 +13,9 @@ import {
   toggleUserVip,
   toggleUserStatus,
   adminDeleteUser,
+  restoreProduct,
+  restoreUser,
+  getCurrentUser,
 } from "./services/api";
 import HomePage from "./components/HomePage";
 import BrandPage from "./components/BrandPage";
@@ -28,12 +31,17 @@ import Footer from "./components/Footer";
 import SearchSidePanel from "./components/SearchSidePanel";
 import PolicyPage from "./components/PolicyPage";
 import CartSidePanel from "./components/CartSidePanel";
+import ResetPassword from "./components/AuthPage/ResetPassword";
 
 export default function App() {
   const appRef = useRef<HTMLDivElement>(null);
 
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     try {
+      const params = new URLSearchParams(window.location.search);
+      if (window.location.pathname === "/reset-password" && params.get("token")) {
+        return "reset-password";
+      }
       const saved = localStorage.getItem("active_tab");
       return saved ? (saved as TabType) : "home";
     } catch {
@@ -60,19 +68,37 @@ export default function App() {
     !!localStorage.getItem("techvie_token"),
   );
   const [userProfile, setUserProfile] = useState({
-    name: localStorage.getItem("techvie_token")
-      ? "ADMINISTRATOR"
-      : "Nguyễn Minh Tiến",
-    email: localStorage.getItem("techvie_token")
-      ? "admin@techvie.com"
-      : "mintzinfinity898@gmail.com",
-    phone: "0912 345 678",
-    address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
-    memberSince: "17-06-2026",
-    techvieId: "TV-992-88X",
-    shieldStatus: "Đang Kích Hoạt (Premium)",
-    role: localStorage.getItem("techvie_token") ? "admin" : "user",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    memberSince: "",
+    techvieId: "",
+    shieldStatus: "Standard",
+    role: "user",
   });
+
+  useEffect(() => {
+    if (token && isLoggedIn) {
+      getCurrentUser(token).then((res) => {
+        if (res.success && res.user) {
+          setUserProfile({
+            name: res.user.username || "",
+            email: res.user.email || "",
+            phone: res.user.phone || "",
+            address: res.user.address || "",
+            memberSince: new Date(res.user.created_at).toLocaleDateString("vi-VN") || "",
+            techvieId: `TV-${(res.user._id || res.user.id || "").substring(0, 6).toUpperCase()}`,
+            shieldStatus: res.user.vipStatus === "Premium" ? "Đang Kích Hoạt (Premium)" : (res.user.vipStatus || "Standard"),
+            role: res.user.role || "user",
+          });
+        } else {
+          // Token might be invalid
+          handleSetIsLoggedIn(false);
+        }
+      });
+    }
+  }, [token, isLoggedIn]);
 
   useEffect(() => {
     getProducts().then((res) => {
@@ -106,7 +132,9 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem("active_tab", activeTab);
+      if (activeTab !== ("reset-password" as any)) {
+        localStorage.setItem("active_tab", activeTab);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -258,6 +286,22 @@ export default function App() {
     }
   };
 
+  const handleRestoreProduct = async (productId: string) => {
+    try {
+      const res = await restoreProduct(productId, token);
+      if (res.success) {
+        // Refresh products to get the restored product with its details
+        getProducts().then((data) => {
+          if (data.success) setProducts(data.products);
+        });
+        return { success: true, message: res.message };
+      }
+      return { success: false, message: res.message };
+    } catch (error: any) {
+      return { success: false, message: "Lỗi kết nối khi khôi phục sản phẩm." };
+    }
+  };
+
   // User Management Admin Handlers
   const handleAddUser = async (newUser: any) => {
     try {
@@ -382,6 +426,34 @@ export default function App() {
     }
   };
 
+  const handleRestoreUser = async (id: string) => {
+    try {
+      const res = await restoreUser(id, token);
+      if (res.success) {
+        // Refresh users to get the restored user with its details
+        getSystemUsers(token).then((data) => {
+          if (data.success && data.users) {
+            const mapped = data.users.map((u: any) => ({
+              id: u.id || u._id,
+              name: u.username,
+              email: u.email,
+              phone: u.phone,
+              role: u.role,
+              vipStatus: u.vipStatus,
+              status: u.status,
+              joinedDate: new Date(u.created_at).toLocaleDateString("vi-VN"),
+            }));
+            setSystemUsers(mapped);
+          }
+        });
+        return { success: true, message: res.message };
+      }
+      return { success: false, message: res.message };
+    } catch (error: any) {
+      return { success: false, message: "Lỗi kết nối mạng." };
+    }
+  };
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -433,7 +505,8 @@ export default function App() {
   const showHeaderFooter =
     activeTab !== "dang-nhap" &&
     activeTab !== "dang-ky" &&
-    activeTab !== "admin";
+    activeTab !== "admin" &&
+    activeTab !== "reset-password";
 
   const navigationItems: { id: TabType; label: string }[] = [
     { id: "home", label: "TRANG CHỦ" },
@@ -702,6 +775,25 @@ export default function App() {
             </motion.div>
           )}
 
+          {activeTab === "reset-password" && (
+            <motion.div
+              key="reset-password-route"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35 }}
+              className="w-full"
+            >
+              <ResetPassword 
+                token={new URLSearchParams(window.location.search).get("token") || ""}
+                onNavigate={(tab) => {
+                  window.history.replaceState({}, document.title, "/");
+                  setActiveTab(tab);
+                }}
+              />
+            </motion.div>
+          )}
+
           {activeTab === "account" && (
             <motion.div
               key="account-route"
@@ -734,10 +826,12 @@ export default function App() {
               className="w-full"
             >
               <AdminPage
+                token={token}
                 products={products}
                 onAddProduct={handleAddProduct}
                 onEditProduct={handleEditProduct}
                 onDeleteProduct={handleDeleteProduct}
+                onRestoreProduct={handleRestoreProduct}
                 onNavigate={(tab) => {
                   setActiveTab(tab);
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -748,6 +842,7 @@ export default function App() {
                 onToggleUserVip={handleToggleUserVip}
                 onToggleUserStatus={handleToggleUserStatus}
                 onDeleteUser={handleDeleteUser}
+                onRestoreUser={handleRestoreUser}
               />
             </motion.div>
           )}

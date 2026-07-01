@@ -23,13 +23,9 @@ interface OrderManagerProps {
   onRefreshOrders: () => void;
   onSeedOrder: () => void;
   onUpdateOrderStatus: (
-    orderId: number | string,
+    orderId: number,
     status: string,
     statusType: string,
-  ) => void;
-  onUpdatePaymentStatus: (
-    orderId: number | string,
-    paymentStatus: "pending" | "paid" | "failed" | "cancelled",
   ) => void;
   isDarkMode?: boolean;
   products?: Product[];
@@ -136,7 +132,6 @@ export default function OrderManager({
   onRefreshOrders,
   onSeedOrder,
   onUpdateOrderStatus,
-  onUpdatePaymentStatus,
   isDarkMode = false,
   products = [],
 }: OrderManagerProps) {
@@ -314,24 +309,6 @@ export default function OrderManager({
                   >
                     {ord.status}
                   </span>
-
-                  <span
-                    className={`px-2.5 py-1 text-[9px] font-black uppercase rounded-full border ${
-                      ord.paymentStatus === "paid"
-                        ? d
-                          ? "bg-emerald-950/30 text-emerald-400 border-emerald-900/40"
-                          : "bg-emerald-50 text-emerald-700 border-emerald-200/50"
-                        : ord.paymentStatus === "failed" || ord.paymentStatus === "cancelled"
-                          ? d
-                            ? "bg-rose-950/30 text-rose-400 border-rose-900/40"
-                            : "bg-rose-50 text-rose-700 border-rose-200/50"
-                          : d
-                            ? "bg-amber-950/30 text-amber-400 border-amber-900/40"
-                            : "bg-amber-50 text-amber-700 border-amber-200/50"
-                    }`}
-                  >
-                    {ord.paymentStatusLabel || "Chờ thanh toán"}
-                  </span>
                 </div>
               </div>
 
@@ -385,42 +362,6 @@ export default function OrderManager({
                         " {ord.notes} "
                       </p>
                     )}
-                    <div
-                      className={`mt-3 p-3 rounded-xl border space-y-1 ${
-                        d
-                          ? "bg-[#0d1117]/40 border-[#30363d]"
-                          : "bg-gray-50/80 border-gray-150"
-                      }`}
-                    >
-                      <p>
-                        <strong className={d ? "text-gray-200" : "text-gray-800"}>
-                          Thanh toán:
-                        </strong>{" "}
-                        {ord.paymentMethod || "Chưa xác định"}
-                      </p>
-                      <p>
-                        <strong className={d ? "text-gray-200" : "text-gray-800"}>
-                          Trạng thái:
-                        </strong>{" "}
-                        {ord.paymentStatusLabel || "Chờ thanh toán"}
-                      </p>
-                      {ord.paymentReference && (
-                        <p className="font-mono text-[10px] break-all">
-                          <strong className={d ? "text-gray-200" : "text-gray-800"}>
-                            Mã đối soát:
-                          </strong>{" "}
-                          {ord.paymentReference}
-                        </p>
-                      )}
-                      {ord.transactionId && (
-                        <p className="font-mono text-[10px] break-all">
-                          <strong className={d ? "text-gray-200" : "text-gray-800"}>
-                            Transaction:
-                          </strong>{" "}
-                          {ord.transactionId}
-                        </p>
-                      )}
-                    </div>
                   </div>
                 </div>
 
@@ -554,41 +495,6 @@ export default function OrderManager({
                     }`}
                   >
                     <X size={11} /> Hủy bỏ đơn
-                  </button>
-
-                  <div className={`my-1 h-px ${d ? "bg-[#30363d]" : "bg-gray-200"}`} />
-
-                  <button
-                    onClick={() => onUpdatePaymentStatus(ord.orderId, "paid")}
-                    className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
-                      d
-                        ? "bg-emerald-950/40 hover:bg-emerald-900/60 border-emerald-900/30 text-emerald-400"
-                        : "bg-emerald-50 hover:bg-emerald-100 border-emerald-200/40 text-emerald-700"
-                    }`}
-                  >
-                    <CheckCircle size={11} /> Xác nhận đã trả
-                  </button>
-
-                  <button
-                    onClick={() => onUpdatePaymentStatus(ord.orderId, "pending")}
-                    className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
-                      d
-                        ? "bg-[#21262d] hover:bg-[#30363d] border-[#30363d] text-gray-200"
-                        : "bg-white hover:bg-gray-100 border-gray-200 text-gray-700"
-                    }`}
-                  >
-                    <Clock size={11} /> Chờ thanh toán
-                  </button>
-
-                  <button
-                    onClick={() => onUpdatePaymentStatus(ord.orderId, "failed")}
-                    className={`w-full py-2 font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
-                      d
-                        ? "bg-rose-950/30 hover:bg-rose-900/40 text-rose-400"
-                        : "bg-rose-50 hover:bg-rose-100 text-rose-600"
-                    }`}
-                  >
-                    <X size={11} /> Thanh toán lỗi
                   </button>
                 </div>
               </div>

@@ -14,5 +14,6 @@ router.put("/:id/role", userController.toggleRole);
 router.put("/:id/vip", userController.toggleVip);
 router.put("/:id/status", userController.toggleStatus);
 router.delete("/:id", userController.deleteUser);
+router.patch("/:id/restore", userController.restoreUser);
 
 module.exports = router;

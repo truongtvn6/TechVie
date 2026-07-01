@@ -36,9 +36,43 @@ const userSchema = new mongoose.Schema({
     enum: ["active", "blocked"],
     default: "active",
   },
+  google_id: {
+    type: String,
+    required: false,
+    sparse: true,
+    index: true
+  },
+  auth_provider: {
+    type: String,
+    enum: ["credentials", "google"],
+    default: "credentials",
+    required: true
+  },
+  avatar: {
+    type: String,
+    required: false
+  },
+  address: {
+    type: String,
+    required: false
+  },
+  // === THÊM MỚI: Trường hỗ trợ tính năng Quên Mật Khẩu ===
+  resetPasswordToken: {
+    type: String,
+    default: null,
+  },
+  resetPasswordExpire: {
+    type: Date,
+    default: null,
+  },
+  // =========================================================
   created_at: {
     type: Date,
     default: Date.now,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -47,7 +81,7 @@ const UserModel = mongoose.model("User", userSchema);
 const User = {
   // Tìm người dùng qua Email
   findByEmail: async (email) => {
-    const doc = await UserModel.findOne({ email });
+    const doc = await UserModel.findOne({ email, isDeleted: { $ne: true } });
     if (!doc) return null;
     return {
       id: doc._id.toString(),
@@ -59,12 +93,44 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      resetPasswordToken: doc.resetPasswordToken,
+      resetPasswordExpire: doc.resetPasswordExpire,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
+    };
+  },
+
+  // Tìm người dùng qua Username (Không phân biệt hoa thường)
+  findByUsername: async (username) => {
+    const doc = await UserModel.findOne({ 
+      username: { $regex: new RegExp(`^${username}$`, 'i') }, 
+      isDeleted: { $ne: true } 
+    });
+    if (!doc) return null;
+    return {
+      id: doc._id.toString(),
+      username: doc.username,
+      email: doc.email,
+      password: doc.password,
+      phone: doc.phone,
+      role: doc.role,
+      vipStatus: doc.vipStatus,
+      status: doc.status,
+      created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     };
   },
 
   // Tìm người dùng qua ID
-  findById: async (id) => {
-    const doc = await UserModel.findById(id);
+  findById: async (id, includeDeleted = false) => {
+    let query = { _id: id };
+    if (!includeDeleted) query.isDeleted = { $ne: true };
+    const doc = await UserModel.findOne(query);
     if (!doc) return null;
     return {
       id: doc._id.toString(),
@@ -75,13 +141,34 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
+    };
+  },
+
+  // Tìm người dùng qua Reset Token
+  findByResetToken: async (token) => {
+    const doc = await UserModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpire: { $gt: Date.now() }, // Token còn hạn
+    });
+    if (!doc) return null;
+    return {
+      id: doc._id.toString(),
+      username: doc.username,
+      email: doc.email,
+      resetPasswordToken: doc.resetPasswordToken,
+      resetPasswordExpire: doc.resetPasswordExpire,
     };
   },
 
   // Lấy tất cả người dùng
-  findAll: async () => {
-    const docs = await UserModel.find().sort({ created_at: -1 });
-    return docs.map(doc => ({
+  findAll: async (includeDeleted = false) => {
+    const query = includeDeleted ? {} : { isDeleted: { $ne: true } };
+    const docs = await UserModel.find(query).sort({ created_at: -1 });
+    return docs.map((doc) => ({
       id: doc._id.toString(),
       username: doc.username,
       email: doc.email,
@@ -90,19 +177,27 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     }));
   },
 
   // Tạo người dùng mới
-  create: async ({ username, email, password, phone, role, vipStatus, status }) => {
-    const doc = await UserModel.create({ 
-      username, 
-      email, 
-      password,
+  create: async ({ username, email, password, phone, role, vipStatus, status, google_id, auth_provider, avatar, address }) => {
+    const doc = await UserModel.create({
+      username,
+      email,
+      password: password || undefined,
       phone: phone || "Chưa cung cấp",
       role: role || "user",
       vipStatus: vipStatus || "Normal",
-      status: status || "active"
+      status: status || "active",
+      google_id,
+      auth_provider: auth_provider || "credentials",
+      avatar,
+      address,
     });
     return {
       id: doc._id.toString(),
@@ -113,6 +208,10 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     };
   },
 
@@ -129,14 +228,18 @@ const User = {
       vipStatus: doc.vipStatus,
       status: doc.status,
       created_at: doc.created_at,
+      google_id: doc.google_id,
+      auth_provider: doc.auth_provider,
+      avatar: doc.avatar,
+      address: doc.address,
     };
   },
 
   // Xóa người dùng theo ID
   deleteById: async (id) => {
-    const result = await UserModel.findByIdAndDelete(id);
+    const result = await UserModel.findByIdAndUpdate(id, { isDeleted: true, status: 'blocked' });
     return !!result;
-  }
+  },
 };
 
 module.exports = User;

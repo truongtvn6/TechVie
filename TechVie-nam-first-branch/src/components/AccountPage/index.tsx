@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import FloatingAdminButton from './FloatingAdminButton';
+import AdminButton from './AdminButton';
 
 // Modular sub-components
 import AccountAuth from './AccountAuth';

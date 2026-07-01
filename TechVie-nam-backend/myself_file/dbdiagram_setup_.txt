@@ -59,14 +59,7 @@ Table orders {
   email varchar(255) [not null, note: 'Email nhận hoá đơn điện tử']
   address text [not null, note: 'Địa chỉ chi tiết điểm giao nhận']
   notes text [note: 'Ghi chú thời gian giao hàng custom']
-  payment_method varchar(50) [not null, note: "Phương thức: 'cod', 'card_online', 'bank_transfer', 'momo', 'zalopay'"]
-  payment_provider varchar(50) [not null, default: 'cod', note: "Cổng thanh toán/nhà cung cấp: cod, bank_transfer, momo, zalopay"]
-  payment_status varchar(50) [not null, default: 'pending', note: "'pending', 'paid', 'failed', 'cancelled'"]
-  payment_reference varchar(100) [note: 'Mã đối soát giao dịch, ví dụ TECHVIE-A1B2C3']
-  payment_note text [note: 'Nội dung chuyển khoản hoặc ghi chú thanh toán']
-  transaction_id varchar(150) [note: 'Mã giao dịch từ cổng thanh toán/demo gateway']
-  payment_url text [note: 'Đường dẫn QR/biên nhận nếu có; trạng thái paid chỉ do admin xác nhận sau đối soát']
-  paid_at timestamp [note: 'Thời điểm thanh toán được xác nhận']
+  payment_method varchar(50) [not null, note: "Phương thức: 'cod', 'card_online', 'bank_transfer'"]
   delivery_method varchar(50) [not null, note: "Tốc độ vận tải: 'express', 'standard'"]
   final_total varchar(100) [not null, note: 'Chuỗi tiền hiển thị tổng hóa đơn (Ví dụ: "28.500.000₫")']
   status varchar(100) [not null, default: 'Đang lắp ráp chuẩn bị gửi']
@@ -76,8 +69,6 @@ Table orders {
   // Đưa index vào bên trong Table
   indexes {
     status_type [name: "idx_orders_status_type"]
-    payment_status [name: "idx_orders_payment_status"]
-    payment_reference [name: "idx_orders_payment_reference"]
   }
 
   Note: '''

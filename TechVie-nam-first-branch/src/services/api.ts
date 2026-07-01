@@ -67,6 +67,47 @@ export async function sendContactInquiry(payload: {
   }
 }
 
+export async function getCurrentUser(token: string): Promise<{ success: boolean; user?: any; message?: string }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch('/api/auth/profile', {
+      method: 'GET',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Phiên đăng nhập không hợp lệ hoặc đã hết hạn.');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi lấy thông tin người dùng:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updateUserProfile(profile: { name: string; phone: string; address: string }): Promise<{ success: boolean; user?: any; message?: string }> {
+  try {
+    const response = await fetch('/api/auth/profile', {
+      method: 'PUT',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(profile),
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Không thể cập nhật hồ sơ.');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi cập nhật hồ sơ:', error);
+    return { success: false, message: error.message };
+  }
+}
+
 // Tải danh sách thư góp ý khách hàng (Chỉ dành cho Administrator)
 export async function getContactMessages(): Promise<{ success: boolean; contacts: any[] }> {
   try {
@@ -108,22 +149,6 @@ export async function updateOrderStatus(orderId: number | string, status: string
   } catch (error) {
     console.error('Lỗi cập nhật trạng thái đơn hàng:', error);
     return { success: false };
-  }
-}
-
-// Cập nhật trạng thái thanh toán đơn hàng (Admin xác nhận chuyển khoản/đối soát)
-export async function updateOrderPaymentStatus(orderId: number | string, paymentStatus: 'pending' | 'paid' | 'failed' | 'cancelled'): Promise<{ success: boolean; order?: any; message?: string }> {
-  try {
-    const response = await fetch(`http://localhost:5000/api/orders/${orderId}/payment-status`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ paymentStatus })
-    });
-    if (!response.ok) throw new Error('Cập nhật thanh toán thất bại!');
-    return await response.json();
-  } catch (error) {
-    console.error('Lỗi cập nhật trạng thái thanh toán:', error);
-    return { success: false, message: 'Không thể cập nhật trạng thái thanh toán.' };
   }
 }
 
@@ -169,7 +194,7 @@ export async function submitCheckoutOrder(orderData: {
   deliveryMethod: string;
   cart: Array<{ product: Product; quantity: number }>;
   finalTotal: string;
-}): Promise<{ success: boolean; orderId?: number | string; message?: string; order?: any; payment?: any }> {
+}): Promise<{ success: boolean; orderId?: number | string; message?: string }> {
   try {
     const response = await fetch('http://localhost:5000/api/checkout', {
       method: 'POST',
@@ -184,23 +209,10 @@ export async function submitCheckoutOrder(orderData: {
   }
 }
 
-// Khách hàng chỉ được kiểm tra trạng thái thanh toán, không được tự xác nhận đã thanh toán
-export async function getCheckoutPaymentStatus(orderId: number | string): Promise<{ success: boolean; message?: string; order?: any; payment?: any }> {
-  try {
-    const response = await fetch(`http://localhost:5000/api/checkout/payment/status/${orderId}`);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Không thể kiểm tra trạng thái thanh toán!');
-    return data;
-  } catch (error: any) {
-    console.error('Lỗi kiểm tra trạng thái thanh toán:', error);
-    return { success: false, message: error.message || 'Không thể kiểm tra trạng thái thanh toán.' };
-  }
-}
-
 // Tải danh sách phân loại sản phẩm (Categories) từ backend
-export async function getCategories(): Promise<{ success: boolean; categories: string[] }> {
+export async function getCategories(includeDeleted: boolean = false): Promise<{ success: boolean; categories: string[] }> {
   try {
-    const response = await fetch('http://localhost:5000/api/categories');
+    const response = await fetch(`http://localhost:5000/api/categories${includeDeleted ? '?includeDeleted=true' : ''}`);
     if (!response.ok) throw new Error('Không thể tải danh mục sản phẩm!');
     const data = await response.json();
     if (data && data.success && Array.isArray(data.categories)) {
@@ -222,11 +234,13 @@ export async function getCategories(): Promise<{ success: boolean; categories: s
 }
 
 // Tải danh sách sản phẩm (Products) từ backend (Hỗ trợ lọc theo từ khóa tìm kiếm)
-export async function getProducts(search?: string): Promise<{ success: boolean; products: Product[] }> {
+export async function getProducts(search?: string, includeDeleted: boolean = false): Promise<{ success: boolean; products: Product[] }> {
   try {
-    const url = search 
-      ? `http://localhost:5000/api/products?search=${encodeURIComponent(search.trim())}`
-      : 'http://localhost:5000/api/products';
+    const queryParams = [];
+    if (search) queryParams.push(`search=${encodeURIComponent(search.trim())}`);
+    if (includeDeleted) queryParams.push(`includeDeleted=true`);
+    const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+    const url = `http://localhost:5000/api/products${queryString}`;
     console.log(`[API getProducts] ➔ Bắt đầu gửi yêu cầu tải danh sách sản phẩm${search ? ` với từ khóa "${search}"` : ''} từ backend...`);
     const response = await fetch(url);
     if (!response.ok) throw new Error('Không thể tải danh sách sản phẩm!');
@@ -325,10 +339,11 @@ export async function deleteProduct(id: string, token: string): Promise<{ succes
 }
 
 // Tải danh sách thành viên hệ thống (Chỉ dành cho Admin)
-export async function getSystemUsers(token: string): Promise<{ success: boolean; users: any[] }> {
+export async function getSystemUsers(token: string, includeDeleted: boolean = false): Promise<{ success: boolean; users: any[] }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch('http://localhost:5000/api/users', {
+    const url = `http://localhost:5000/api/users${includeDeleted ? '?includeDeleted=true' : ''}`;
+    const response = await fetch(url, {
       headers: {
         'Authorization': cleanToken,
         'Content-Type': 'application/json',
@@ -453,6 +468,46 @@ export async function adminDeleteUser(id: string, token: string): Promise<{ succ
   }
 }
 
+// Khôi phục tài khoản thành viên đã xóa (Chỉ dành cho Admin)
+export async function restoreUser(id: string, token: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/users/${id}/restore`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || 'Không thể khôi phục tài khoản thành viên!');
+    return { success: true, message: data.message || 'Khôi phục tài khoản thành công!' };
+  } catch (error: any) {
+    console.error('Lỗi khôi phục tài khoản thành viên:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối.' };
+  }
+}
+
+// Khôi phục sản phẩm đã xóa (Chỉ dành cho Admin)
+export async function restoreProduct(id: string, token: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch(`http://localhost:5000/api/products/${id}/restore`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || 'Không thể khôi phục sản phẩm!');
+    return { success: true, message: data.message || 'Khôi phục sản phẩm thành công!' };
+  } catch (error: any) {
+    console.error('Lỗi khôi phục sản phẩm:', error);
+    return { success: false, message: error.message || 'Lỗi kết nối.' };
+  }
+}
+
 // Tải danh mục tìm kiếm phổ biến (Popular Searches) từ backend
 export async function getPopularSearches(): Promise<{ success: boolean; popular: string[] }> {
   try {
@@ -503,3 +558,6 @@ export async function changePassword(payload: {
     return { success: false, message: 'Không thể kết nối đến máy chủ trực tuyến.' };
   }
 }
+
+
+

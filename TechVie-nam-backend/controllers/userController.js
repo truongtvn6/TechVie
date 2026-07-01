@@ -5,7 +5,8 @@ const userController = {
   // 1. Lấy danh sách tất cả thành viên
   getAllUsers: async (req, res) => {
     try {
-      const users = await User.findAll();
+      const { includeDeleted } = req.query;
+      const users = await User.findAll(includeDeleted === 'true');
       return res.status(200).json({
         success: true,
         users,
@@ -201,7 +202,7 @@ const userController = {
         });
       }
 
-      const user = await User.findById(id);
+      const user = await User.findById(id, true);
 
       if (!user) {
         return res.status(404).json({
@@ -222,7 +223,7 @@ const userController = {
       if (deleted) {
         return res.status(200).json({
           success: true,
-          message: "Gỡ bỏ tài khoản thành viên thành công!",
+          message: "Xóa mềm tài khoản thành viên thành công!",
         });
       } else {
         throw new Error("Không thể xóa bản ghi khỏi database.");
@@ -231,7 +232,37 @@ const userController = {
       console.error("Lỗi gỡ bỏ thành viên:", error);
       return res.status(500).json({
         success: false,
-        message: "Có lỗi xảy ra khi gỡ bỏ thành viên khỏi cơ sở dữ liệu!",
+        message: "Có lỗi xảy ra khi xóa thành viên!",
+        error: error.message,
+      });
+    }
+  },
+
+  // 7. Khôi phục tài khoản thành viên bị xóa mềm
+  restoreUser: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findById(id, true);
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy thành viên!",
+        });
+      }
+
+      const updatedUser = await User.updateById(id, { isDeleted: false, status: 'active' });
+
+      return res.status(200).json({
+        success: true,
+        message: "Khôi phục tài khoản thành viên thành công!",
+        user: updatedUser,
+      });
+    } catch (error) {
+      console.error("Lỗi khôi phục thành viên:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Có lỗi xảy ra khi khôi phục thành viên!",
         error: error.message,
       });
     }
