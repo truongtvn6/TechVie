@@ -16,12 +16,15 @@ import backgroundImage from '/image/huum-8fSitumSVw8-unsplash.jpg';
 // Import default mock data
 import { defaultUserProfile, mockOrders } from './_mockdata';
 
+import { getUserOrders } from '../../services/api';
+
 interface AccountPageProps {
   onNavigate: (tab: any) => void;
   isLoggedIn?: boolean;
   setIsLoggedIn?: (val: boolean) => void;
   userProfile?: any;
   setUserProfile?: (profile: any) => void;
+  token?: string;
 }
 
 export default function AccountPage({ 
@@ -29,7 +32,8 @@ export default function AccountPage({
   isLoggedIn: externalIsLoggedIn,
   setIsLoggedIn: externalSetIsLoggedIn,
   userProfile: externalUserProfile,
-  setUserProfile: externalSetUserProfile
+  setUserProfile: externalSetUserProfile,
+  token = "",
 }: AccountPageProps) {
   const [localIsLoggedIn, localSetIsLoggedIn] = useState(false);
   const isLoggedIn = externalIsLoggedIn !== undefined ? externalIsLoggedIn : localIsLoggedIn;
@@ -55,8 +59,18 @@ export default function AccountPage({
   const userProfile = externalUserProfile !== undefined ? externalUserProfile : localUserProfile;
   const setUserProfile = externalSetUserProfile !== undefined ? externalSetUserProfile : localSetUserProfile;
 
-  // Mock Orders with vivid real-time phase updates
-  const [orders] = useState(mockOrders);
+  // Real orders synced dynamically from MongoDB
+  const [orders, setOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      getUserOrders(token).then((res) => {
+        if (res.success && res.orders) {
+          setOrders(res.orders);
+        }
+      });
+    }
+  }, [isLoggedIn, token]);
 
   const handleLogout = () => {
     setIsLoggedIn(false);

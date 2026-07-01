@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { MapPin, ArrowRight, Copy, Check, Loader2 } from 'lucide-react';
-import { updateUserProfile } from '../../services/api';
+import React, { useState } from "react";
+import { MapPin, ArrowRight, Copy, Check, Loader2 } from "lucide-react";
+import { updateUserProfile } from "../../services/api";
 
 interface TabProfileProps {
   userProfile: any;
   setUserProfile: (profile: any) => void;
 }
 
-export default function TabProfile({ userProfile, setUserProfile }: TabProfileProps) {
+export default function TabProfile({
+  userProfile,
+  setUserProfile,
+}: TabProfileProps) {
   const [copied, setCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -26,20 +29,20 @@ export default function TabProfile({ userProfile, setUserProfile }: TabProfilePr
           phone: res.user.phone,
           address: res.user.address,
         });
-        alert("Lưu thông tin hồ sơ cá nhân thành công!");
+        console.log("Lưu thông tin hồ sơ cá nhân thành công!");
       } else {
-        alert(res.message || "Lỗi lưu hồ sơ.");
+        console.error(res.message || "Lỗi lưu hồ sơ.");
       }
     } catch (error) {
       console.error(error);
-      alert("Lỗi kết nối khi lưu hồ sơ.");
+      console.error("Lỗi kết nối khi lưu hồ sơ.");
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(userProfile.email || '');
+    navigator.clipboard.writeText(userProfile.email || "");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -48,24 +51,36 @@ export default function TabProfile({ userProfile, setUserProfile }: TabProfilePr
     <div className="h-full bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm">
       {/* Top subtle glow */}
       <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/40 rounded-full blur-[80px] pointer-events-none" />
-      
+
       {/* Section Header */}
       <div className="mb-4 border-b border-white/60 pb-2">
-        <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">HỒ SƠ THÀNH VIÊN</h3>
-        <p className="text-[#4a5568] mt-1 text-[15px]">Các thông tin cá nhân của bạn phục vụ điền nhanh bưu kiện tại trang thanh toán Checkout.</p>
+        <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">
+          HỒ SƠ THÀNH VIÊN
+        </h3>
+        <p className="text-[#4a5568] mt-1 text-[15px]">
+          Các thông tin cá nhân của bạn phục vụ điền nhanh bưu kiện tại trang
+          thanh toán Checkout.
+        </p>
       </div>
 
       {/* Form Grid */}
-      <form className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow" onSubmit={(e) => e.preventDefault()}>
+      <form
+        className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow"
+        onSubmit={(e) => e.preventDefault()}
+      >
         {/* Input: Full Name */}
         <div className="space-y-1.5">
-          <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">HỌ VÀ TÊN</label>
+          <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">
+            HỌ VÀ TÊN
+          </label>
           <div className="relative group">
             <input
               className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 placeholder-[#4a5568]/50 shadow-sm mt-1.5"
               type="text"
               value={userProfile.name}
-              onChange={(e) => setUserProfile({ ...userProfile, name: e.target.value })}
+              onChange={(e) =>
+                setUserProfile({ ...userProfile, name: e.target.value })
+              }
             />
             <div className="absolute inset-0 rounded-lg pointer-events-none border border-transparent group-hover:border-gray-300 transition-colors" />
           </div>
@@ -73,18 +88,25 @@ export default function TabProfile({ userProfile, setUserProfile }: TabProfilePr
 
         {/* Input: Phone */}
         <div className="space-y-1.5">
-          <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">SỐ ĐIỆN THOẠI LIÊN HỆ</label>
+          <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">
+            SỐ ĐIỆN THOẠI LIÊN HỆ
+          </label>
           <input
-            className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 shadow-sm mt-1.5"
+            className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 shadow-sm mt-1.5 placeholder-[#4a5568]/40"
             type="text"
+            placeholder="Chưa cung cấp"
             value={userProfile.phone}
-            onChange={(e) => setUserProfile({ ...userProfile, phone: e.target.value })}
+            onChange={(e) =>
+              setUserProfile({ ...userProfile, phone: e.target.value })
+            }
           />
         </div>
 
         {/* Input: Email (Readonly) */}
         <div className="space-y-1.5 md:col-span-2">
-          <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">EMAIL ĐĂNG BẠ</label>
+          <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">
+            EMAIL ĐĂNG BẠ
+          </label>
           <div className="relative mt-1.5 flex items-center">
             <input
               className="w-full bg-gray-100/50 border border-gray-200/50 rounded-lg pl-3.5 pr-12 py-2.5 text-[#4a5568] text-[15px] cursor-not-allowed shadow-sm"
@@ -98,19 +120,28 @@ export default function TabProfile({ userProfile, setUserProfile }: TabProfilePr
               className="absolute right-3 p-1.5 text-gray-400 hover:text-black rounded-md transition-colors cursor-pointer flex items-center justify-center"
               title="Sao chép email"
             >
-              {copied ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+              {copied ? (
+                <Check size={16} className="text-emerald-600" />
+              ) : (
+                <Copy size={16} />
+              )}
             </button>
           </div>
         </div>
 
         {/* Input: Address */}
         <div className="space-y-1.5 md:col-span-2">
-          <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">ĐỊA CHỈ GIAO NHẬN BƯU KIỆN MẶC ĐỊNH</label>
+          <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">
+            ĐỊA CHỈ GIAO NHẬN BƯU KIỆN MẶC ĐỊNH
+          </label>
           <textarea
-            className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 resize-none shadow-sm mt-1.5"
+            className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 resize-none shadow-sm mt-1.5 placeholder-[#4a5568]/40"
             rows={2}
+            placeholder="Chưa cung cấp"
             value={userProfile.address}
-            onChange={(e) => setUserProfile({ ...userProfile, address: e.target.value })}
+            onChange={(e) =>
+              setUserProfile({ ...userProfile, address: e.target.value })
+            }
           />
         </div>
 
@@ -130,7 +161,10 @@ export default function TabProfile({ userProfile, setUserProfile }: TabProfilePr
             ) : (
               <>
                 <span>LƯU HỒ SƠ THÔNG TIN</span>
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                <ArrowRight
+                  size={16}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
               </>
             )}
           </button>

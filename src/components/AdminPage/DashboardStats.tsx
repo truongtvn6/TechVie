@@ -18,26 +18,37 @@ export default function DashboardStats({
   isDarkMode = false,
 }: DashboardStatsProps) {
   const d = isDarkMode;
+
+  const formatRevenue = (value: number) => {
+    if (value >= 1_000_000_000) {
+      return (value / 1_000_000_000).toLocaleString('vi-VN', { maximumFractionDigits: 2 }) + ' tỷ ₫';
+    }
+    if (value >= 1_000_000) {
+      return (value / 1_000_000).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' triệu ₫';
+    }
+    return value.toLocaleString('vi-VN') + '₫';
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Stat 1: Revenue */}
-      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-black/20 transition-all duration-300">
-        <div className="space-y-1">
-          <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider font-sans block">DOANH THU ƯỚC TÍNH</span>
-          <strong className="text-2xl font-black text-gray-900 font-mono tracking-tight block">
-            {totalRevenue.toLocaleString('vi-VN')}₫
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex items-center justify-between transition-all duration-300 min-w-0">
+        <div className="space-y-1 min-w-0 flex-grow">
+          <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider font-sans block">DOANH THU ƯỚC TÍNH</span>
+          <strong className="text-xl sm:text-2xl font-black text-gray-900 font-mono tracking-tight block truncate" title={totalRevenue.toLocaleString('vi-VN') + '₫'}>
+            {formatRevenue(totalRevenue)}
           </strong>
           <span className="text-[9px] text-emerald-500 uppercase font-bold tracking-wider font-mono">
             ● Dữ liệu máy chủ thực
           </span>
         </div>
-        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform ${d ? 'bg-indigo-950/40 text-indigo-400' : 'bg-[#e0e7ff] text-[#4f46e5]'}`}>
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform ${d ? 'bg-indigo-950/40 text-indigo-400' : 'bg-[#e0e7ff] text-[#4f46e5]'}`}>
           <DollarSign size={20} />
         </div>
       </div>
 
       {/* Stat 2: Orders Total */}
-      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-black/20 transition-all duration-300">
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex items-center justify-between transition-all duration-300">
         <div className="space-y-1">
           <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider font-sans block">SỔ ĐƠN ĐÃ LỌC</span>
           <strong className="text-2xl font-black text-gray-900 font-mono tracking-tight block">
@@ -47,13 +58,13 @@ export default function DashboardStats({
             Gồm {processingOrdersCount} đơn đang xử lý
           </span>
         </div>
-        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform ${d ? 'bg-indigo-950/40 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform ${d ? 'bg-indigo-950/40 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
           <ShoppingBag size={20} />
         </div>
       </div>
 
       {/* Stat 3: Products Store */}
-      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-black/20 transition-all duration-300">
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex items-center justify-between transition-all duration-300">
         <div className="space-y-1">
           <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider font-sans block">ACTIVE CATALOGUE</span>
           <strong className="text-2xl font-black text-gray-900 font-mono tracking-tight block">
@@ -63,13 +74,13 @@ export default function DashboardStats({
             ● Sẵn sàng hiển thị
           </span>
         </div>
-        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform ${d ? 'bg-emerald-950/40 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform ${d ? 'bg-emerald-950/40 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
           <Package size={20} />
         </div>
       </div>
 
       {/* Stat 4: Contacts messages */}
-      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-black/20 transition-all duration-300">
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex items-center justify-between transition-all duration-300">
         <div className="space-y-1">
           <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider font-sans block">THƯ LIÊN HỆ GÓP Ý</span>
           <strong className="text-2xl font-black text-gray-900 font-mono tracking-tight block">
@@ -79,7 +90,7 @@ export default function DashboardStats({
             Khách hàng gửi qua Contact form
           </span>
         </div>
-        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform ${d ? 'bg-amber-950/40 text-amber-500' : 'bg-amber-50 text-amber-500'}`}>
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform ${d ? 'bg-amber-950/40 text-amber-500' : 'bg-amber-50 text-amber-500'}`}>
           <MessageSquare size={20} />
         </div>
       </div>

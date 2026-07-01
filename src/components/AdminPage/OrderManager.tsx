@@ -275,6 +275,21 @@ export default function OrderManager({
                   />
                   <div>
                     <span
+                      className={`text-[9px] uppercase font-bold tracking-wider ${d ? "text-gray-500" : "text-gray-400"}`}
+                    >
+                      Thành tiền
+                    </span>
+                    <strong
+                      className={`block font-mono font-black text-sm text-indigo-500 ${d ? "text-indigo-400" : "text-indigo-650"}`}
+                    >
+                      {ord.finalTotal}
+                    </strong>
+                  </div>
+                  <div
+                    className={`h-6 w-px hidden sm:block ${d ? "bg-[#30363d]" : "bg-gray-250"}`}
+                  />
+                  <div>
+                    <span
                       className={`text-[9px] uppercase font-bold tracking-wider block ${d ? "text-gray-500" : "text-gray-400"}`}
                     >
                       Thời gian

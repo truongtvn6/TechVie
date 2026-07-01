@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Eye, EyeOff } from 'lucide-react';
+import { checkEmailExists } from '../../services/api';
 
 interface RegisterFormProps {
   regFullName: string;
@@ -41,6 +42,39 @@ export default function RegisterForm({
   registerError,
   onSubmit
 }: RegisterFormProps) {
+  const [emailCheckError, setEmailCheckError] = React.useState('');
+  const [isCheckingEmail, setIsCheckingEmail] = React.useState(false);
+
+  const handleEmailBlur = async () => {
+    if (!regEmail) return;
+    
+    // Simple email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(regEmail)) {
+      setEmailCheckError('Định dạng email không hợp lệ.');
+      return;
+    }
+
+    setEmailCheckError('');
+    setIsCheckingEmail(true);
+    try {
+      const res = await checkEmailExists(regEmail);
+      if (res.success && res.exists) {
+        setEmailCheckError('Email này đã được sử dụng bởi tài khoản khác!');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsCheckingEmail(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (emailCheckError) return;
+    onSubmit(e);
+  };
+
   return (
     <motion.div
       key="register-form-div"
@@ -49,7 +83,7 @@ export default function RegisterForm({
       exit={{ opacity: 0, x: -15, y: -1 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
     >
-      <form onSubmit={onSubmit} className="flex flex-col gap-4.5">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4.5">
         {registerError && (
           <motion.div 
             initial={{ opacity: 0, scale: 0.98 }}
@@ -85,9 +119,21 @@ export default function RegisterForm({
             required
             placeholder="example@techvie.com"
             value={regEmail}
-            onChange={(e) => setRegEmail(e.target.value)}
-            className="w-full glass-input px-4 py-2.5 rounded-xl text-sm outline-none placeholder-black/35 font-jakarta"
+            onChange={(e) => {
+              setRegEmail(e.target.value);
+              if (emailCheckError) setEmailCheckError('');
+            }}
+            onBlur={handleEmailBlur}
+            className={`w-full glass-input px-4 py-2.5 rounded-xl text-sm outline-none placeholder-black/35 font-jakarta ${
+              emailCheckError ? 'border-red-500/50 focus:border-red-500 ring-1 ring-red-500/20' : ''
+            }`}
           />
+          {isCheckingEmail && (
+            <span className="text-[10px] text-gray-400 block ml-1 font-sans animate-pulse">Đang kiểm tra email...</span>
+          )}
+          {emailCheckError && (
+            <span className="text-[10px] text-red-500 block ml-1 font-sans font-bold">{emailCheckError}</span>
+          )}
         </div>
 
         {/* Password Row */}

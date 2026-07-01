@@ -70,7 +70,7 @@ export async function sendContactInquiry(payload: {
 export async function getCurrentUser(token: string): Promise<{ success: boolean; user?: any; message?: string }> {
   try {
     const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    const response = await fetch('/api/auth/profile', {
+    const response = await fetch('http://localhost:5000/api/auth/profile', {
       method: 'GET',
       headers: {
         'Authorization': cleanToken,
@@ -89,7 +89,7 @@ export async function getCurrentUser(token: string): Promise<{ success: boolean;
 
 export async function updateUserProfile(profile: { name: string; phone: string; address: string }): Promise<{ success: boolean; user?: any; message?: string }> {
   try {
-    const response = await fetch('/api/auth/profile', {
+    const response = await fetch('http://localhost:5000/api/auth/profile', {
       method: 'PUT',
       headers: {
         ...getAuthHeaders(),
@@ -105,6 +105,46 @@ export async function updateUserProfile(profile: { name: string; phone: string; 
   } catch (error: any) {
     console.error('Lỗi khi cập nhật hồ sơ:', error);
     return { success: false, message: error.message };
+  }
+}
+
+// Tải danh sách đơn đặt hàng của cá nhân người dùng
+export async function getUserOrders(token: string): Promise<{ success: boolean; orders?: any[]; message?: string }> {
+  try {
+    const cleanToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    const response = await fetch('http://localhost:5000/api/orders/user', {
+      method: 'GET',
+      headers: {
+        'Authorization': cleanToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Không thể tải lịch sử đơn hàng.');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi lấy danh sách đơn hàng:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+// Kiểm tra xem email đã được đăng ký hay chưa
+export async function checkEmailExists(email: string): Promise<{ success: boolean; exists: boolean; message?: string }> {
+  try {
+    const response = await fetch(`http://localhost:5000/api/auth/check-email?email=${encodeURIComponent(email)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Không thể kiểm tra email.');
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi kiểm tra email:', error);
+    return { success: false, exists: false, message: error.message };
   }
 }
 

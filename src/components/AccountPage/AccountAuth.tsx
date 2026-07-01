@@ -40,7 +40,7 @@ export default function AccountAuth({ onNavigate, setIsLoggedIn }: AccountAuthPr
             }}
             className="w-full py-4 bg-black hover:bg-gray-800 text-white rounded-lg font-tech-label text-tech-label text-center transition-all shadow-md active:scale-95 cursor-pointer block"
           >
-            ĐĂNG NHẬP LIQUID GLASS
+            ĐĂNG NHẬP
           </a>
           <a
             href="#dang-ky"

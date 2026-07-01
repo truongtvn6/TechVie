@@ -93,7 +93,7 @@ export default function App() {
             role: res.user.role || "user",
           });
         } else {
-          // Token might be invalid
+          // Token không hợp lệ hoặc tài khoản đã bị xóa (ví dụ sau khi seed lại database)
           handleSetIsLoggedIn(false);
         }
       });
@@ -812,6 +812,7 @@ export default function App() {
                 setIsLoggedIn={handleSetIsLoggedIn}
                 userProfile={userProfile}
                 setUserProfile={setUserProfile}
+                token={token}
               />
             </motion.div>
           )}
