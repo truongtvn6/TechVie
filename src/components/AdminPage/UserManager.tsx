@@ -276,20 +276,26 @@ export default function UserManager({
 
       {/* New account registration Modal overlay */}
       {isNewUsrFormOpen && (
-        <div className="fixed inset-0 bg-slate-955/40 backdrop-blur-[6px] z-[120] flex items-center justify-center p-4">
-          <div className={`rounded-[2rem] p-8 max-w-md w-full relative shadow-2xl font-sans text-left border transition-all duration-300 ${
-            d ? 'bg-[#161b22] border-[#30363d] text-white shadow-black/40' : 'bg-white border-gray-200 shadow-2xl'
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-[6px] z-[100] flex items-center justify-center p-4">
+          <div className={`rounded-[2.5rem] p-8 max-w-md w-full relative shadow-2xl font-sans text-left border transition-all duration-300 ${
+            d 
+              ? 'bg-[#161b22] border border-[#30363d] text-white shadow-[0_24px_70px_rgba(0,0,0,0.4)]' 
+              : 'bg-white border border-gray-200 text-gray-955 shadow-[0_24px_70px_rgba(0,0,0,0.12)]'
           }`}>
             
             <button
               type="button"
               onClick={() => setIsNewUsrFormOpen(false)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full border border-gray-200 hover:border-black flex items-center justify-center text-gray-500 hover:text-black transition-colors"
+              className={`absolute top-6 right-6 w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer ${
+                d 
+                  ? 'border-[#30363d] text-gray-400 hover:bg-[#21262d] hover:text-white' 
+                  : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-black'
+              }`}
             >
               <X size={14} />
             </button>
 
-            <h3 className={`text-lg font-black uppercase tracking-tight mb-4 ${d ? 'text-white' : 'text-gray-955'}`}>
+            <h3 className={`text-sm font-extrabold uppercase tracking-wider mb-5 pb-3 border-b border-gray-200/10 ${d ? 'text-white' : 'text-gray-955'}`}>
               Cấp tài khoản TechVie ID mới
             </h3>
 

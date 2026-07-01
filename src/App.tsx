@@ -571,6 +571,8 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 onAddToCart={handleAddToCart}
+                isLoggedIn={isLoggedIn}
+                userEmail={userProfile.email}
               />
             </motion.div>
           )}

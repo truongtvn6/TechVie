@@ -73,17 +73,14 @@ export default function TabProfile({
           <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">
             HỌ VÀ TÊN
           </label>
-          <div className="relative group">
-            <input
-              className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 placeholder-[#4a5568]/50 shadow-sm mt-1.5"
-              type="text"
-              value={userProfile.name}
-              onChange={(e) =>
-                setUserProfile({ ...userProfile, name: e.target.value })
-              }
-            />
-            <div className="absolute inset-0 rounded-lg pointer-events-none border border-transparent group-hover:border-gray-300 transition-colors" />
-          </div>
+          <input
+            className="w-full bg-white/70 border border-gray-200/50 hover:border-gray-300 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 placeholder-[#4a5568]/50 shadow-sm mt-1.5"
+            type="text"
+            value={userProfile.name}
+            onChange={(e) =>
+              setUserProfile({ ...userProfile, name: e.target.value })
+            }
+          />
         </div>
 
         {/* Input: Phone */}
@@ -92,7 +89,7 @@ export default function TabProfile({
             SỐ ĐIỆN THOẠI LIÊN HỆ
           </label>
           <input
-            className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 shadow-sm mt-1.5 placeholder-[#4a5568]/40"
+            className="w-full bg-white/70 border border-gray-200/50 hover:border-gray-300 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 shadow-sm mt-1.5 placeholder-[#4a5568]/40"
             type="text"
             placeholder="Chưa cung cấp"
             value={userProfile.phone}
@@ -135,7 +132,7 @@ export default function TabProfile({
             ĐỊA CHỈ GIAO NHẬN BƯU KIỆN MẶC ĐỊNH
           </label>
           <textarea
-            className="w-full bg-white/70 border border-gray-200/50 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 resize-none shadow-sm mt-1.5 placeholder-[#4a5568]/40"
+            className="w-full bg-white/70 border border-gray-200/50 hover:border-gray-300 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 resize-none shadow-sm mt-1.5 placeholder-[#4a5568]/40"
             rows={2}
             placeholder="Chưa cung cấp"
             value={userProfile.address}

@@ -162,6 +162,40 @@ export async function getContactMessages(): Promise<{ success: boolean; contacts
   }
 }
 
+// Xóa thư góp ý khách hàng (Chỉ dành cho Administrator)
+export async function deleteContactMessage(id: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`http://localhost:5000/api/contacts/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Không thể xóa thư liên hệ.');
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi xóa thư liên hệ:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+// Trả lời thư góp ý khách hàng (Chỉ dành cho Administrator)
+export async function replyContactMessage(id: string, replySubject: string, replyContent: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`http://localhost:5000/api/contacts/${id}/reply`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ replySubject, replyContent })
+    });
+    if (!response.ok) throw new Error('Không thể gửi thư phản hồi.');
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi gửi thư phản hồi:', error);
+    return { success: false, message: error.message };
+  }
+}
+
 // Tải danh sách đơn đặt hàng từ Server (Chỉ dành cho Administrator)
 export async function getAdminOrders(): Promise<{ success: boolean; orders: any[] }> {
   try {
