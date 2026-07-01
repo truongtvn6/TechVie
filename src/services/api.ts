@@ -196,6 +196,20 @@ export async function replyContactMessage(id: string, replySubject: string, repl
   }
 }
 
+// Tải danh sách thiết bị của tài khoản người dùng
+export async function getUserDevices(): Promise<{ success: boolean; devices: any[] }> {
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/my-devices', {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Không thể tải danh sách thiết bị.');
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi khi tải danh sách thiết bị:', error);
+    return { success: false, devices: [] };
+  }
+}
+
 // Tải danh sách đơn đặt hàng từ Server (Chỉ dành cho Administrator)
 export async function getAdminOrders(): Promise<{ success: boolean; orders: any[] }> {
   try {

@@ -12,6 +12,8 @@ import {
   Plus
 } from "lucide-react";
 import { subscribeNewsletter } from "../services/api";
+import ProductCard from "./ProductPage/ProductCard";
+import ProductDetail from "./ProductPage/ProductDetail";
 
 interface HomePageProps {
   products?: Product[];
@@ -21,6 +23,35 @@ interface HomePageProps {
   userEmail?: string;
 }
 
+const normalizeProduct = (p: any): Product => {
+  let safeSpecs: { label: string; value: string }[] = [];
+  if (Array.isArray(p.specs)) {
+    safeSpecs = p.specs.map((s: any) => ({
+      label: s && typeof s.label === 'string' ? s.label : 'Thông số',
+      value: s && typeof s.value === 'string' ? s.value : (typeof s === 'string' ? s : 'Đang cập nhật')
+    }));
+  } else if (p.specs && typeof p.specs === 'object') {
+    safeSpecs = Object.entries(p.specs).map(([key, val]) => ({
+      label: key,
+      value: String(val)
+    }));
+  }
+  
+  while (safeSpecs.length < 2) {
+    safeSpecs.push({ label: 'Thông số', value: 'Đang cập nhật' });
+  }
+
+  return {
+    id: p.id || p._id || String(Math.random()),
+    name: p.name || 'Sản phẩm TechVie',
+    price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
+    image: p.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+    category: p.category || 'Thiết bị',
+    description: p.description || 'Mô tả đang được cập nhật.',
+    specs: safeSpecs
+  };
+};
+
 export default function HomePage({
   products,
   onNavigate,
@@ -28,13 +59,54 @@ export default function HomePage({
   isLoggedIn = false,
   userEmail = "",
 }: HomePageProps) {
-  const allProducts = products || [];
+  const allProducts = (products || []).map(normalizeProduct);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [showSubscriptionSuccess, setShowSubscriptionSuccess] = useState(false);
   const [isSubmittingSubscription, setIsSubmittingSubscription] =
     useState(false);
   const [isLoadedFromApi, setIsLoadedFromApi] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [justAddedId, setJustAddedId] = useState<string | null>(null);
+  const [magneticRefId, setMagneticRefId] = useState<string | null>(null);
+  const [flyingParticles, setFlyingParticles] = useState<{ id: number; startX: number; startY: number; image: string }[]>([]);
+
+  const handleAddToCartWithSuccess = (product: Product, e?: React.MouseEvent<HTMLButtonElement>) => {
+    let startX = window.innerWidth / 2;
+    let startY = window.innerHeight / 2;
+
+    if (e) {
+      const buttonRect = e.currentTarget.getBoundingClientRect();
+      startX = buttonRect.left + buttonRect.width / 2;
+      startY = buttonRect.top + buttonRect.height / 2;
+    }
+
+    const particleId = Date.now() + Math.random();
+    setFlyingParticles(prev => [
+      ...prev,
+      {
+        id: particleId,
+        startX: startX,
+        startY: startY,
+        image: product.image
+      }
+    ]);
+
+    setTimeout(() => {
+      setFlyingParticles(prev => prev.filter(p => p.id !== particleId));
+    }, 950);
+
+    setMagneticRefId(product.id);
+    setTimeout(() => {
+      setMagneticRefId(null);
+    }, 600);
+
+    onAddToCart(product);
+    setJustAddedId(product.id);
+    setTimeout(() => {
+      setJustAddedId(null);
+    }, 2000);
+  };
 
   const [images, setImages] = useState<string[]>([
     "https://images.unsplash.com/photo-1771218829829-3f7b00974fa5?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -241,50 +313,14 @@ export default function HomePage({
         {/* 3 Core Products matching Vietnamese template cards layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {allProducts.slice(0, 3).map((product) => (
-            <div
+            <ProductCard
               key={product.id}
-              className="group bg-white/40 border border-gray-200 rounded-[2rem] p-8 flex flex-col justify-between transition-all duration-500 hover:shadow-xl hover:-translate-y-2 h-[520px] relative overflow-hidden"
-            >
-              {/* Product Category tag & Specs summary */}
-              <div className="absolute top-6 left-8 flex items-center gap-2">
-                <span className="text-[10px] uppercase font-bold tracking-widest bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">
-                  {product.category}
-                </span>
-                {product.specs && product.specs[0] && (
-                  <span className="text-[10px] font-mono text-gray-400">
-                    {product.specs[0].label}: {product.specs[0].value}
-                  </span>
-                )}
-              </div>
-
-              {/* Large Product image centered and scaled on hover */}
-              <div className="h-60 mt-4 flex items-center justify-center">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  referrerPolicy="no-referrer"
-                  className="max-h-52 object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700"
-                />
-              </div>
-
-              {/* Title & Price & Purchase Controls */}
-              <div className="mt-4">
-                <h3 className="text-xl font-semibold text-gray-900 tracking-tight group-hover:text-secondary transition-colors truncate">
-                  {product.name}
-                </h3>
-                <p className="text-2xl font-black text-gray-800 mt-1 mb-6">
-                  {product.price.toLocaleString("vi-VN")}₫
-                </p>
-
-                <button
-                  onClick={() => onAddToCart(product)}
-                  className="w-full bg-black text-white hover:bg-gray-900 font-sans text-xs uppercase tracking-widest font-black py-4 rounded-full flex items-center justify-center gap-2 shadow transition-all duration-300 cursor-pointer"
-                >
-                  <Plus size={16} />
-                  Thêm Vào Giỏ
-                </button>
-              </div>
-            </div>
+              product={product}
+              onSelect={setSelectedProduct}
+              onAddToCart={handleAddToCartWithSuccess}
+              isJustAdded={justAddedId === product.id}
+              isMagnetized={magneticRefId === product.id}
+            />
           ))}
         </div>
       </section>
@@ -437,6 +473,51 @@ export default function HomePage({
           </div>
         </div>
       </section>
+
+      {/* Product Detail Specs Modal */}
+      <ProductDetail
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onAddToCart={handleAddToCartWithSuccess}
+        onNavigate={onNavigate}
+        isLoggedIn={isLoggedIn}
+      />
+
+      {/* Flying Particles for Cart Magnet */}
+      <div className="fixed inset-0 pointer-events-none z-[101]">
+        {flyingParticles.map((particle) => (
+          <motion.div
+            key={particle.id}
+            initial={{ 
+              left: particle.startX - 24, 
+              top: particle.startY - 24, 
+              scale: 0.8, 
+              opacity: 1,
+              rotate: 0,
+              position: 'fixed'
+            }}
+            animate={{ 
+              left: [particle.startX - 24, particle.startX - 80, window.innerWidth - 80],
+              top: [particle.startY - 24, particle.startY - 180, 24], 
+              scale: [0.8, 1.2, 0.12],
+              opacity: [1, 1, 0],
+              rotate: [0, -30, 360]
+            }}
+            transition={{ 
+              duration: 0.9, 
+              ease: [0.16, 1, 0.3, 1] 
+            }}
+            className="w-12 h-12 rounded-full overflow-hidden bg-white shadow-2xl border border-gray-250 flex items-center justify-center p-1"
+          >
+            <img 
+              src={particle.image} 
+              alt="glowing-hardware" 
+              referrerPolicy="no-referrer"
+              className="w-full h-full object-contain mix-blend-multiply" 
+            />
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }

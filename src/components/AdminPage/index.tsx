@@ -570,23 +570,6 @@ export default function AdminPage({
                 {activeSubTab === 'users' && 'Điều chỉnh phân quyền cán bộ nhân viên, xem thông tin số điện thoại email và trạng thái khoá tài khoản.'}
               </p>
             </div>
-            {(activeSubTab === 'products' || activeSubTab === 'users') && (
-              <button
-                onClick={() => setShowDeletedItems(!showDeletedItems)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] uppercase font-black tracking-wider transition-colors border ${
-                  showDeletedItems
-                    ? isDarkMode 
-                      ? 'bg-amber-950/40 text-amber-500 border-amber-900/50' 
-                      : 'bg-amber-50 text-amber-600 border-amber-200'
-                    : isDarkMode
-                      ? 'bg-[#161b22] text-gray-400 border-[#30363d] hover:bg-[#21262d]'
-                      : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
-                }`}
-              >
-                <Eye size={14} />
-                {showDeletedItems ? 'Đang hiển thị mục đã xóa' : 'Xem các mục đã xóa'}
-              </button>
-            )}
           </div>
 
           {/* DYNAMIC SUBTAB VIEWS */}

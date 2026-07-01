@@ -13,10 +13,18 @@ import TabSecurity from './TabSecurity';
 // @ts-ignore
 import backgroundImage from '/image/huum-8fSitumSVw8-unsplash.jpg';
 
-// Import default mock data
-import { defaultUserProfile, mockOrders } from './_mockdata';
+const defaultUserProfile = {
+  name: 'Khách hàng TechVie',
+  email: '',
+  phone: 'Chưa cung cấp',
+  address: 'Chưa cung cấp',
+  memberSince: '01/07/2026',
+  techvieId: 'TV-MEMBER',
+  shieldStatus: 'Đang hoạt động',
+  role: 'user',
+};
 
-import { getUserOrders } from '../../services/api';
+import { getUserOrders, getUserDevices } from '../../services/api';
 
 interface AccountPageProps {
   onNavigate: (tab: any) => void;
@@ -61,6 +69,8 @@ export default function AccountPage({
 
   // Real orders synced dynamically from MongoDB
   const [orders, setOrders] = useState<any[]>([]);
+  const [devices, setDevices] = useState<any[]>([]);
+  const [isLoadingDevices, setIsLoadingDevices] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn && token) {
@@ -68,6 +78,15 @@ export default function AccountPage({
         if (res.success && res.orders) {
           setOrders(res.orders);
         }
+      });
+      setIsLoadingDevices(true);
+      getUserDevices().then((res) => {
+        if (res.success && res.devices) {
+          setDevices(res.devices);
+        }
+        setIsLoadingDevices(false);
+      }).catch(() => {
+        setIsLoadingDevices(false);
       });
     }
   }, [isLoggedIn, token]);
@@ -264,7 +283,7 @@ export default function AccountPage({
                         </motion.div>
                       )}
 
-                      {accountTab === 'devices' && (
+                       {accountTab === 'devices' && (
                         <motion.div
                           key="devices-tab"
                           initial={{ opacity: 0, y: 10 }}
@@ -273,7 +292,7 @@ export default function AccountPage({
                           transition={{ duration: 0.3 }}
                           className="w-full"
                         >
-                          <TabDevices />
+                          <TabDevices devices={devices} isLoading={isLoadingDevices} />
                         </motion.div>
                       )}
 

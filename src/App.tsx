@@ -79,6 +79,20 @@ export default function App() {
   });
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("token");
+    if (urlToken) {
+      localStorage.setItem("techvie_token", urlToken);
+      localStorage.setItem("active_tab", "account");
+      setToken(urlToken);
+      setIsLoggedIn(true);
+      setActiveTab("account");
+      // Clean query params in the URL bar
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  useEffect(() => {
     if (token && isLoggedIn) {
       getCurrentUser(token).then((res) => {
         if (res.success && res.user) {

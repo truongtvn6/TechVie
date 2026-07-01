@@ -37,8 +37,8 @@ export default function TabSecurity() {
   return (
     <div className="bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm">
       <div className="mb-4 border-b border-white/60 pb-2">
-        <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">BẢO MẬT & MÃ HÓA QUANTUM</h3>
-        <p className="text-[#4a5568] mt-1 max-w-lg">Cập nhật mật khẩu kết nối hoặc thiết lập đặc cách xác thực hai cổng vân quang học.</p>
+        <h3 className="font-headline-lg text-headline-lg text-text-[#2d3748] tracking-widest uppercase">thay đổi mật khẩu</h3>
+        <p className="text-[#4a5568] mt-1 max-w-lg">Cập nhật mật khẩu kết nối hoặc thiết lập đặc cách xác thực</p>
       </div>
 
       <div className="space-y-4 flex-grow">
@@ -78,9 +78,9 @@ export default function TabSecurity() {
         )}
 
         <div className="p-3 bg-white/50 border border-white/60 rounded-xl flex items-start gap-3 shadow-sm">
-          <CheckCircle2 size={16} className="text-emerald-600 mt-0.5 flex-shrink-0" />
+          <CheckCircle2 size={16} className="text-emerald-700 mt-0.5 flex-shrink-0" />
           <p className="text-[11px] text-[#4a5568] leading-relaxed">
-            Xác thực thành viên TechVie ID vĩnh viễn được tự động áp dụng ưu đãi giảm giá lên tới 10% tại tất cả các hệ thống showroom và trạm trải nghiệm TechVie chính hãng trên toàn cầu.
+            Xác thực thành viên TechVie được tự động áp dụng ưu đãi giảm giá lên tới 10% tại tất cả các hệ thống showroom & trải nghiệm TechVie chính hãng trên toàn cầu.
           </p>
         </div>
       </div>
