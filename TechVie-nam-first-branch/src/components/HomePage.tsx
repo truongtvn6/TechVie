@@ -13,6 +13,35 @@ import {
 } from "lucide-react";
 import { subscribeNewsletter } from "../services/api";
 
+const normalizeProduct = (p: any): Product => {
+  let safeSpecs: { label: string; value: string }[] = [];
+  if (Array.isArray(p.specs)) {
+    safeSpecs = p.specs.map((s: any) => ({
+      label: s && typeof s.label === 'string' ? s.label : 'Thông số',
+      value: s && typeof s.value === 'string' ? s.value : (typeof s === 'string' ? s : 'Đang cập nhật')
+    }));
+  } else if (p.specs && typeof p.specs === 'object') {
+    safeSpecs = Object.entries(p.specs).map(([key, val]) => ({
+      label: key,
+      value: String(val)
+    }));
+  }
+  
+  while (safeSpecs.length < 2) {
+    safeSpecs.push({ label: 'Thông số', value: 'Đang cập nhật' });
+  }
+
+  return {
+    id: p.id || p._id || String(Math.random()),
+    name: p.name || 'Sản phẩm TechVie',
+    price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
+    image: p.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+    category: p.category || 'Thiết bị',
+    description: p.description || 'Mô tả đang được cập nhật.',
+    specs: safeSpecs
+  };
+};
+
 interface HomePageProps {
   products?: Product[];
   onNavigate: (tab: TabType) => void;
@@ -24,7 +53,7 @@ export default function HomePage({
   onNavigate,
   onAddToCart,
 }: HomePageProps) {
-  const allProducts = products || [];
+  const allProducts = (products || []).map(normalizeProduct);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [showSubscriptionSuccess, setShowSubscriptionSuccess] = useState(false);
@@ -42,7 +71,7 @@ export default function HomePage({
     let intervalId: NodeJS.Timeout;
 
     const fetchImages = () => {
-      fetch("http://localhost:5000/api/hero-images")
+      fetch("/api/hero-images")
         .then((res) => {
           if (!res.ok) throw new Error("API server unreachable");
           return res.json();

@@ -5,7 +5,7 @@ import { CheckCircle2 } from 'lucide-react';
 
 interface CheckoutSuccessProps {
   email: string;
-  serverOrderId: number | null;
+  serverOrderId: number | string | null;
   fullName: string;
   phone: string;
   address: string;

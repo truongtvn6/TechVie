@@ -92,7 +92,7 @@ export default function Header({
       `}</style>
       <div className="flex justify-between items-center h-18 px-4 md:px-8 lg:px-10 max-w-none mx-auto relative w-full">
         {/* Brand Logo text */}
-        <button 
+        <button
           onClick={() => {
             setActiveTab('home');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -111,11 +111,10 @@ export default function Header({
                 setActiveTab(item.id);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`nav-btn px-4 py-2 text-[11px] lg:text-[13px] font-sans tracking-widest font-extrabold transition-all duration-300 rounded-sm cursor-pointer ${
-                activeTab === item.id 
-                  ? 'nav-btn-active' 
+              className={`nav-btn px-4 py-2 text-[11px] lg:text-[13px] font-sans tracking-widest font-extrabold transition-all duration-300 rounded-sm cursor-pointer ${activeTab === item.id
+                  ? 'nav-btn-active'
                   : 'text-gray-500'
-              }`}
+                }`}
             >
               {item.label}
             </button>
@@ -124,7 +123,7 @@ export default function Header({
 
         {/* Action Header controls */}
         <div className="flex items-center space-x-4">
-          <button 
+          <button
             onClick={() => setIsSearchOpen(true)}
             className="relative w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-200 transition-all duration-300 active:scale-95 cursor-pointer"
             title="Tìm kiếm thiết bị"
@@ -133,7 +132,7 @@ export default function Header({
             {/* <div className="absolute top-[-2px] right-[-2px] w-2 h-2 bg-indigo-600 rounded-full shadow-[0_0_8px_rgba(70,72,212,0.6)]" /> */}
           </button>
 
-          <button 
+          <button
             onClick={() => setIsCartOpen(true)}
             className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-200 hover:backdrop-blur-sm transition-all duration-300 relative cursor-pointer"
             title="Giỏ hàng TechVie"
@@ -147,13 +146,13 @@ export default function Header({
           </button>
 
           <div className="flex items-center space-x-2">
-            {isLoggedIn && (
+            {isLoggedIn && userProfile.name && (
               <span className="hidden lg:inline-block text-[10px] tracking-widest uppercase font-mono bg-indigo-50 border border-indigo-150 text-black py-1.5 px-3 rounded-full font-black">
-                Chào, {userProfile.name.split(' ').pop()?.toUpperCase()}
+                Chào, {userProfile.name.split(' ').pop()?.toUpperCase() || ''}
               </span>
             )}
 
-            <a 
+            <a
               href={!isLoggedIn ? '#dang-nhap' : '#account'}
               onClick={(e) => {
                 e.preventDefault();
@@ -164,18 +163,17 @@ export default function Header({
                 }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative cursor-pointer ${
-                activeTab === 'account' || activeTab === 'dang-nhap' || activeTab === 'dang-ky'
-                  ? 'bg-black text-white shadow-md' 
+              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative cursor-pointer ${activeTab === 'account' || activeTab === 'dang-nhap' || activeTab === 'dang-ky'
+                  ? 'bg-black text-white shadow-md'
                   : 'hover:bg-gray-200 hover:backdrop-blur-sm text-gray-950 border border-transparent/0'
-              }`}
+                }`}
               title="Tài khoản TechVie ID"
             >
               <User size={20} />
             </a>
           </div>
 
-          <button 
+          <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-200 hover:backdrop-blur-sm transition-all duration-300 cursor-pointer"
             title="Danh mục menu"
@@ -187,7 +185,7 @@ export default function Header({
 
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -202,14 +200,13 @@ export default function Header({
                     setIsMobileMenuOpen(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`text-left text-sm uppercase tracking-widest font-black py-2.5 cursor-pointer font-bold ${
-                    activeTab === item.id ? 'text-indigo-600 font-extrabold' : 'text-gray-600 shadow-none'
-                  }`}
+                  className={`text-left text-sm uppercase tracking-widest font-black py-2.5 cursor-pointer font-bold ${activeTab === item.id ? 'text-indigo-600 font-extrabold' : 'text-gray-600 shadow-none'
+                    }`}
                 >
                   {item.label}
                 </button>
               ))}
-              
+
               {!isLoggedIn ? (
                 <div className="pt-4 border-t border-gray-200 flex flex-col gap-2">
                   <a
@@ -220,9 +217,8 @@ export default function Header({
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 font-bold ${
-                      activeTab === 'dang-nhap' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
-                    }`}
+                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 font-bold ${activeTab === 'dang-nhap' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
+                      }`}
                   >
                     {/* <User size={16} />  */}
                     ĐĂNG NHẬP
@@ -235,9 +231,8 @@ export default function Header({
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 font-bold ${
-                      activeTab === 'dang-ky' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
-                    }`}
+                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 font-bold ${activeTab === 'dang-ky' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
+                      }`}
                   >
                     ĐĂNG KÝ
                   </a>
@@ -252,11 +247,10 @@ export default function Header({
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 ${
-                      activeTab === 'account' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
-                    }`}
+                    className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 ${activeTab === 'account' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
+                      }`}
                   >
-                    <User size={16} /> TÀI KHOẢN ({userProfile.name.split(' ').pop()?.toUpperCase()})
+                    <User size={16} /> TÀI KHOẢN ({userProfile.name ? (userProfile.name.split(' ').pop()?.toUpperCase() || '') : ''})
                   </a>
                 </div>
               )}
