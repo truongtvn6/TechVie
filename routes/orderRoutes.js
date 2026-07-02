@@ -17,6 +17,9 @@ router.get("/", orderController.getOrders);
 // Cập nhật trạng thái đơn hàng (sử dụng POST để tương thích với frontend cũ)
 router.post("/:id/status", orderController.updateOrderStatus);
 
+// Cập nhật trạng thái thanh toán của đơn hàng
+router.post("/:id/payment-status", orderController.updatePaymentStatus);
+
 // Xóa sạch toàn bộ đơn hàng
 router.delete("/", orderController.clearAllOrders);
 

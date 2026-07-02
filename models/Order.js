@@ -54,8 +54,45 @@ const orderSchema = new mongoose.Schema({
   payment_method: {
     type: String,
     required: true,
-    enum: ["cod", "card_online", "bank_transfer"],
-    description: "Phương thức: 'cod', 'card_online', 'bank_transfer'",
+    enum: ["cod", "card_online", "bank_transfer", "momo", "zalopay"],
+    description: "Phương thức: 'cod', 'card_online', 'bank_transfer', 'momo', 'zalopay'",
+  },
+  payment_provider: {
+    type: String,
+    required: true,
+    enum: ["cod", "card_online", "bank_transfer", "momo", "zalopay"],
+    default: "cod",
+    index: true,
+    description: "Nhà cung cấp/cổng thanh toán được chọn",
+  },
+  payment_status: {
+    type: String,
+    required: true,
+    enum: ["pending", "paid", "failed", "cancelled"],
+    default: "pending",
+    index: true,
+    description: "Trạng thái thanh toán: pending, paid, failed, cancelled",
+  },
+  payment_reference: {
+    type: String,
+    index: true,
+    description: "Mã tham chiếu đối soát thanh toán",
+  },
+  payment_note: {
+    type: String,
+    description: "Nội dung chuyển khoản hoặc ghi chú thanh toán",
+  },
+  transaction_id: {
+    type: String,
+    description: "Mã giao dịch trả về từ cổng thanh toán/demo gateway",
+  },
+  payment_url: {
+    type: String,
+    description: "URL chuyển hướng sang cổng thanh toán MoMo/ZaloPay sandbox hoặc demo",
+  },
+  paid_at: {
+    type: Date,
+    description: "Thời điểm thanh toán được xác nhận",
   },
   delivery_method: {
     type: String,
