@@ -16,6 +16,10 @@ button, svg, img, input[type="range"], .select-none {
   -webkit-user-drag: none;
 }
 
+button {
+  cursor: pointer;
+}
+
 /* Glassmorphism custom classes */
 .glass-card {
   background: rgba(255, 255, 255, 0.45);

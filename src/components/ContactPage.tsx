@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Phone, MapPin, Send, Check, HelpCircle, ChevronDown, Users, ArrowRight } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { teamMembers } from '../data_mockdata';
 import { sendContactInquiry } from '../services/api';
 // @ts-ignore
@@ -55,9 +56,12 @@ export default function ContactPage() {
         setFormEmail('');
         setFormSubject('');
         setFormMessage('');
+        toast.success("Cảm ơn bạn! Chúng tôi đã nhận được thông tin và sẽ phản hồi sớm nhất.");
         setTimeout(() => {
           setIsSubmitted(false);
         }, 5000);
+      } else {
+        toast.error("Gửi thất bại: " + data.message);
       }
     } catch (error) {
       console.error('Error submitting feedback:', error);
@@ -67,6 +71,7 @@ export default function ContactPage() {
       setFormEmail('');
       setFormSubject('');
       setFormMessage('');
+      toast.success("Cảm ơn bạn! Chúng tôi đã nhận được thông tin và sẽ phản hồi sớm nhất.");
       setTimeout(() => {
         setIsSubmitted(false);
       }, 5000);

@@ -10,7 +10,7 @@ export default function TabDevices({ devices = [], isLoading = false }: TabDevic
     <div className="bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm">
       <div className="mb-4 border-b border-white/60 pb-2">
         <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">THIẾT BỊ HOẠT ĐỘNG & CHỈ SỐ</h3>
-        <p className="text-[#4a5568] mt-1 max-w-lg">Theo dõi bảo hành phần cứng, trạng thái nâng cấp và cấu hình thiết bị của bạn.</p>
+        <p className="text-[#4a5568] mt-1 max-w-lg text-sm">Theo dõi bảo hành phần cứng, trạng thái nâng cấp và cấu hình thiết bị của bạn.</p>
       </div>
 
       {isLoading ? (
@@ -20,7 +20,7 @@ export default function TabDevices({ devices = [], isLoading = false }: TabDevic
       ) : devices.length === 0 ? (
         <div className="border border-dashed border-gray-300 rounded-2xl p-8 text-center text-gray-500 font-sans">
           <Cpu className="mx-auto mb-3 text-gray-400" size={32} />
-          <h4 className="font-bold text-sm text-gray-800">Bạn chưa sở hữu thiết bị TechVie nào</h4>
+          <h4 className="font-bold text-sm text-gray-800">Bạn chưa sở hữu sản phẩm nào từ TechVie</h4>
           <p className="text-xs text-gray-500 mt-1 max-w-md mx-auto">
             Hệ thống sẽ tự động kích hoạt bảo hành điện tử và hiển thị cấu hình thiết bị tại đây ngay khi đơn hàng của bạn được giao thành công!
           </p>
@@ -72,13 +72,13 @@ export default function TabDevices({ devices = [], isLoading = false }: TabDevic
         </div>
       )}
 
-      <div className="mt-6 p-4 bg-white/50 border border-white/60 rounded-xl flex items-start gap-3 text-[#2d3748] text-[11px] leading-relaxed shadow-sm">
+      {/* <div className="mt-6 p-4 bg-white/50 border border-white/60 rounded-xl flex items-start gap-3 text-[#2d3748] text-[11px] leading-relaxed shadow-sm">
         <Clock size={20} className="text-black flex-shrink-0 mt-0.5" />
         <div className='!text-sm text-left'>
           <strong>Bạn cần đặt mua thêm loại phụ kiện nào?</strong>
           <p className="text-[#4a5568] mt-0.5">Mọi bộ phụ kiện cao cấp và củ sạc hi-end của TechVie đều đảm bảo truyền dẫn sạc mượt mà đồng bộ. Hãy duyệt sảnh để bổ sung mục giỏ hàng.</p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

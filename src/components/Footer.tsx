@@ -43,55 +43,24 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
           </ul>
         </div>
 
-        {/* Nav columns 2 */}
+        {/* Contact Info */}
         <div>
           <h5 className="text-[12px] uppercase font-bold tracking-[0.2em] text-gray-400 mb-6 font-sans">
-            DỊCH VỤ & LAB
+            LIÊN HỆ
           </h5>
           <ul className="space-y-3 text-sm text-gray-600 font-sans">
-            <li>
-              <button
-                onClick={() => {
-                  setActiveTab("brand");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="hover:underline text-left cursor-pointer"
-              >
-                TechVie Book Silicon specs
-              </button>
+            <li className="flex items-start gap-2">
+              <span className="font-semibold text-gray-800">Điện thoại:</span>
+              <a href="tel:19006868" className="hover:text-black hover:underline transition-colors">1900 6868</a>
             </li>
-            <li>
-              <button
-                onClick={() => {
-                  setActiveTab("brand");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="hover:underline text-left cursor-pointer"
-              >
-                Hệ Sinh Thái Thông Minh 2026
-              </button>
+            <li className="flex items-start gap-2">
+              <span className="font-semibold text-gray-800">Email:</span>
+              <a href="mailto:hello@techvie.vn" className="hover:text-black hover:underline transition-colors">hello@techvie.vn</a>
             </li>
-            <li>
-              <button
-                onClick={() => {
-                  setActiveTab("contact");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="hover:underline text-left cursor-pointer"
-              >
-                Trạm Trải Nghiệm Premium
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => {
-                  setActiveTab("contact");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="hover:underline text-left cursor-pointer"
-              >
-                Hỗ trợ kỹ thuật & Bảo hành
-              </button>
+            <li className="flex flex-col gap-1 mt-2">
+              <span className="font-semibold text-gray-800">Địa chỉ:</span>
+              <span className="leading-relaxed">Tầng 3, Tech Building, Quận 1, TP. HCM</span>
+              <span className="leading-relaxed italic">(Xem bản đồ tại trang Liên hệ)</span>
             </li>
           </ul>
         </div>

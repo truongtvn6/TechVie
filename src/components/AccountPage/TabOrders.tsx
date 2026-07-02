@@ -8,8 +8,8 @@ export default function TabOrders({ orders }: TabOrdersProps) {
   return (
     <div className="h-full bg-white/60 backdrop-blur-lg border border-white/60 rounded-xl p-6 relative overflow-hidden flex flex-col shadow-sm custom-glass-scrollbar overflow-y-auto max-h-[75vh]">
       <div className="mb-4 border-b border-white/60 pb-2">
-        <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">TIẾN TRÌNH VẬN CHUYỂN ĐƠN HÀNG</h3>
-        <p className="text-[#4a5568] mt-1 max-w-lg">Theo dõi thực tế hành trình đơn sản phẩm cao cấp và trạng thái bàn giao của bạn.</p>
+        <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest">TIẾN TRÌNH ĐƠN HÀNG</h3>
+        <p className="text-[#4a5568] mt-1 max-w-lg text-sm">Theo dõi thực tế hành trình đơn sản phẩm và trạng thái bàn giao.</p>
       </div>
 
       <div className="space-y-6 flex-grow">

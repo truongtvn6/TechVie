@@ -58,8 +58,7 @@ export default function TabProfile({
           HỒ SƠ THÀNH VIÊN
         </h3>
         <p className="text-[#4a5568] mt-1 text-[15px]">
-          Các thông tin cá nhân của bạn phục vụ điền nhanh bưu kiện tại trang
-          thanh toán Checkout.
+          Các thông tin cá nhân của bạn phục vụ điền nhanh bưu kiện tại trang Thanh toán.
         </p>
       </div>
 

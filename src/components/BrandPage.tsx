@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Sparkles, Compass, Eye, Gift, BadgeCheck, ShieldCheck } from 'lucide-react';
+import SloganQuote from "./SloganQuote";
 
 export default function BrandPage() {
 
@@ -12,16 +13,16 @@ export default function BrandPage() {
       className="py-12 relative min-h-screen"
     >
       {/* Blurred Aesthetic Background Image */}
-      <div 
-        className="fixed inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-30 blur-xs scale-110"
+      {/* <div 
+        className="fixed inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-30 blur-md scale-110"
         style={{ backgroundImage: "url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop')" }}
-      />
+      /> */}
       {/* Overlay for readability */}
-      <div className="fixed inset-0 z-[-10] bg-slate-50/80 backdrop-blur-sm" />
+      {/* <div className="fixed inset-0 z-[-10] bg-slate-50/80 backdrop-blur-sm" /> */}
       {/* Hero Header */}
       <div className="max-w-7xl mx-auto px-6 mb-20 text-center relative">
         <div className="absolute top-10 left-1/2 -translate-x-1/2 w-80 h-80 bg-secondary/10 rounded-full blur-3xl pointer-events-none -z-10" />
-        <span className="text-xs uppercase tracking-[0.4em] text-secondary font-bold mb-4 block">
+        <span className="text-lg uppercase tracking-[0.4em] text-secondary font-bold mb-4 block">
           CÂU CHUYỆN & SỨ MỆNH
         </span>
         <h1 className="text-5xl md:text-7xl font-sans tracking-tighter text-gray-950 font-extrabold mb-6 leading-none">
@@ -67,9 +68,8 @@ export default function BrandPage() {
 
       {/* Strategic Partners & Ecosystem Section */}
       <div className="max-w-7xl mx-auto px-6 mb-16">
-        <div className="bg-linear-to-t from-blue-100 to-white rounded-[3rem] p-10 md:p-12 text-center relative overflow-hidden shadow-2xl hover:-translate-y-1.5 transition-all duration-500">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-100/30 rounded-full blur-3xl pointer-events-none -z-10" />
-          <p className="text-[14px] uppercase tracking-[0.2em] text-gray-900 font-extrabold mb-8">
+        <div className="p-10 md:p-12 text-center relative overflow-hidden transition-all duration-500">
+          <p className="text-lg uppercase tracking-[0.2em] text-gray-900 font-extrabold mb-8">
             CAM KẾT CHẤT LƯỢNG & TRẢI NGHIỆM
           </p>
           
@@ -102,8 +102,14 @@ export default function BrandPage() {
           <p className="text-gray-500 font-sans text-[16px] mt-8 max-w-3xl mx-auto leading-relaxed">
             Mọi sản phẩm trước khi đến tay bạn đều trải qua quy trình kiểm tra chất lượng (QC) nghiêm ngặt. TechVie chú trọng đóng gói chỉn chu theo tiêu chuẩn hộp quà tặng (Gift box) kèm thư tay, cùng chính sách bảo hành 1-đổi-1 minh bạch, mang lại sự an tâm tuyệt đối khi mua sắm.
           </p>
-        </div>
+        </div>        
       </div>
+        <div className="p-10 md:p-12 relative overflow-hidden transition-all duration-500">
+          <p className="text-lg uppercase tracking-[0.2em] text-gray-900 font-extrabold text-center">
+            SỨ MỆNH CỦA TECHVIE
+          </p>
+          <SloganQuote />
+        </div>       
     </motion.div>
   );
 }

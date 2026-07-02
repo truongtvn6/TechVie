@@ -69,14 +69,14 @@ export default function AccountSidebar({
         <div className="mt-4 pt-3 border-t border-white/60 flex flex-col gap-1.5 font-sans text-sm">
           <div className="flex justify-between items-center">
             <span className="text-[#4a5568]">Thành viên từ:</span>
-            <span className="font-tech-label text-tech-label !text-sm">{userProfile.memberSince}</span>
+            <span className="font-tech-label text-tech-label !text-sm !tracking-normal">{userProfile.memberSince}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-[#4a5568]">Đặc quyền:</span>
-            <span className={`font-tech-label text-tech-label px-2 py-1 rounded !text-sm ${
+            <span className={`font-tech-label text-tech-label !text-sm !tracking-normal border-none ${
               userProfile.shieldStatus === 'Standard' 
-                ? 'text-gray-600 bg-gray-100 border border-gray-200' 
-                : 'text-black bg-gray-150 border border-gray-200'
+                ? 'text-blue-700' 
+                : 'text-emerald-700'
             }`}>
               {userProfile.shieldStatus || 'Standard'}
             </span>
@@ -129,7 +129,7 @@ export default function AccountSidebar({
           }`}
         >
           <Laptop size={18} />
-          <span className="font-headline-sm font-bold uppercase tracking-widest text-[13px]">Thiết bị & sản phẩm</span>
+          <span className="font-headline-sm font-bold uppercase tracking-widest text-[13px]">Bảo hành sản phẩm</span>
           {accountTab === 'devices' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
         </button>
 
@@ -143,7 +143,7 @@ export default function AccountSidebar({
           }`}
         >
           <Settings size={18} />
-          <span className="font-headline-sm font-bold uppercase tracking-widest text-[13px]">Cấu hình mật mã</span>
+          <span className="font-headline-sm font-bold uppercase tracking-widest text-[13px]">cập nhật mật khẩu</span>
           {accountTab === 'security' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
         </button>
 

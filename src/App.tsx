@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronUp } from "lucide-react";
+import { Toaster, toast } from 'react-hot-toast';
 import { TabType, CartItem, Product } from "./types";
 import {
   createProduct,
@@ -113,6 +114,7 @@ export default function App() {
         } else {
           // Token không hợp lệ hoặc tài khoản đã bị xóa (ví dụ sau khi seed lại database)
           handleSetIsLoggedIn(false);
+          toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
         }
       });
     }
@@ -255,17 +257,17 @@ export default function App() {
           added,
         );
         setProducts((prev) => [added, ...prev]);
-        console.log("Đăng bán sản phẩm thành công!");
+        toast.success("Đăng bán sản phẩm thành công!");
       } else {
         console.error(
           "Lỗi phản hồi từ backend khi thêm sản phẩm:",
           res.message,
         );
-        console.error(`Lỗi khi thêm sản phẩm: ${res.message}`);
+        toast.error(`Lỗi khi thêm sản phẩm: ${res.message}`);
       }
     } catch (error: any) {
       console.error("Lỗi thêm sản phẩm:", error);
-      console.error("Không thể thêm sản phẩm, vui lòng kiểm tra kết nối.");
+      toast.error("Không thể thêm sản phẩm, vui lòng kiểm tra kết nối.");
     }
   };
 
@@ -314,14 +316,14 @@ export default function App() {
         setProducts((prev) =>
           prev.map((p) => (p.id === updated.id ? updated : p)),
         );
-        console.log("Cập nhật sản phẩm thành công!");
+        toast.success("Cập nhật thông tin sản phẩm thành công!");
       } else {
-        console.error("Lỗi phản hồi từ backend khi sửa sản phẩm:", res.message);
-        console.error(`Lỗi khi cập nhật sản phẩm: ${res.message}`);
+        console.error("Cập nhật thất bại:", res.message);
+        toast.error(`Lỗi cập nhật sản phẩm: ${res.message}`);
       }
     } catch (error: any) {
-      console.error("Lỗi sửa sản phẩm:", error);
-      console.error("Không thể cập nhật sản phẩm, vui lòng kiểm tra kết nối.");
+      console.error("Lỗi cập nhật sản phẩm:", error);
+      toast.error("Không thể cập nhật sản phẩm, vui lòng kiểm tra mạng.");
     }
   };
 
@@ -332,14 +334,14 @@ export default function App() {
       if (res.success) {
         console.log(`Xóa sản phẩm #${productId} thành công khỏi state React.`);
         setProducts((prev) => prev.filter((p) => p.id !== productId));
-        console.log("Xóa sản phẩm thành công!");
+        toast.success("Xóa sản phẩm thành công!");
       } else {
         console.error("Lỗi phản hồi từ backend khi xóa sản phẩm:", res.message);
-        console.error(`Lỗi khi xóa sản phẩm: ${res.message}`);
+        toast.error(`Lỗi khi xóa sản phẩm: ${res.message}`);
       }
     } catch (error: any) {
       console.error("Lỗi xóa sản phẩm:", error);
-      console.error("Không thể xóa sản phẩm, vui lòng kiểm tra kết nối.");
+      toast.error("Không thể xóa sản phẩm, vui lòng kiểm tra kết nối.");
     }
   };
 
@@ -351,10 +353,13 @@ export default function App() {
         getProducts().then((data) => {
           if (data.success) setProducts(data.products);
         });
+        toast.success("Khôi phục sản phẩm thành công!");
         return { success: true, message: res.message };
       }
+      toast.error(`Lỗi khôi phục: ${res.message}`);
       return { success: false, message: res.message };
     } catch (error: any) {
+      toast.error("Lỗi kết nối khi khôi phục sản phẩm.");
       return { success: false, message: "Lỗi kết nối khi khôi phục sản phẩm." };
     }
   };
@@ -529,6 +534,7 @@ export default function App() {
       }
       return [...prevCart, { product, quantity: 1 }];
     });
+    toast.success(`Đã thêm ${product.name} vào giỏ hàng`, { position: "bottom-right", duration: 3000 });
     // Open cart drawer so customer enjoys the feedback
     setIsCartOpen(true);
   };
@@ -579,6 +585,23 @@ export default function App() {
       ref={appRef}
       className="min-h-screen bg-[#f7f9fb] text-gray-900 font-sans flex flex-col justify-between selection:bg-black selection:text-white relative"
     >
+      <Toaster 
+        toastOptions={{
+          style: {
+            background: '#333',
+            color: '#fff',
+            borderRadius: '10px',
+            fontSize: '14px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)'
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+        }} 
+      />
       {/* Aurora Ambient Backgrounds */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-[-200px] left-[-100px] w-[600px] h-[600px] rounded-full bg-indigo-500/5 blur-[120px] animate-drift-slow" />
@@ -762,8 +785,10 @@ export default function App() {
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
                     setActiveTab("admin");
+                    toast.success("Đăng nhập Admin thành công", { icon: "👑" });
                   } else {
                     setActiveTab("account");
+                    toast.success(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
                   }
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
@@ -776,6 +801,7 @@ export default function App() {
                   }));
                   setIsLoggedIn(true);
                   setActiveTab("account");
+                  toast.success(`Đăng ký thành công! Chào mừng ${name}.`);
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               />
@@ -814,8 +840,10 @@ export default function App() {
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
                     setActiveTab("admin");
+                    toast.success("Đăng nhập Admin thành công", { icon: "👑" });
                   } else {
                     setActiveTab("account");
+                    toast.success(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
                   }
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
@@ -828,6 +856,7 @@ export default function App() {
                   }));
                   setIsLoggedIn(true);
                   setActiveTab("account");
+                  toast.success(`Đăng ký thành công! Chào mừng ${name}.`);
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               />

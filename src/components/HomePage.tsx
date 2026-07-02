@@ -14,6 +14,7 @@ import {
 import { subscribeNewsletter, API_BASE_URL } from "../services/api";
 import ProductCard from "./ProductPage/ProductCard";
 import ProductDetail from "./ProductPage/ProductDetail";
+import SloganQuote from "./SloganQuote";
 
 interface HomePageProps {
   products?: Product[];
@@ -271,13 +272,13 @@ export default function HomePage({
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => onNavigate("brand")}
-                  className="group group-hover:before:duration-500 group-hover:after:duration-500 after:duration-500 hover:border-rose-300 hover:before:[box-shadow:_20px_20px_20px_30px_#a21caf] duration-500 before:duration-500 hover:duration-500 underline underline-offset-2 hover:after:-right-8 hover:before:right-12 hover:before:-bottom-8 hover:before:blur hover:underline hover:underline-offset-4 origin-left hover:decoration-2 hover:text-rose-300 relative bg-neutral-800 h-16 w-64 border border-neutral-700 text-left p-3 text-gray-50 text-base font-bold rounded-lg overflow-hidden before:absolute before:w-12 before:h-12 before:content-[''] before:right-1 before:top-1 before:z-10 before:bg-violet-500 before:rounded-full before:blur-lg after:absolute after:z-10 after:w-20 after:h-20 after:content-[''] after:bg-rose-300 after:right-8 after:top-3 after:rounded-full after:blur-lg cursor-pointer flex items-center justify-between"
+                  className="group group-hover:before:duration-500 group-hover:after:duration-500 after:duration-500  duration-500 before:duration-500 hover:duration-500  hover:after:-right-6 hover:before:right-8 hover:before:-bottom-8 hover:before:blur origin-left hover:decoration-2 hover:text-white relative bg-neutral-800 h-16 text-right p-8 text-gray-50 text-base font-bold rounded-2xl overflow-hidden before:absolute before:w-12 before:h-12 before:content-[''] before:right-1 before:top-1 before:z-10 before:bg-white/40 before:rounded-full before:blur-lg after:absolute after:z-10 after:w-20 after:h-20 after:content-[''] after:bg-amber-100 after:right-8 after:top-3 after:rounded-full after:blur-lg cursor-pointer flex items-center justify-between w-full shadow-amber-100 shadow-2xl"
                 >
-                  <span className="relative z-[2] flex items-center gap-2">
-                    Khám phá
+                  <span className="relative z-[2] flex items-center gap-2 uppercase transition-all duration-300 group-hover:[text-shadow:0_0_8px_rgba(255,255,255,0.8)]">
+                    Khám phá thương hiệu
                     <ArrowRight
-                      size={16}
-                      className="transition-transform duration-300 group-hover:translate-x-1.5"
+                      size={24}
+                      className="transition-all duration-300 group-hover:translate-x-1.5 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]"
                     />
                   </span>
                 </button>
@@ -343,8 +344,10 @@ export default function HomePage({
         </div>
       </section>
 
+      <SloganQuote />
+
       {/* Exquisite Brand Promo Card Banner */}
-      <section className="px-6 max-w-7xl mx-auto mb-20">
+      <section className="px-6 max-w-7xl mx-auto mb-20 mt-40">
         <div className="bg-linear-to-l from-black/5 to-white/90 rounded-[3rem] p-8 md:p-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
