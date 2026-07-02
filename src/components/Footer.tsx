@@ -1,6 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { TabType } from "../types";
-import { Globe, Layers, Brush, ArrowUpRight, Copyright } from "lucide-react";
+import { Facebook, Instagram, Youtube, ArrowUpRight, Copyright } from "lucide-react";
 
 interface FooterProps {
   navigationItems: Array<{ id: TabType; label: string }>;
@@ -29,15 +30,15 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
           <ul className="space-y-3">
             {navigationItems.map((item) => (
               <li key={item.id}>
-                <button
+                <Link
+                  to={item.id === 'home' ? '/' : `/${item.id}`}
                   onClick={() => {
-                    setActiveTab(item.id);
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="text-sm text-gray-600 hover:text-black transition-colors font-sans text-left uppercase tracking-wider font-semibold cursor-pointer"
+                  className="text-sm text-gray-600 hover:text-black transition-colors font-sans text-left uppercase tracking-wider font-semibold cursor-pointer block"
                 >
                   {item.label}
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
@@ -74,23 +75,23 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
             <a
               href="#"
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:border-black transition-all"
-              title="TechVie Global Network"
+              title="Facebook"
             >
-              <Globe size={18} />
+              <Facebook size={18} />
             </a>
             <a
               href="#"
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:border-black transition-all"
-              title="TechVie Micro-Animations"
+              title="Instagram"
             >
-              <Layers size={18} />
+              <Instagram size={18} />
             </a>
             <a
               href="#"
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:border-black transition-all"
-              title="TechVie Crafts"
+              title="Youtube"
             >
-              <Brush size={18} />
+              <Youtube size={18} />
             </a>
           </div>
         </div>

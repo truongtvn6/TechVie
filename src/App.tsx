@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronUp } from "lucide-react";
 import { Toaster, toast } from 'react-hot-toast';
@@ -35,21 +36,26 @@ import PolicyPage from "./components/PolicyPage";
 import CartSidePanel from "./components/CartSidePanel";
 import ResetPassword from "./components/AuthPage/ResetPassword";
 
-export default function App() {
+function AppContent() {
   const appRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<TabType>(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      if (window.location.pathname === "/reset-password" && params.get("token")) {
-        return "reset-password";
-      }
-      const saved = localStorage.getItem("active_tab");
-      return saved ? (saved as TabType) : "home";
-    } catch {
-      return "home";
+  const getActiveTab = (pathname: string): TabType => {
+    const path = pathname.replace(/^\//, '');
+    if (!path) return "home";
+    return path as TabType;
+  };
+  const activeTab = getActiveTab(location.pathname);
+
+  const handleNavigate = (tab: any) => {
+    if (tab === "home") {
+      navigate("/");
+    } else {
+      navigate(`/${tab}`);
     }
-  });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -90,9 +96,9 @@ export default function App() {
       localStorage.setItem("active_tab", "account");
       setToken(urlToken);
       setIsLoggedIn(true);
-      setActiveTab("account");
+      handleNavigate("account");
       // Clean query params in the URL bar
-      window.history.replaceState({}, document.title, window.location.pathname);
+      navigate(location.pathname, { replace: true });
     }
   }, []);
 
@@ -123,7 +129,7 @@ export default function App() {
   // Tự động chuyển về trang chủ nếu không phải admin nhưng activeTab là admin
   useEffect(() => {
     if (activeTab === "admin" && (!isLoggedIn || userProfile.role !== "admin")) {
-      setActiveTab("home");
+      handleNavigate("home");
     }
   }, [activeTab, isLoggedIn, userProfile.role]);
 
@@ -157,15 +163,6 @@ export default function App() {
     }
   }, [isLoggedIn, userProfile.role, token]);
 
-  useEffect(() => {
-    try {
-      if (activeTab !== "reset-password") {
-        localStorage.setItem("active_tab", activeTab);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, [activeTab]);
 
   const handleSetIsLoggedIn = (val: boolean) => {
     setIsLoggedIn(val);
@@ -209,7 +206,7 @@ export default function App() {
           role: isSystemAdmin ? "admin" : "user",
           authProvider: "credentials",
         });
-        setActiveTab(isSystemAdmin ? "admin" : "account");
+        handleNavigate(isSystemAdmin ? "admin" : "account");
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch (err) {
@@ -568,7 +565,7 @@ export default function App() {
   const showHeaderFooter =
     activeTab !== "login" &&
     activeTab !== "register" &&
-    activeTab !== "admin" &&
+    !String(activeTab).startsWith("admin") &&
     activeTab !== "reset-password";
 
   const navigationItems: { id: TabType; label: string }[] = [
@@ -612,7 +609,7 @@ export default function App() {
       {showHeaderFooter && (
         <Header
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          setActiveTab={handleNavigate}
           navigationItems={navigationItems}
           isSearchOpen={isSearchOpen}
           setIsSearchOpen={setIsSearchOpen}
@@ -634,141 +631,46 @@ export default function App() {
             : "min-h-screen flex items-center justify-center p-0 w-full"
         }
       >
-        <AnimatePresence mode="wait">
-          {activeTab === "home" && (
-            <motion.div
-              key="home-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <HomePage
-                products={products}
-                onNavigate={(tab) => {
-                  setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                onAddToCart={handleAddToCart}
-                isLoggedIn={isLoggedIn}
-                userEmail={userProfile.email}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === "brand" && (
-            <motion.div
-              key="brand-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <BrandPage />
-            </motion.div>
-          )}
-
-          {activeTab === "products" && (
-            <motion.div
-              key="products-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <ProductPage 
-                products={products} 
-                onAddToCart={handleAddToCart} 
-                onNavigate={(tab) => {
-                  setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === "news" && (
-            <motion.div
-              key="news-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <NewsPage />
-            </motion.div>
-          )}
-
-          {activeTab === "contact" && (
-            <motion.div
-              key="contact-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <ContactPage />
-            </motion.div>
-          )}
-
-          {activeTab === "policy" && (
-            <motion.div
-              key="policy-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <PolicyPage />
-            </motion.div>
-          )}
-
-          {activeTab === "checkout" && (
-            <motion.div
-              key="checkout-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <CheckoutPage
-                cart={cart}
-                onQuantityChange={handleQuantityChange}
-                onRemoveItem={handleRemoveItem}
-                onClearCart={handleClearCart}
-                isLoggedIn={isLoggedIn}
-                userProfile={userProfile}
-                onNavigate={(tab) => {
-                  setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === "login" && (
-            <motion.div
-              key="login-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <AuthPage
-                initialMode="login"
-                onNavigate={(tab) => {
-                  setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                onLoginSuccess={(email, userToken) => {
+                <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <HomePage products={products} onNavigate={handleNavigate} onAddToCart={handleAddToCart} isLoggedIn={isLoggedIn} userEmail={userProfile.email} />
+              </motion.div>
+            } />
+            <Route path="/brand" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <BrandPage />
+              </motion.div>
+            } />
+            <Route path="/products" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <ProductPage products={products} onAddToCart={handleAddToCart} onNavigate={handleNavigate} />
+              </motion.div>
+            } />
+            <Route path="/news" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <NewsPage />
+              </motion.div>
+            } />
+            <Route path="/contact" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <ContactPage />
+              </motion.div>
+            } />
+            <Route path="/policy" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <PolicyPage />
+              </motion.div>
+            } />
+            <Route path="/checkout" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <CheckoutPage cart={cart} onQuantityChange={handleQuantityChange} onRemoveItem={handleRemoveItem} onClearCart={handleClearCart} isLoggedIn={isLoggedIn} userProfile={userProfile} onNavigate={handleNavigate} />
+              </motion.div>
+            } />
+            <Route path="/login" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <AuthPage initialMode="login" onNavigate={handleNavigate} onLoginSuccess={(email, userToken) => {
                   const isSystemAdmin = email === "admin@techvie.com";
                   if (userToken) {
                     setToken(userToken);
@@ -777,22 +679,18 @@ export default function App() {
                   setUserProfile((prev) => ({
                     ...prev,
                     email: email,
-                    name: isSystemAdmin
-                      ? "ADMINISTRATOR"
-                      : email.split("@")[0].toUpperCase(),
+                    name: isSystemAdmin ? "ADMINISTRATOR" : email.split("@")[0].toUpperCase(),
                     role: isSystemAdmin ? "admin" : "user",
                   }));
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
-                    setActiveTab("admin");
+                    handleNavigate("admin");
                     toast.success("Đăng nhập Admin thành công", { icon: "👑" });
                   } else {
-                    setActiveTab("account");
+                    handleNavigate("account");
                     toast.success(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
                   }
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                onRegisterSuccess={(email, name) => {
+                }} onRegisterSuccess={(email, name) => {
                   setUserProfile((prev) => ({
                     ...prev,
                     email: email,
@@ -800,30 +698,14 @@ export default function App() {
                     role: "user",
                   }));
                   setIsLoggedIn(true);
-                  setActiveTab("account");
+                  handleNavigate("account");
                   toast.success(`Đăng ký thành công! Chào mừng ${name}.`);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === "register" && (
-            <motion.div
-              key="register-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <AuthPage
-                initialMode="register"
-                onNavigate={(tab) => {
-                  setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                onLoginSuccess={(email, userToken) => {
+                }} />
+              </motion.div>
+            } />
+            <Route path="/register" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <AuthPage initialMode="register" onNavigate={handleNavigate} onLoginSuccess={(email, userToken) => {
                   const isSystemAdmin = email === "admin@techvie.com";
                   if (userToken) {
                     setToken(userToken);
@@ -832,22 +714,18 @@ export default function App() {
                   setUserProfile((prev) => ({
                     ...prev,
                     email: email,
-                    name: isSystemAdmin
-                      ? "ADMINISTRATOR"
-                      : email.split("@")[0].toUpperCase(),
+                    name: isSystemAdmin ? "ADMINISTRATOR" : email.split("@")[0].toUpperCase(),
                     role: isSystemAdmin ? "admin" : "user",
                   }));
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
-                    setActiveTab("admin");
+                    handleNavigate("admin");
                     toast.success("Đăng nhập Admin thành công", { icon: "👑" });
                   } else {
-                    setActiveTab("account");
+                    handleNavigate("account");
                     toast.success(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
                   }
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                onRegisterSuccess={(email, name) => {
+                }} onRegisterSuccess={(email, name) => {
                   setUserProfile((prev) => ({
                     ...prev,
                     email: email,
@@ -855,94 +733,40 @@ export default function App() {
                     role: "user",
                   }));
                   setIsLoggedIn(true);
-                  setActiveTab("account");
+                  handleNavigate("account");
                   toast.success(`Đăng ký thành công! Chào mừng ${name}.`);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === "reset-password" && (
-            <motion.div
-              key="reset-password-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <ResetPassword 
-                token={new URLSearchParams(window.location.search).get("token") || ""}
-                onNavigate={(tab) => {
-                  window.history.replaceState({}, document.title, "/");
-                  setActiveTab(tab);
-                }}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === "account" && (
-            <motion.div
-              key="account-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <AccountPage
-                onNavigate={(tab) => {
-                  setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={handleSetIsLoggedIn}
-                userProfile={userProfile}
-                setUserProfile={setUserProfile}
-                token={token}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === "admin" && userProfile.role === "admin" && (
-            <motion.div
-              key="admin-route"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="w-full"
-            >
-              <AdminPage
-                token={token}
-                products={products}
-                onAddProduct={handleAddProduct}
-                onEditProduct={handleEditProduct}
-                onDeleteProduct={handleDeleteProduct}
-                onRestoreProduct={handleRestoreProduct}
-                onNavigate={(tab) => {
-                  setActiveTab(tab);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                systemUsers={systemUsers}
-                onAddUser={handleAddUser}
-                onToggleUserRole={handleToggleUserRole}
-                onToggleUserVip={handleToggleUserVip}
-                onToggleUserStatus={handleToggleUserStatus}
-                onDeleteUser={handleDeleteUser}
-                onRestoreUser={handleRestoreUser}
-                onSwitchAccount={handleQuickSwitchAccount}
-                onRefreshProducts={() => getProducts().then(res => res.success && setProducts(res.products))}
-              />
-            </motion.div>
-          )}
+                }} />
+              </motion.div>
+            } />
+            <Route path="/reset-password" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <ResetPassword token={new URLSearchParams(location.search).get("token") || ""} onNavigate={handleNavigate} />
+              </motion.div>
+            } />
+            <Route path="/account" element={
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                <AccountPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} setIsLoggedIn={handleSetIsLoggedIn} userProfile={userProfile} setUserProfile={setUserProfile} token={token} />
+              </motion.div>
+            } />
+            <Route path="/admin/*" element={
+              (token && userProfile.name === "") ? (
+                <div className="min-h-screen flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                </div>
+              ) : userProfile.role === "admin" ? (
+                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+                  <AdminPage token={token} products={products} onAddProduct={handleAddProduct} onEditProduct={handleEditProduct} onDeleteProduct={handleDeleteProduct} onRestoreProduct={handleRestoreProduct} onNavigate={handleNavigate} systemUsers={systemUsers} onAddUser={handleAddUser} onToggleUserRole={handleToggleUserRole} onToggleUserVip={handleToggleUserVip} onToggleUserStatus={handleToggleUserStatus} onDeleteUser={handleDeleteUser} onRestoreUser={handleRestoreUser} onSwitchAccount={handleQuickSwitchAccount} onRefreshProducts={() => getProducts().then(res => res.success && setProducts(res.products))} />
+                </motion.div>
+              ) : <Navigate to="/" replace />
+            } />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </AnimatePresence>
       </main>
 
       {/* Master Website Footer conforming to branding mock directions */}
       {showHeaderFooter && (
-        <Footer navigationItems={navigationItems} setActiveTab={setActiveTab} />
+        <Footer navigationItems={navigationItems} setActiveTab={handleNavigate} />
       )}
 
       {/* Left 70%-width Slide out Search panel drawer */}
@@ -951,7 +775,7 @@ export default function App() {
         onClose={() => setIsSearchOpen(false)}
         products={products}
         onNavigate={(tab) => {
-          setActiveTab(tab);
+          handleNavigate(tab);
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
         onAddToCart={handleAddToCart}
@@ -966,7 +790,7 @@ export default function App() {
         onRemoveItem={handleRemoveItem}
         onClearCart={handleClearCart}
         onNavigate={(tab) => {
-          setActiveTab(tab);
+          handleNavigate(tab);
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       />
@@ -975,7 +799,7 @@ export default function App() {
       <AnimatePresence>
         {showScrollTop && 
          activeTab !== 'account' && 
-         activeTab !== 'admin' && 
+         !String(activeTab).startsWith('admin') && 
          activeTab !== 'login' && 
          activeTab !== 'register' && (
           <motion.button
@@ -991,5 +815,14 @@ export default function App() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }

@@ -91,7 +91,11 @@ export default function TabProfile({
             className="w-full bg-white/70 border border-gray-200/50 hover:border-gray-300 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 shadow-sm mt-1.5 placeholder-[#4a5568]/40"
             type="text"
             placeholder="Chưa cung cấp"
-            value={userProfile.phone}
+            value={
+              !userProfile.phone || userProfile.phone === "Chưa cung cấp"
+                ? ""
+                : userProfile.phone
+            }
             onChange={(e) =>
               setUserProfile({ ...userProfile, phone: e.target.value })
             }
@@ -101,7 +105,7 @@ export default function TabProfile({
         {/* Input: Email (Readonly) */}
         <div className="space-y-1.5 md:col-span-2">
           <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">
-            EMAIL ĐĂNG BẠ
+            EMAIL ĐĂNG KÝ
           </label>
           <div className="relative mt-1.5 flex items-center">
             <input
@@ -128,7 +132,7 @@ export default function TabProfile({
         {/* Input: Address */}
         <div className="space-y-1.5 md:col-span-2">
           <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">
-            ĐỊA CHỈ GIAO NHẬN BƯU KIỆN MẶC ĐỊNH
+            ĐỊA CHỈ GIAO NHẬN MẶC ĐỊNH
           </label>
           <textarea
             className="w-full bg-white/70 border border-gray-200/50 hover:border-gray-300 rounded-lg px-3.5 py-2.5 text-[#2d3748] text-[15px] focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all duration-300 resize-none shadow-sm mt-1.5 placeholder-[#4a5568]/40"

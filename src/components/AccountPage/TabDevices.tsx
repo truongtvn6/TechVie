@@ -21,7 +21,7 @@ export default function TabDevices({ devices = [], isLoading = false }: TabDevic
         <div className="border border-dashed border-gray-300 rounded-2xl p-8 text-center text-gray-500 font-sans">
           <Cpu className="mx-auto mb-3 text-gray-400" size={32} />
           <h4 className="font-bold text-sm text-gray-800">Bạn chưa sở hữu sản phẩm nào từ TechVie</h4>
-          <p className="text-xs text-gray-500 mt-1 max-w-md mx-auto">
+          <p className="text-md text-gray-500 mt-1 max-w-md mx-auto">
             Hệ thống sẽ tự động kích hoạt bảo hành điện tử và hiển thị cấu hình thiết bị tại đây ngay khi đơn hàng của bạn được giao thành công!
           </p>
         </div>

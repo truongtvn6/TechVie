@@ -160,8 +160,8 @@ export default function AdminSidebar({
         <div className="space-y-4">
           {/* Nhóm 1: BÁO CÁO & THỐNG KÊ */}
           <div>
-            <span className={`block text-[9px] uppercase font-black tracking-[0.2em] mb-2 font-mono ${
-              isDarkMode ? 'text-gray-500' : 'text-gray-400'
+            <span className={`block text-[10px] uppercase font-black tracking-[0.2em] mb-2 font-mono ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
               Báo cáo & Thống kê
             </span>
@@ -184,8 +184,8 @@ export default function AdminSidebar({
 
           {/* Nhóm 2: CỬA HÀNG & KHO HÀNG */}
           <div>
-            <span className={`block text-[9px] uppercase font-black tracking-[0.2em] mb-2 font-mono ${
-              isDarkMode ? 'text-gray-500' : 'text-gray-400'
+            <span className={`block text-[10px] uppercase font-black tracking-[0.2em] mb-2 font-mono ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
               Cửa hàng & Kho hàng
             </span>
@@ -200,7 +200,7 @@ export default function AdminSidebar({
               >
                 <div className="flex items-center gap-2">
                   <FolderTree size={14} />
-                  <span>Danh mục</span>
+                  <span>Danh mục SP</span>
                 </div>
                 <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
                   activeSubTab === 'categories' 
@@ -257,8 +257,8 @@ export default function AdminSidebar({
 
           {/* Nhóm 3: CHĂM SÓC & CHIẾN DỊCH */}
           <div>
-            <span className={`block text-[9px] uppercase font-black tracking-[0.2em] mb-2 font-mono ${
-              isDarkMode ? 'text-gray-500' : 'text-gray-400'
+            <span className={`block text-[10px] uppercase font-black tracking-[0.2em] mb-2 font-mono ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
               Chăm sóc & Chiến dịch
             </span>
@@ -273,7 +273,7 @@ export default function AdminSidebar({
               >
                 <div className="flex items-center gap-2">
                   <MessageSquare size={14} />
-                  <span>Khách hàng</span>
+                  <span>Phản hồi KH</span>
                 </div>
                 <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
                   activeSubTab === 'messages' 
@@ -289,7 +289,7 @@ export default function AdminSidebar({
                 className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
                   activeSubTab === 'promos' 
                     ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
-                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-505 hover:bg-black/5 hover:text-black')
+                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -309,8 +309,8 @@ export default function AdminSidebar({
 
           {/* Nhóm 4: HỆ THỐNG */}
           <div>
-            <span className={`block text-[9px] uppercase font-black tracking-[0.2em] mb-2 font-mono ${
-              isDarkMode ? 'text-gray-500' : 'text-gray-400'
+            <span className={`block text-[10px] uppercase font-black tracking-[0.2em] mb-2 font-mono ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-600'
             }`}>
               Hệ thống
             </span>
@@ -356,8 +356,8 @@ export default function AdminSidebar({
           <span className={isDarkMode ? 'group-hover:!text-black transition-colors duration-200' : ''}>Trang chủ TechVie</span>
         </button>
 
-        <div className="text-[10px] text-center text-gray-400 font-mono">
-          v1.0.0 ● Live Production
+        <div className="text-[11px] text-center text-gray-600 font-mono">
+          v1.0.0 ● TechVie Administration
         </div>
       </div>
     </aside>

@@ -49,13 +49,13 @@ export default function TabSecurity({ userProfile }: TabSecurityProps) {
           <h3 className="font-headline-lg text-headline-lg text-[#2d3748] tracking-widest uppercase">thay đổi mật khẩu</h3>
           <p className="text-[#4a5568] mt-1 max-w-lg">Cập nhật mật khẩu kết nối hoặc thiết lập đặc cách xác thực</p>
         </div>
-        <div className="py-10 text-center max-w-md mx-auto space-y-4">
+        <div className="py-10 text-center max-w-xl mx-auto space-y-4">
           <div className="w-16 h-16 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto text-indigo-600">
             <CheckCircle2 size={32} />
           </div>
-          <h4 className="font-bold text-sm text-gray-900 uppercase tracking-wider">Đăng Nhập Bằng Google Active</h4>
-          <p className="text-xs text-gray-600 font-sans leading-relaxed">
-            Tài khoản của bạn được liên kết trực tiếp và bảo mật bởi hệ thống <span className="text-[#2d3748] font-bold">Google OAuth2</span><br/>
+          <h4 className="font-bold text-sm text-gray-900 uppercase tracking-wider">Đã Đăng Nhập Bằng Tài Khoản Google</h4>
+          <p className="text-md text-gray-600 font-sans leading-relaxed">
+            Tài khoản của bạn được liên kết trực tiếp và bảo mật bởi hệ thống <span className="text-[#2d3748] font-bold">Google OAuth2</span><br/><br/>
             Mật khẩu và cơ chế xác thực hai lớp (2FA) của bạn được quản lý an toàn trực tiếp bởi Google,<br/>do đó bạn không cần thiết lập mật khẩu truyền thống trên hệ thống TechVie.
           </p>
         </div>

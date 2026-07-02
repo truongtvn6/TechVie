@@ -20,7 +20,7 @@ export default function TabOrders({ orders }: TabOrdersProps) {
             </div>
             <div className="space-y-1">
               <h4 className="font-extrabold text-[#2d3748] text-sm uppercase tracking-wider">Không tìm thấy đơn hàng</h4>
-              <p className="text-[#4a5568] max-w-xs text-[12px]">Lịch sử giao dịch của tài khoản này hiện chưa có bưu kiện nào được ghi nhận.</p>
+              <p className="text-[#4a5568] max-w-xs text-[13px]">Lịch sử giao dịch của tài khoản này hiện chưa có bưu kiện nào được ghi nhận.</p>
             </div>
           </div>
         ) : (

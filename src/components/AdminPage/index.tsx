@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Product } from '../../types';
 import { 
   getContactMessages,
@@ -68,6 +69,9 @@ export default function AdminPage({
   onSwitchAccount,
   onRefreshProducts
 }: AdminPageProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   // Persistent Dark Mode state
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     try {
@@ -175,7 +179,14 @@ export default function AdminPage({
   };
 
   // Admin active sub tab
-  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'categories' | 'products' | 'orders' | 'messages' | 'promos' | 'users'>('overview');
+  const pathParts = location.pathname.split('/');
+  const subRoute = pathParts[2] || 'overview';
+  const validTabs = ['overview', 'categories', 'products', 'orders', 'messages', 'promos', 'users'];
+  const activeSubTab = validTabs.includes(subRoute) ? subRoute as any : 'overview';
+
+  const setActiveSubTab = (tab: string) => {
+    navigate(`/admin/${tab}`);
+  };
 
   // Product categories state (always fetch all, including soft-deleted)
   const [allCategories, setAllCategories] = useState<any[]>([]);

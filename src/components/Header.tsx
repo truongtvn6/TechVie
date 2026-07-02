@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { TabType } from '../types';
 import { Search, ShoppingBag, Menu, X, User } from 'lucide-react';
 import Logo from '../assets/logopage/logo-b-w-techvie.png'
@@ -92,33 +93,29 @@ export default function Header({
       `}</style>
       <div className="flex justify-between items-center h-18 px-4 md:px-8 lg:px-10 max-w-none mx-auto relative w-full">
         {/* Brand Logo text */}
-        <button 
-          onClick={() => {
-            setActiveTab('home');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+        <Link 
+          to="/"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="text-2xl md:text-3xl font-sans tracking-tighter text-black font-black hover:opacity-80 transition-opacity"
         >
           <img src={Logo} alt="TechVie Logo" className="h-12 md:h-14 lg:h-16 w-auto object-contain cursor-pointer" />
-        </button>
+        </Link>
 
         {/* Desktop Nav menu items */}
         <nav className="hidden md:flex items-center space-x-3 lg:space-x-8 xl:space-x-10">
           {navigationItems.map((item) => (
-            <button
+            <Link
               key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`nav-btn px-4 py-2 text-[11px] lg:text-[13px] font-sans tracking-widest font-extrabold transition-all duration-300 rounded-sm cursor-pointer ${
+              to={item.id === 'home' ? '/' : `/${item.id}`}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className={`nav-btn px-4 py-2 text-[11px] lg:text-[13px] font-sans tracking-widest font-extrabold transition-all duration-300 rounded-sm cursor-pointer inline-block ${
                 activeTab === item.id 
                   ? 'nav-btn-active' 
                   : 'text-gray-500'
               }`}
             >
               {item.label}
-            </button>
+            </Link>
           ))}
         </nav>
 
@@ -153,15 +150,9 @@ export default function Header({
               </span>
             )}
 
-            <a 
-              href={!isLoggedIn ? '#login' : '#account'}
+            <Link 
+              to={!isLoggedIn ? '/login' : '/account'}
               onClick={(e) => {
-                e.preventDefault();
-                if (!isLoggedIn) {
-                  setActiveTab('login');
-                } else {
-                  setActiveTab('account');
-                }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative cursor-pointer ${
@@ -172,7 +163,7 @@ export default function Header({
               title="Tài khoản TechVie ID"
             >
               <User size={20} />
-            </a>
+            </Link>
           </div>
 
           <button 
@@ -195,28 +186,26 @@ export default function Header({
           >
             <div className="flex flex-col px-6 space-y-4">
               {navigationItems.map((item) => (
-                <button
+                <Link
                   key={item.id}
+                  to={item.id === 'home' ? '/' : `/${item.id}`}
                   onClick={() => {
-                    setActiveTab(item.id);
                     setIsMobileMenuOpen(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`text-left text-sm uppercase tracking-widest font-black py-2.5 cursor-pointer font-bold ${
+                  className={`text-left block text-sm uppercase tracking-widest font-black py-2.5 cursor-pointer font-bold ${
                     activeTab === item.id ? 'text-indigo-600 font-extrabold' : 'text-gray-600 shadow-none'
                   }`}
                 >
                   {item.label}
-                </button>
+                </Link>
               ))}
               
               {!isLoggedIn ? (
                 <div className="pt-4 border-t border-gray-200 flex flex-col gap-2">
-                  <a
-                    href="#login"
+                  <Link
+                    to="/login"
                     onClick={(e) => {
-                      e.preventDefault();
-                      setActiveTab('login');
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
@@ -226,12 +215,10 @@ export default function Header({
                   >
                     {/* <User size={16} />  */}
                     ĐĂNG NHẬP
-                  </a>
-                  <a
-                    href="#register"
+                  </Link>
+                  <Link
+                    to="/register"
                     onClick={(e) => {
-                      e.preventDefault();
-                      setActiveTab('register');
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
@@ -240,15 +227,13 @@ export default function Header({
                     }`}
                   >
                     ĐĂNG KÝ
-                  </a>
+                  </Link>
                 </div>
               ) : (
                 <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
-                  <a
-                    href="#account"
+                  <Link
+                    to="/account"
                     onClick={(e) => {
-                      e.preventDefault();
-                      setActiveTab('account');
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
@@ -257,7 +242,7 @@ export default function Header({
                     }`}
                   >
                     <User size={16} /> TÀI KHOẢN ({userProfile.name.split(' ').pop()?.toUpperCase()})
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
