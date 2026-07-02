@@ -235,22 +235,25 @@ export default function AdminPage({
 
   // Xóa hẳn danh mục khỏi cơ sở dữ liệu
   const handleHardDeleteCategory = async (id: string) => {
+    console.log('[CategoryManager] handleHardDeleteCategory starting for ID:', id);
     const target = allCategories.find(c => c._id === id);
     const name = target ? target.name : id;
-    const confirmed = window.confirm(`⚠️ Hành động này không thể hoàn tác!\n\nBạn chắc chắn muốn XÓA HẲNG danh mục "${name}" khỏi cơ sở dữ liệu?`);
-    if (confirmed) {
-      try {
-        const res = await hardDeleteCategory(id);
-        if (res.success) {
-          addLog(`Đã xóa hẳn danh mục: "${name}" khỏi CSDL`);
-          fetchCategories();
-        } else {
-          addLog(`Lỗi khi xóa hẳn danh mục: ${res.message}`);
-        }
-      } catch (err) {
-        console.error('[CategoryManager] Hard delete error:', err);
-        addLog(`Lỗi xóa hẳn danh mục: ${err}`);
+    console.log('[CategoryManager] Target category to hard delete:', name);
+    try {
+      console.log('[CategoryManager] Calling hardDeleteCategory API for ID:', id);
+      const res = await hardDeleteCategory(id);
+      console.log('[CategoryManager] API result:', res);
+      if (res.success) {
+        addLog(`Đã xóa hẳn danh mục: "${name}" khỏi CSDL`);
+        console.log('[CategoryManager] Delete successful, refetching...');
+        fetchCategories();
+      } else {
+        addLog(`Lỗi khi xóa hẳn danh mục: ${res.message}`);
+        console.error('[CategoryManager] API failed:', res.message);
       }
+    } catch (err) {
+      console.error('[CategoryManager] Hard delete error:', err);
+      addLog(`Lỗi xóa hẳn danh mục: ${err}`);
     }
   };
 

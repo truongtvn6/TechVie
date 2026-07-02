@@ -749,3 +749,14 @@ export async function hardDeleteCategory(id: string): Promise<{ success: boolean
     return { success: false, message: error.message };
   }
 }
+
+// Gửi logs từ Client về hiển thị trên CMD Backend Server
+export async function sendClientLog(message: string, level: 'log' | 'warn' | 'error' = 'log', details?: any): Promise<void> {
+  try {
+    fetch(`${API_BASE_URL}/api/logs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ level, message, details })
+    }).catch(() => {});
+  } catch (e) {}
+}

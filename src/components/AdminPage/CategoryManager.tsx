@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FolderTree, Plus, Edit2, Trash2, Check, X } from 'lucide-react';
+import { sendClientLog } from '../../services/api';
 
 interface Category {
   _id: string;
@@ -30,6 +31,7 @@ export default function CategoryManager({
   const [editingName, setEditingName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,9 +70,17 @@ export default function CategoryManager({
   };
 
   const handleToggle = async (id: string) => {
+    const target = categories.find(c => c._id === id);
+    const name = target ? target.name : id;
+    const action = target?.isDeleted ? 'BẬT' : 'TẮT';
+    
+    sendClientLog(`[CategoryManager] Yêu cầu ${action} danh mục "${name}" (ID: ${id})`, 'log');
     setTogglingIds(prev => new Set(prev).add(id));
     try {
       await onToggleCategory(id);
+      sendClientLog(`[CategoryManager] Đã ${action} danh mục "${name}" thành công`, 'log');
+    } catch (err: any) {
+      sendClientLog(`[CategoryManager] Lỗi khi ${action} danh mục "${name}": ${err.message}`, 'error');
     } finally {
       setTogglingIds(prev => {
         const next = new Set(prev);
@@ -190,13 +200,13 @@ export default function CategoryManager({
               {categories.map((c) => (
                 <div 
                   key={c._id} 
-                  className={`p-5 rounded-3xl shadow-sm transition-all duration-300 flex flex-col justify-between min-h-[140px] border ${
+                  className={`p-6 rounded-3xl shadow-sm transition-all duration-300 flex flex-col justify-between min-h-[170px] border ${
                     d ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-gray-200'
                   } ${c.isDeleted ? 'opacity-60' : 'hover:border-black/15'}`}
                 >
                   <div className="text-left w-full">
                     {/* Header item info */}
-                    <div className={`flex justify-between items-center border-b pb-2 mb-3 transition-all duration-300 ${
+                    <div className={`flex justify-between items-center border-b pb-3 mb-4 transition-all duration-300 ${
                       d ? 'border-[#30363d]' : 'border-gray-100'
                     }`}>
                       <span className="text-[10px] text-gray-400 uppercase tracking-widest font-mono">
@@ -226,7 +236,7 @@ export default function CategoryManager({
                     </div>
 
                     {editingId === c._id ? (
-                      <div className="flex gap-2 items-center mb-3">
+                      <div className="flex gap-2 items-center mb-4">
                         <input
                           type="text"
                           value={editingName}
@@ -251,10 +261,10 @@ export default function CategoryManager({
                         </button>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3 mb-4">
                         <h4 className={`font-black text-sm tracking-tight transition-colors duration-300 ${
                           d ? 'text-white' : 'text-gray-955'
-                        } ${c.isDeleted ? 'line-through' : ''}`}>
+                        } ${c.isDeleted ? 'line-through opacity-70' : ''}`}>
                           {c.name}
                         </h4>
                         {c.isDeleted && (
@@ -276,27 +286,63 @@ export default function CategoryManager({
                   </div>
 
                   {/* Actions bar inside card */}
-                  <div className={`flex items-center justify-end gap-3 pt-3 border-t text-xs transition-all duration-300 ${
+                  <div className={`flex items-center justify-end gap-5 pt-4 border-t text-xs transition-all duration-300 ${
                     d ? 'border-[#30363d]' : 'border-gray-50'
                   }`}>
                     {editingId !== c._id && (
-                      <button
-                        type="button"
-                        onClick={() => startEditing(c)}
-                        className="text-amber-600 hover:text-amber-800 font-black uppercase tracking-wider text-[10px] cursor-pointer flex items-center gap-1"
-                      >
-                        <Edit2 size={11} />
-                        Đổi tên
-                      </button>
+                      <>
+                        {confirmDeleteId === c._id ? (
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] text-rose-500 font-extrabold uppercase animate-pulse">Xác nhận xóa?</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                console.log('CategoryManager: Confirmed hard delete for category ID:', c._id);
+                                sendClientLog(`[CategoryManager] Người dùng ĐỒNG Ý Xóa hẳn danh mục "${c.name}" (ID: ${c._id})`, 'warn');
+                                onHardDeleteCategory(c._id);
+                                setConfirmDeleteId(null);
+                              }}
+                              className="px-2.5 py-1 bg-rose-500 hover:bg-rose-600 text-white rounded text-[10px] font-black uppercase cursor-pointer"
+                            >
+                              Đồng ý
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                sendClientLog(`[CategoryManager] Người dùng đã HỦY yêu cầu Xóa hẳn danh mục "${c.name}" (ID: ${c._id})`, 'log');
+                                setConfirmDeleteId(null);
+                              }}
+                              className="px-2.5 py-1 bg-gray-500 hover:bg-gray-600 text-white rounded text-[10px] font-black uppercase cursor-pointer"
+                            >
+                              Hủy
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => startEditing(c)}
+                              className="text-amber-600 hover:text-amber-800 font-black uppercase tracking-wider text-[10px] cursor-pointer flex items-center gap-1.5"
+                            >
+                              <Edit2 size={11} />
+                              Đổi tên
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                console.log('CategoryManager: Initial click for hard delete, setting confirm ID:', c._id);
+                                sendClientLog(`[CategoryManager] Người dùng click "Xóa hẳn" danh mục "${c.name}" (ID: ${c._id})`, 'log');
+                                setConfirmDeleteId(c._id);
+                              }}
+                              className="text-rose-500 hover:text-rose-700 font-black uppercase tracking-wider text-[10px] cursor-pointer flex items-center gap-1.5"
+                            >
+                              <Trash2 size={11} />
+                              Xóa hẳn
+                            </button>
+                          </>
+                        )}
+                      </>
                     )}
-                    <button
-                      type="button"
-                      onClick={() => onHardDeleteCategory(c._id)}
-                      className="text-rose-500 hover:text-rose-700 font-black uppercase tracking-wider text-[10px] cursor-pointer flex items-center gap-1"
-                    >
-                      <Trash2 size={11} />
-                      Xóa hẳn
-                    </button>
                   </div>
 
                 </div>
