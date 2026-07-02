@@ -74,9 +74,9 @@ export default function AccountSidebar({
           <div className="flex justify-between items-center">
             <span className="text-[#4a5568]">Đặc quyền:</span>
             <span className={`font-tech-label text-tech-label !text-sm !tracking-normal border-none ${
-              userProfile.shieldStatus === 'Standard' 
-                ? 'text-blue-700' 
-                : 'text-emerald-700'
+              userProfile.shieldStatus === 'Đang Kích Hoạt (Premium)' || userProfile.shieldStatus === 'Premium'
+                ? 'text-emerald-700' 
+                : 'text-blue-700'
             }`}>
               {userProfile.shieldStatus || 'Standard'}
             </span>
