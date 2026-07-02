@@ -28,6 +28,10 @@ interface OrderManagerProps {
     status: string,
     statusType: string,
   ) => void;
+  onUpdatePaymentStatus?: (
+    orderId: number | string,
+    paymentStatus: "pending" | "paid" | "failed" | "cancelled",
+  ) => void;
   isDarkMode?: boolean;
   products?: Product[];
 }
@@ -132,6 +136,7 @@ export default function OrderManager({
   isLoadingOrders,
   onRefreshOrders,
   onUpdateOrderStatus,
+  onUpdatePaymentStatus,
   isDarkMode = false,
   products = [],
 }: OrderManagerProps) {
@@ -692,6 +697,45 @@ export default function OrderManager({
                       >
                         <X size={11} /> Hủy bỏ đơn
                       </button>
+
+                      {onUpdatePaymentStatus && (
+                        <>
+                          <div className={`my-1 h-px ${d ? "bg-[#30363d]" : "bg-gray-200"}`} />
+
+                          <button
+                            onClick={() => onUpdatePaymentStatus(ord.orderId, "paid")}
+                            className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                              d
+                                ? "bg-emerald-950/40 hover:bg-emerald-900/60 border-emerald-900/30 text-emerald-400"
+                                : "bg-emerald-50 hover:bg-emerald-100 border-emerald-200/40 text-emerald-700"
+                            }`}
+                          >
+                            <CheckCircle size={11} /> Xác nhận đã trả
+                          </button>
+
+                          <button
+                            onClick={() => onUpdatePaymentStatus(ord.orderId, "pending")}
+                            className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                              d
+                                ? "bg-[#21262d] hover:bg-[#30363d] border-[#30363d] text-gray-200"
+                                : "bg-white hover:bg-gray-100 border-gray-200 text-gray-700"
+                            }`}
+                          >
+                            <Clock size={11} /> Chờ thanh toán
+                          </button>
+
+                          <button
+                            onClick={() => onUpdatePaymentStatus(ord.orderId, "failed")}
+                            className={`w-full py-2 font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                              d
+                                ? "bg-rose-950/30 hover:bg-rose-900/40 text-rose-400"
+                                : "bg-rose-50 hover:bg-rose-100 text-rose-600"
+                            }`}
+                          >
+                            <X size={11} /> Thanh toán lỗi
+                          </button>
+                        </>
+                      )}
                     </>
                   )}
                 </div>

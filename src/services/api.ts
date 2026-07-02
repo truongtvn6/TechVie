@@ -274,30 +274,30 @@ export async function clearAllOrdersFromServer(): Promise<{ success: boolean; me
 }
 
 // Lưu trữ đơn hàng thực tế của khách hàng khi Checkout
-export async function submitCheckoutOrder(orderData: {
-  fullName: string;
-  phone: string;
-  email: string;
-  address: string;
-  notes: string;
-  paymentMethod: string;
-  deliveryMethod: string;
-  cart: Array<{ product: Product; quantity: number }>;
-  finalTotal: string;
-}): Promise<{ success: boolean; orderId?: number | string; message?: string }> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/checkout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderData)
-    });
-    if (!response.ok) throw new Error('Gửi đơn mua hàng thất bại!');
-    return await response.json();
-  } catch (error) {
-    console.error('Lỗi trong quá trình thanh toán:', error);
-    return { success: false, message: 'Máy chủ bận hoặc gặp lỗi truyền kết nối.' };
-  }
-}
+// export async function submitCheckoutOrder(orderData: {
+//   fullName: string;
+//   phone: string;
+//   email: string;
+//   address: string;
+//   notes: string;
+//   paymentMethod: string;
+//   deliveryMethod: string;
+//   cart: Array<{ product: Product; quantity: number }>;
+//   finalTotal: string;
+// }): Promise<{ success: boolean; orderId?: number | string; message?: string }> {
+//   try {
+//     const response = await fetch(`${API_BASE_URL}/api/checkout`, {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify(orderData)
+//     });
+//     if (!response.ok) throw new Error('Gửi đơn mua hàng thất bại!');
+//     return await response.json();
+//   } catch (error) {
+//     console.error('Lỗi trong quá trình thanh toán:', error);
+//     return { success: false, message: 'Máy chủ bận hoặc gặp lỗi truyền kết nối.' };
+//   }
+// }
 
 // Tải danh sách phân loại sản phẩm (Categories) từ backend
 export async function getCategories(includeDeleted: boolean = false): Promise<{ success: boolean; categories: string[] }> {
@@ -759,4 +759,59 @@ export async function sendClientLog(message: string, level: 'log' | 'warn' | 'er
       body: JSON.stringify({ level, message, details })
     }).catch(() => {});
   } catch (e) {}
+}
+
+// Cập nhật trạng thái thanh toán đơn hàng (Admin xác nhận chuyển khoản/đối soát)
+export async function updateOrderPaymentStatus(orderId: number | string, paymentStatus: 'pending' | 'paid' | 'failed' | 'cancelled'): Promise<{ success: boolean; order?: any; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/payment-status`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ paymentStatus })
+    });
+    if (!response.ok) throw new Error('Cập nhật thanh toán thất bại!');
+    return await response.json();
+  } catch (error) {
+    console.error('Lỗi cập nhật trạng thái thanh toán:', error);
+    return { success: false, message: 'Lỗi máy chủ.' };
+  }
+}
+
+// Lưu trữ đơn hàng thực tế của khách hàng khi Checkout
+export async function submitCheckoutOrder(orderData: {
+  fullName: string;
+  phone: string;
+  email: string;
+  address: string;
+  notes: string;
+  paymentMethod: string;
+  deliveryMethod: string;
+  cart: Array<{ product: Product; quantity: number }>;
+  finalTotal: string;
+}): Promise<{ success: boolean; orderId?: number | string; message?: string; order?: any; payment?: any }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    });
+    if (!response.ok) throw new Error('Gửi đơn mua hàng thất bại!');
+    return await response.json();
+  } catch (error) {
+    console.error('Lỗi trong quá trình thanh toán:', error);
+    return { success: false, message: 'Máy chủ bận hoặc gặp lỗi truyền kết nối.' };
+  }
+}
+
+// Khách hàng chỉ được kiểm tra trạng thái thanh toán, không được tự xác nhận đã thanh toán
+export async function getCheckoutPaymentStatus(orderId: number | string): Promise<{ success: boolean; message?: string; order?: any; payment?: any }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/checkout/payment/status/${orderId}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể kiểm tra trạng thái thanh toán!');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi kiểm tra trạng thái thanh toán:', error);
+    return { success: false, message: error.message || 'Không thể kiểm tra trạng thái thanh toán.' };
+  }
 }

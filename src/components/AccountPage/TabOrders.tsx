@@ -69,13 +69,13 @@ export default function TabOrders({ orders }: TabOrdersProps) {
                     </span>
                   </div>
 
-                  <button 
+                  {/* <button 
                     type="button"
                     onClick={() => console.log(`Sản phẩm mã ${ord.id} đang nằm trong lộ trình bưu tá giao hàng tận nơi nguyên seal.`)}
                     className="text-[10px] font-tech-label text-tech-label text-black bg-white/80 border border-white/60 hover:bg-white px-4 py-2 rounded-lg transition-all shadow-sm"
                   >
                     Xem Vị Trí Vận Chuyển
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>

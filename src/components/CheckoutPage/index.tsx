@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem } from '../../types';
-import { submitCheckoutOrder } from '../../services/api';
+import { getCheckoutPaymentStatus, submitCheckoutOrder } from '../../services/api';
 import { Gift, Info } from 'lucide-react';
 
 import CheckoutForm from './CheckoutForm';
@@ -18,7 +18,7 @@ interface CheckoutPageProps {
   userProfile?: any;
 }
 
-type PaymentMethodType = 'bank' | 'card' | 'cod';
+type PaymentMethodType = 'bank' | 'cod' | 'momo' | 'zalopay';
 type DeliveryMethodType = 'standard' | 'express';
 
 export default function CheckoutPage({
@@ -33,8 +33,11 @@ export default function CheckoutPage({
   const [step, setStep] = useState<'form' | 'processing' | 'success'>('form');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('bank');
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethodType>('standard');
-  const [serverOrderId, setServerOrderId] = useState<number | null>(null);
+  const [serverOrderId, setServerOrderId] = useState<number | string | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<any>(null);
   const [apiError, setApiError] = useState<string>('');
+  const [paymentStatusMessage, setPaymentStatusMessage] = useState<string>('');
+  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
   
   // Checkout Input States initialized from userProfile if available
   const [fullName, setFullName] = useState(userProfile?.name || '');
@@ -58,12 +61,6 @@ export default function CheckoutPage({
   const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
   const [promoError, setPromoError] = useState('');
   const [promoSuccess, setPromoSuccess] = useState('');
-
-  // Card data
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardHolder, setCardHolder] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
 
   // Calculations
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -139,6 +136,7 @@ export default function CheckoutPage({
       setTimeout(() => {
         if (data.success && data.orderId) {
           setServerOrderId(data.orderId);
+          setPaymentDetails(data.payment || data.order || null);
           setStep('success');
         } else {
           setApiError(data.message || 'Lỗi hệ thống khi khởi tạo bưu kiện đơn hàng.');
@@ -158,6 +156,31 @@ export default function CheckoutPage({
     onClearCart();
     onNavigate('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleRefreshPaymentStatus = async () => {
+    if (!serverOrderId) return;
+
+    setIsCheckingPayment(true);
+    setPaymentStatusMessage('');
+
+    const data = await getCheckoutPaymentStatus(serverOrderId);
+
+    if (data.success) {
+      setPaymentDetails(data.payment || data.order || paymentDetails);
+      const status = data.payment?.status || data.order?.paymentStatus;
+      if (status === 'paid') {
+        setPaymentStatusMessage('Admin đã xác nhận tiền về. Đơn hàng đã thanh toán thành công.');
+      } else if (status === 'failed') {
+        setPaymentStatusMessage('Thanh toán đang được đánh dấu lỗi. Vui lòng liên hệ cửa hàng để kiểm tra.');
+      } else {
+        setPaymentStatusMessage('Đơn hàng vẫn đang chờ admin đối soát giao dịch.');
+      }
+    } else {
+      setPaymentStatusMessage(data.message || 'Không thể kiểm tra trạng thái thanh toán lúc này.');
+    }
+
+    setIsCheckingPayment(false);
   };
 
   if (cart.length === 0 && step !== 'success') {
@@ -264,14 +287,6 @@ export default function CheckoutPage({
               setPaymentMethod={setPaymentMethod}
               deliveryMethod={deliveryMethod}
               setDeliveryMethod={setDeliveryMethod}
-              cardNumber={cardNumber}
-              setCardNumber={setCardNumber}
-              cardHolder={cardHolder}
-              setCardHolder={setCardHolder}
-              cardExpiry={cardExpiry}
-              setCardExpiry={setCardExpiry}
-              cardCvv={cardCvv}
-              setCardCvv={setCardCvv}
               promoCode={promoCode}
               setPromoCode={setPromoCode}
               appliedDiscount={appliedDiscount}
@@ -297,6 +312,7 @@ export default function CheckoutPage({
           <CheckoutSuccess
             email={email}
             serverOrderId={serverOrderId}
+            paymentDetails={paymentDetails}
             fullName={fullName}
             phone={phone}
             address={address}
@@ -308,6 +324,9 @@ export default function CheckoutPage({
             deliveryFee={deliveryFee}
             finalTotal={finalTotal}
             onFinish={handleFinishSuccess}
+            onRefreshPaymentStatus={handleRefreshPaymentStatus}
+            isCheckingPayment={isCheckingPayment}
+            paymentStatusMessage={paymentStatusMessage}
           />
         )}
       </AnimatePresence>

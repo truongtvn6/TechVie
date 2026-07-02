@@ -7,6 +7,7 @@ import {
   replyContactMessage,
   getAdminOrders,
   updateOrderStatus,
+  updateOrderPaymentStatus,
   getProducts,
   getSystemUsers,
   getBackendCategories,
@@ -570,7 +571,22 @@ export default function AdminPage({
       });
   };
 
-
+  // Update payment status on Express
+  const handleUpdatePaymentStatus = (orderId: number | string, paymentStatus: 'pending' | 'paid' | 'failed' | 'cancelled') => {
+    updateOrderPaymentStatus(orderId, paymentStatus)
+      .then(data => {
+        if (data.success) {
+          const label = paymentStatus === 'paid' ? 'Đã thanh toán' : paymentStatus === 'failed' ? 'Thanh toán thất bại' : paymentStatus === 'cancelled' ? 'Đã hủy thanh toán' : 'Chờ thanh toán';
+          addLog(`Đơn hàng #${orderId} cập nhật thanh toán: ${label}`);
+          fetchOrders();
+        } else {
+          addLog(`Lỗi cập nhật thanh toán #${orderId}: ${data.message || 'Không rõ nguyên nhân'}`);
+        }
+      })
+      .catch(err => {
+        console.error('Error changing payment status:', err);
+      });
+  };
 
   return (
     <div className={`admin-dashboard-root min-h-screen bg-[#f7f9fb] text-gray-900 w-full flex flex-col md:flex-row ${isDarkMode ? 'dark' : ''}`}>
@@ -711,6 +727,7 @@ export default function AdminPage({
               isLoadingOrders={isLoadingOrders}
               onRefreshOrders={fetchOrders}
               onUpdateOrderStatus={handleUpdateOrderStatus}
+              onUpdatePaymentStatus={handleUpdatePaymentStatus}
               isDarkMode={isDarkMode}
               products={products}
             />

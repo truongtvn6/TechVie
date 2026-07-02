@@ -3,13 +3,11 @@ import { motion } from 'motion/react';
 import { CartItem } from '../../types';
 import { 
   ArrowLeft, 
-  CreditCard, 
   Truck, 
   ShieldCheck, 
   Sparkles, 
   CheckCircle2, 
   QrCode, 
-  Building, 
   Gift, 
   Smartphone, 
   Info,
@@ -29,20 +27,10 @@ interface CheckoutFormProps {
   notes: string;
   setNotes: (val: string) => void;
   
-  paymentMethod: 'bank' | 'card' | 'cod';
-  setPaymentMethod: (method: 'bank' | 'card' | 'cod') => void;
+  paymentMethod: 'bank' | 'cod' | 'momo' | 'zalopay';
+  setPaymentMethod: (method: 'bank' | 'cod' | 'momo' | 'zalopay') => void;
   deliveryMethod: 'standard' | 'express';
   setDeliveryMethod: (method: 'standard' | 'express') => void;
-  
-  // Card states
-  cardNumber: string;
-  setCardNumber: (val: string) => void;
-  cardHolder: string;
-  setCardHolder: (val: string) => void;
-  cardExpiry: string;
-  setCardExpiry: (val: string) => void;
-  cardCvv: string;
-  setCardCvv: (val: string) => void;
   
   // Promo states
   promoCode: string;
@@ -79,14 +67,6 @@ export default function CheckoutForm({
   setPaymentMethod,
   deliveryMethod,
   setDeliveryMethod,
-  cardNumber,
-  setCardNumber,
-  cardHolder,
-  setCardHolder,
-  cardExpiry,
-  setCardExpiry,
-  cardCvv,
-  setCardCvv,
   promoCode,
   setPromoCode,
   appliedDiscount,
@@ -115,31 +95,20 @@ export default function CheckoutForm({
             <div className="flex items-start gap-3">
               <QrCode className="text-indigo-600 flex-shrink-0 animate-pulse" size={32} />
               <div>
-                <h4 className="font-bold text-gray-900 mb-1">Mã QR Thanh Toán Tự Động</h4>
+                <h4 className="font-bold text-gray-900 mb-1">Mã QR Chuyển Khoản Ngân Hàng</h4>
                 <p className="text-gray-550 leading-relaxed">
-                  Hệ thống tự động liên kết với ngân hàng nhận ủy thác. Vui lòng quét mã bên dưới hoặc chuyển khoản theo thông tin.
+                  Quét mã MB Bank bên dưới và chuyển đúng số tiền. Đơn hàng sẽ ở trạng thái chờ thanh toán cho đến khi người bán đối soát tiền về.
                 </p>
               </div>
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-around p-4 bg-white border border-indigo-100 rounded-xl gap-4">
               <div className="relative p-2 border border-gray-200 rounded-xl bg-white shadow-sm flex-shrink-0">
-                {/* Visual mock QR code matching premium standards */}
-                <div className="grid grid-cols-4 gap-0.5 w-[110px] h-[110px] bg-black p-1 rounded-sm relative">
-                  <div className="absolute inset-0 bg-white m-1.5 flex flex-col justify-between p-1">
-                    <div className="flex justify-between">
-                      <span className="w-5 h-5 bg-black rounded-[2px]" />
-                      <span className="w-5 h-5 bg-black rounded-[2px]" />
-                    </div>
-                    <div className="flex justify-center items-center">
-                      <span className="w-3 h-3 bg-indigo-600 rounded-full" />
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="w-5 h-5 bg-black rounded-[2px]" />
-                      <span className="w-2 h-2 bg-indigo-900 rounded-xs" />
-                    </div>
-                  </div>
-                </div>
+                <img
+                  src="/src/assets/images/nganhang.jpg"
+                  alt="QR chuyển khoản MB Bank"
+                  className="w-[150px] h-[190px] object-cover rounded-lg"
+                />
                 <div className="absolute bottom-[-10px] left-1/2 -translate-x-1/2 bg-indigo-600 text-[8px] text-white px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
                   QUÉT QR
                 </div>
@@ -148,15 +117,15 @@ export default function CheckoutForm({
               <div className="space-y-2 text-left w-full md:w-auto">
                 <div className="grid grid-cols-3 gap-x-2">
                   <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Ngân hàng:</span>
-                  <span className="col-span-2 font-bold text-gray-900">Techcombank (TCB)</span>
+                  <span className="col-span-2 font-bold text-gray-900">MB Bank</span>
                 </div>
                 <div className="grid grid-cols-3 gap-x-2">
                   <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Số Tài Khoản:</span>
-                  <span className="col-span-2 font-mono font-bold text-indigo-700">1903 8888 9999 68</span>
+                  <span className="col-span-2 font-mono font-bold text-indigo-700">25350879130818</span>
                 </div>
                 <div className="grid grid-cols-3 gap-x-2">
                   <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Tên chủ TK:</span>
-                  <span className="col-span-2 text-gray-900 font-bold">CÔNG TY TECHVIE VIETNAM</span>
+                  <span className="col-span-2 text-gray-900 font-bold">TRUONG THANH DANH</span>
                 </div>
                 <div className="grid grid-cols-3 gap-x-2">
                   <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Số tiền:</span>
@@ -173,103 +142,95 @@ export default function CheckoutForm({
 
             <div className="flex items-center gap-2 text-[10px] text-indigo-505 bg-indigo-50 p-2.5 rounded-lg border border-indigo-100/50">
               <Info size={14} />
-              <span>Thanh toán sẽ được phê chuẩn ngay sau 1-2 phút thông qua cổng quét quang học tự động.</span>
+              <span>Sau khi đặt hàng, hệ thống lưu đơn ở trạng thái chờ thanh toán. Người bán kiểm tra biến động tài khoản rồi xác nhận trong trang quản trị.</span>
             </div>
           </motion.div>
         );
-      case 'card':
+      case 'momo':
         return (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-5 bg-gray-50 border border-gray-200 rounded-2xl space-y-4"
+            className="p-5 bg-[#fff0f8] border border-[#ffd1eb] rounded-2xl space-y-4 text-xs font-sans text-gray-700"
           >
-            {/* Visual credit card mockup */}
-            <div className="w-full max-w-[320px] mx-auto h-[180px] bg-gradient-to-tr from-slate-900 to-indigo-955 rounded-2xl p-5 text-white flex flex-col justify-between shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-xl -mr-10 -mt-10" />
-              <div className="flex justify-between items-start">
-                <span className="font-extrabold tracking-widest text-[11px] text-indigo-400">TECHVIE PREMIUM CARD</span>
-                <Building size={20} className="text-indigo-300" />
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#a50064] text-white flex items-center justify-center font-black text-[10px] shrink-0">
+                MoMo
               </div>
-              <div className="mt-4">
-                <p className="font-mono text-base tracking-widest text-indigo-100">
-                  {cardNumber || '•••• •••• •••• ••••'}
+              <div>
+                <h4 className="font-bold text-gray-900 mb-1">QR Thanh Toán MoMo</h4>
+                <p className="text-gray-550 leading-relaxed">
+                  Quét mã MoMo bên dưới để chuyển tiền. Trạng thái chỉ chuyển sang đã thanh toán sau khi người bán kiểm chứng giao dịch.
                 </p>
               </div>
-              <div className="flex justify-between items-end mt-2">
-                <div>
-                  <p className="text-[7px] uppercase font-bold tracking-wider text-indigo-400 font-sans">CHỦ THẺ</p>
-                  <p className="font-mono text-xs font-bold uppercase tracking-wider h-4">
-                    {cardHolder || 'NGUYEN VAN A'}
-                  </p>
+            </div>
+            <div className="bg-white border border-[#ffd1eb] rounded-xl p-4 grid grid-cols-1 md:grid-cols-[150px_1fr] gap-4 items-center">
+              <img
+                src="/src/assets/images/momo.jpg"
+                alt="QR thanh toán MoMo"
+                className="w-[150px] h-[190px] object-cover rounded-xl border border-pink-100 mx-auto"
+              />
+              <div className="space-y-2">
+                <div className="flex justify-between gap-3">
+                  <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Ví điện tử</span>
+                  <span className="font-black text-[#a50064]">MoMo</span>
                 </div>
-                <div className="flex gap-4">
-                  <div>
-                    <p className="text-[7px] uppercase font-bold tracking-wider text-indigo-400 font-sans">HẠN DÙNG</p>
-                    <p className="font-mono text-xs font-bold h-4">{cardExpiry || 'MM/YY'}</p>
-                  </div>
-                  <div>
-                    <p className="text-[7px] uppercase font-bold tracking-wider text-indigo-400 font-sans">CVV</p>
-                    <p className="font-mono text-xs font-bold h-4">{cardCvv ? '•••' : '000'}</p>
-                  </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Chủ ví</span>
+                  <span className="font-bold text-gray-900">TRƯƠNG THÀNH DANH</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Số tiền</span>
+                  <span className="font-mono font-black text-emerald-600">{finalTotal.toLocaleString('vi-VN')}₫</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Trạng thái</span>
+                  <span className="font-bold text-amber-700">Chờ đối soát</span>
                 </div>
               </div>
             </div>
-
-            {/* Inputs */}
-            <div className="space-y-3 font-sans text-xs">
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-450 tracking-wider mb-1">Số thẻ tín dụng</label>
-                <input 
-                  type="text" 
-                  maxLength={19}
-                  placeholder="4000 1234 5678 9010"
-                  value={cardNumber}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim();
-                    setCardNumber(val);
-                  }}
-                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-black"
-                />
+          </motion.div>
+        );
+      case 'zalopay':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-5 bg-blue-50/80 border border-blue-100 rounded-2xl space-y-4 text-xs font-sans text-gray-700"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#0068ff] text-white flex items-center justify-center font-black text-[10px] shrink-0">
+                Zalo
               </div>
               <div>
-                <label className="block text-[10px] uppercase font-bold text-gray-455 tracking-wider mb-1">Tên trên thẻ</label>
-                <input 
-                  type="text" 
-                  placeholder="NGUYEN VAN A"
-                  value={cardHolder}
-                  onChange={(e) => setCardHolder(e.target.value.toUpperCase())}
-                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-black uppercase text-xs"
-                />
+                <h4 className="font-bold text-gray-900 mb-1">QR Thanh Toán ZaloPay</h4>
+                <p className="text-gray-550 leading-relaxed">
+                  Quét mã ZaloPay để chuyển tiền. Đơn hàng được lưu ở MongoDB và chờ người bán xác nhận giao dịch thực tế.
+                </p>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-450 tracking-wider mb-1">Hạn sử dụng</label>
-                  <input 
-                    type="text" 
-                    maxLength={5}
-                    placeholder="MM/YY"
-                    value={cardExpiry}
-                    onChange={(e) => {
-                      let val = e.target.value.replace(/\//g, '');
-                      if (val.length > 2) {
-                        val = val.substring(0, 2) + '/' + val.substring(2);
-                      }
-                      setCardExpiry(val);
-                    }}
-                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-black text-center"
-                  />
+            </div>
+            <div className="bg-white border border-blue-100 rounded-xl p-4 grid grid-cols-1 md:grid-cols-[150px_1fr] gap-4 items-center">
+              <img
+                src="/src/assets/images/zalopay.jpg"
+                alt="QR thanh toán ZaloPay"
+                className="w-[150px] h-[190px] object-cover rounded-xl border border-blue-100 mx-auto"
+              />
+              <div className="space-y-2">
+                <div className="flex justify-between gap-3">
+                  <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Ví điện tử</span>
+                  <span className="font-black text-[#0068ff]">ZaloPay</span>
                 </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-gray-450 tracking-wider mb-1">Mã bảo mật CVV</label>
-                  <input 
-                    type="password" 
-                    maxLength={3}
-                    placeholder="123"
-                    value={cardCvv}
-                    onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
-                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-black text-center"
-                  />
+                <div className="flex justify-between gap-3">
+                  <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Chủ ví</span>
+                  <span className="font-bold text-gray-900">TRƯƠNG THÀNH DANH</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Số tiền</span>
+                  <span className="font-mono font-black text-emerald-600">{finalTotal.toLocaleString('vi-VN')}₫</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Trạng thái</span>
+                  <span className="font-bold text-amber-700">Chờ đối soát</span>
                 </div>
               </div>
             </div>
@@ -477,11 +438,11 @@ export default function CheckoutForm({
               </h3>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <button
                 type="button"
                 onClick={() => setPaymentMethod('bank')}
-                className={`py-3.5 px-3 rounded-xl border text-[11px] font-sans font-black uppercase tracking-wider transition-all flex flex-col items-center gap-2 ${
+                className={`py-3.5 px-3 rounded-xl border text-[10px] font-sans font-black uppercase tracking-wider transition-all flex flex-col items-center gap-2 ${
                   paymentMethod === 'bank' 
                     ? 'border-black bg-black text-white' 
                     : 'border-gray-200 text-gray-650 hover:bg-gray-50'
@@ -492,20 +453,32 @@ export default function CheckoutForm({
               </button>
               <button
                 type="button"
-                onClick={() => setPaymentMethod('card')}
-                className={`py-3.5 px-3 rounded-xl border text-[11px] font-sans font-black uppercase tracking-wider transition-all flex flex-col items-center gap-2 ${
-                  paymentMethod === 'card' 
+                onClick={() => setPaymentMethod('momo')}
+                className={`py-3.5 px-3 rounded-xl border text-[10px] font-sans font-black uppercase tracking-wider transition-all flex flex-col items-center gap-2 ${
+                  paymentMethod === 'momo'
                     ? 'border-black bg-black text-white' 
                     : 'border-gray-200 text-gray-650 hover:bg-gray-50'
                 }`}
               >
-                <CreditCard size={16} />
-                Thẻ Visa/MC
+                <Smartphone size={16} />
+                MoMo
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('zalopay')}
+                className={`py-3.5 px-3 rounded-xl border text-[10px] font-sans font-black uppercase tracking-wider transition-all flex flex-col items-center gap-2 ${
+                  paymentMethod === 'zalopay'
+                    ? 'border-black bg-black text-white'
+                    : 'border-gray-200 text-gray-650 hover:bg-gray-50'
+                }`}
+              >
+                <QrCode size={16} />
+                ZaloPay
               </button>
               <button
                 type="button"
                 onClick={() => setPaymentMethod('cod')}
-                className={`py-3.5 px-3 rounded-xl border text-[11px] font-sans font-black uppercase tracking-wider transition-all flex flex-col items-center gap-2 ${
+                className={`py-3.5 px-3 rounded-xl border text-[10px] font-sans font-black uppercase tracking-wider transition-all flex flex-col items-center gap-2 ${
                   paymentMethod === 'cod' 
                     ? 'border-black bg-black text-white' 
                     : 'border-gray-200 text-gray-650 hover:bg-gray-50'
@@ -537,7 +510,7 @@ export default function CheckoutForm({
               type="submit"
               className="w-full bg-black hover:bg-gray-900 text-white py-5 rounded-xl text-xs uppercase tracking-widest font-black font-sans transition-all flex items-center justify-center gap-3 shadow-lg active:scale-[0.99]"
             >
-              Xác nhận kết nối đặt hàng ({finalTotal.toLocaleString('vi-VN')}₫)
+              Tạo đơn & chờ xác nhận thanh toán ({finalTotal.toLocaleString('vi-VN')}₫)
               <CheckCircle2 size={16} />
             </button>
           </div>
