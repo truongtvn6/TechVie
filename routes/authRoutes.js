@@ -39,4 +39,10 @@ router.post("/change-password", authMiddleware, authController.changePassword);
 // Route Lấy Danh Sách Thiết Bị Của Người Dùng (Đã đăng nhập): GET /api/auth/my-devices
 router.get("/my-devices", authMiddleware, authController.getMyDevices);
 
+// Route Gửi email xác thực: POST /api/auth/send-verification-email (Yêu cầu đăng nhập)
+router.post("/send-verification-email", authMiddleware, authController.sendVerificationEmail);
+
+// Route Xác nhận mã từ link email: GET /api/auth/verify-email (Public)
+router.get("/verify-email", authController.verifyEmail);
+
 module.exports = router;

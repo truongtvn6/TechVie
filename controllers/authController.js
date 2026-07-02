@@ -59,7 +59,7 @@ const authController = {
         }
         if (!user.google_id) {
           // Tự động liên kết Google ID và cập nhật nhà cung cấp
-          user = await User.updateById(user.id, { google_id: googleId, auth_provider: "google" });
+          user = await User.updateById(user.id, { google_id: googleId, auth_provider: "google", isEmailVerified: true });
         }
       } else {
         user = await User.create({
@@ -70,7 +70,8 @@ const authController = {
           avatar: avatar || "",
           role: "user",
           vipStatus: "Normal",
-          status: "active"
+          status: "active",
+          isEmailVerified: true
         });
       }
 
@@ -340,6 +341,19 @@ const authController = {
         });
       }
 
+      // Kiểm tra cooldown chống spam (chờ ít nhất 60 giây)
+      if (user.resetPasswordToken && user.resetPasswordExpire) {
+        const timeElapsedSinceLastSent = 15 * 60 * 1000 - (new Date(user.resetPasswordExpire).getTime() - Date.now());
+        const cooldownMs = 60 * 1000;
+        if (timeElapsedSinceLastSent < cooldownMs) {
+          const secondsLeft = Math.ceil((cooldownMs - timeElapsedSinceLastSent) / 1000);
+          return res.status(429).json({
+            success: false,
+            message: `Yêu cầu gửi mail đặt lại mật khẩu quá nhanh. Vui lòng thử lại sau ${secondsLeft} giây.`
+          });
+        }
+      }
+
       // Tạo token ngẫu nhiên (32 bytes hex = 64 ký tự)
       const resetToken = crypto.randomBytes(32).toString("hex");
 
@@ -597,6 +611,127 @@ const authController = {
         message: "Lỗi kết nối khi tải danh sách thiết bị.",
         error: error.message
       });
+    }
+  },
+
+  // 8. Gửi email xác thực tài khoản qua SMTP
+  sendVerificationEmail: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy người dùng!" });
+      }
+
+      if (user.isEmailVerified) {
+        return res.status(400).json({ success: false, message: "Email này đã được xác thực rồi!" });
+      }
+
+      // Kiểm tra cooldown chống spam (chờ ít nhất 60 giây)
+      if (user.emailVerificationToken && user.emailVerificationExpire) {
+        const timeElapsedSinceLastSent = 24 * 60 * 60 * 1000 - (new Date(user.emailVerificationExpire).getTime() - Date.now());
+        const cooldownMs = 60 * 1000;
+        if (timeElapsedSinceLastSent < cooldownMs) {
+          const secondsLeft = Math.ceil((cooldownMs - timeElapsedSinceLastSent) / 1000);
+          return res.status(429).json({
+            success: false,
+            message: `Yêu cầu gửi mail xác thực quá nhanh. Vui lòng thử lại sau ${secondsLeft} giây.`
+          });
+        }
+      }
+
+      // Tạo verification token
+      const verificationToken = crypto.randomBytes(32).toString("hex");
+      const hashedToken = crypto.createHash("sha256").update(verificationToken).digest("hex");
+      const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 giờ hiệu lực
+
+      await User.updateById(userId, {
+        emailVerificationToken: hashedToken,
+        emailVerificationExpire: expireTime,
+      });
+
+      const verifyUrl = `${process.env.API_BASE_URL || "http://localhost:5000"}/api/auth/verify-email?token=${verificationToken}`;
+
+      const emailHtml = `
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; color: #111111;">
+          <div style="text-align: center; border-bottom: 1px solid #e5e5e5; padding-bottom: 30px; margin-bottom: 30px;">
+            <h1 style="font-size: 28px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin: 0; color: #000000;">TECHVIE</h1>
+            <p style="font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: #71717a; margin: 5px 0 0;">Refractive Excellence</p>
+          </div>
+          <div style="padding: 10px 0;">
+            <h2 style="font-size: 18px; font-weight: 700; margin-top: 0; margin-bottom: 20px; color: #000000; text-transform: uppercase; letter-spacing: 0.05em;">Xác thực địa chỉ email</h2>
+            <p style="font-size: 14px; line-height: 1.6; color: #3f3f46; margin-bottom: 20px;">
+              Xin chào <strong>${user.username}</strong>,
+            </p>
+            <p style="font-size: 14px; line-height: 1.6; color: #3f3f46; margin-bottom: 30px;">
+              Cảm ơn bạn đã đồng hành cùng TechVie. Vui lòng nhấp vào nút dưới đây để xác thực địa chỉ email của bạn.
+            </p>
+            
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${verifyUrl}"
+                style="background-color: #000000; color: #ffffff; padding: 16px 40px; text-decoration: none;
+                       border-radius: 8px; font-size: 13px; font-weight: bold; display: inline-block;
+                       letter-spacing: 0.2em; text-transform: uppercase; transition: background 0.2s ease;">
+                XÁC THỰC EMAIL
+              </a>
+            </div>
+            
+            <p style="font-size: 12px; line-height: 1.6; color: #71717a; margin-top: 40px; border-top: 1px solid #e5e5e5; padding-top: 20px;">
+              Liên kết này có hiệu lực trong vòng <strong>24 giờ</strong>.
+            </p>
+            <p style="font-size: 11px; line-height: 1.6; color: #a1a1aa; word-break: break-all;">
+              Nếu nút trên không hoạt động, bạn có thể sao chép liên kết dưới đây vào trình duyệt:<br/>
+              <a href="${verifyUrl}" style="color: #000000; text-decoration: underline;">${verifyUrl}</a>
+            </p>
+          </div>
+          <div style="text-align: center; margin-top: 50px; border-top: 1px solid #e5e5e5; padding-top: 20px;">
+            <p style="font-size: 10px; letter-spacing: 0.1em; color: #a1a1aa; text-transform: uppercase; margin: 0;">
+              © ${new Date().getFullYear()} TechVie Shop. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `;
+
+      await sendEmail({
+        to: user.email,
+        subject: "[TechVie] Xác thực địa chỉ email của bạn",
+        html: emailHtml,
+      });
+
+      return res.status(200).json({ success: true, message: "Email xác thực đã được gửi, vui lòng kiểm tra hộp thư của bạn!" });
+    } catch (error) {
+      console.error("Lỗi gửi email xác thực:", error);
+      return res.status(500).json({ success: false, message: "Không thể kết nối đến máy chủ gửi mail." });
+    }
+  },
+
+  // 9. Xác thực email thông qua token nhận được từ liên kết
+  verifyEmail: async (req, res) => {
+    try {
+      const { token } = req.query;
+      if (!token) {
+        return res.status(400).send("Thiếu token xác thực.");
+      }
+
+      const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+      const user = await User.findByVerificationToken(hashedToken);
+
+      if (!user) {
+        return res.status(400).send("Liên kết xác thực không hợp lệ hoặc đã hết hạn.");
+      }
+
+      await User.updateById(user.id, {
+        isEmailVerified: true,
+        emailVerificationToken: null,
+        emailVerificationExpire: null,
+      });
+
+      // Redirect về trang cá nhân của Frontend kèm theo query param báo thành công
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+      return res.redirect(`${frontendUrl}/account?verified=true`);
+    } catch (error) {
+      console.error("Lỗi xác thực email:", error);
+      return res.status(500).send("Lỗi hệ thống khi xác thực email.");
     }
   },
 };

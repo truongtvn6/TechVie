@@ -15,7 +15,9 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: function () {
+      return this.auth_provider === "credentials";
+    },
   },
   phone: {
     type: String,
@@ -66,6 +68,18 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  emailVerificationToken: {
+    type: String,
+    default: null,
+  },
+  emailVerificationExpire: {
+    type: Date,
+    default: null,
+  },
   // =========================================================
   created_at: {
     type: Date,
@@ -100,6 +114,7 @@ const User = {
       auth_provider: doc.auth_provider,
       avatar: doc.avatar,
       address: doc.address,
+      isEmailVerified: doc.isEmailVerified,
     };
   },
 
@@ -124,6 +139,7 @@ const User = {
       auth_provider: doc.auth_provider,
       avatar: doc.avatar,
       address: doc.address,
+      isEmailVerified: doc.isEmailVerified,
     };
   },
 
@@ -147,6 +163,11 @@ const User = {
       auth_provider: doc.auth_provider,
       avatar: doc.avatar,
       address: doc.address,
+      isEmailVerified: doc.isEmailVerified,
+      resetPasswordToken: doc.resetPasswordToken,
+      resetPasswordExpire: doc.resetPasswordExpire,
+      emailVerificationToken: doc.emailVerificationToken,
+      emailVerificationExpire: doc.emailVerificationExpire,
     };
   },
 
@@ -163,6 +184,21 @@ const User = {
       email: doc.email,
       resetPasswordToken: doc.resetPasswordToken,
       resetPasswordExpire: doc.resetPasswordExpire,
+    };
+  },
+
+  // Tìm người dùng qua Verification Token
+  findByVerificationToken: async (token) => {
+    const doc = await UserModel.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpire: { $gt: Date.now() }, // Token còn hạn
+    });
+    if (!doc) return null;
+    return {
+      id: doc._id.toString(),
+      username: doc.username,
+      email: doc.email,
+      isEmailVerified: doc.isEmailVerified,
     };
   },
 
@@ -183,6 +219,7 @@ const User = {
       auth_provider: doc.auth_provider,
       avatar: doc.avatar,
       address: doc.address,
+      isEmailVerified: doc.isEmailVerified,
     }));
   },
 
@@ -199,12 +236,13 @@ const User = {
     auth_provider,
     avatar,
     address,
+    isEmailVerified,
   }) => {
     const doc = await UserModel.create({
       username,
       email,
       password: password || undefined,
-      phone: phone || "Chưa cung cấp",
+      phone: phone || "",
       role: role || "user",
       vipStatus: vipStatus || "Normal",
       status: status || "active",
@@ -212,6 +250,7 @@ const User = {
       auth_provider: auth_provider || "credentials",
       avatar,
       address,
+      isEmailVerified: isEmailVerified || false,
     });
     return {
       id: doc._id.toString(),
@@ -226,6 +265,7 @@ const User = {
       auth_provider: doc.auth_provider,
       avatar: doc.avatar,
       address: doc.address,
+      isEmailVerified: doc.isEmailVerified,
     };
   },
 
@@ -246,6 +286,7 @@ const User = {
       auth_provider: doc.auth_provider,
       avatar: doc.avatar,
       address: doc.address,
+      isEmailVerified: doc.isEmailVerified,
     };
   },
 

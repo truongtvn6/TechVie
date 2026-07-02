@@ -52,7 +52,7 @@ const userController = {
         username,
         email,
         password: hashedPassword,
-        phone: phone || "Chưa cung cấp",
+        phone: phone || "",
         role: role || "user",
         vipStatus: vipStatus || "Normal",
         status: "active",
