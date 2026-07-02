@@ -85,11 +85,21 @@ function AppContent() {
     shieldStatus: "Standard",
     role: "user",
     authProvider: "credentials",
+    isEmailVerified: false,
   });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get("token");
+    const verified = params.get("verified");
+
+    if (verified === "true") {
+      toast.success("Xác thực địa chỉ email thành công!", { icon: "✉️" });
+      localStorage.setItem("active_tab", "account");
+      handleNavigate("account");
+      navigate(location.pathname, { replace: true });
+    }
+
     // Chỉ đánh chặn token đăng nhập nếu KHÔNG ở trang đặt lại mật khẩu (/reset-password)
     if (urlToken && window.location.pathname !== "/reset-password") {
       localStorage.setItem("techvie_token", urlToken);
@@ -116,6 +126,7 @@ function AppContent() {
             shieldStatus: res.user.vipStatus === "Premium" ? "Đang Kích Hoạt (Premium)" : (res.user.vipStatus || "Standard"),
             role: res.user.role || "user",
             authProvider: res.user.auth_provider || "credentials",
+            isEmailVerified: res.user.isEmailVerified || false,
           });
         } else {
           // Token không hợp lệ hoặc tài khoản đã bị xóa (ví dụ sau khi seed lại database)
@@ -170,14 +181,16 @@ function AppContent() {
       setToken("");
       localStorage.removeItem("techvie_token");
       setUserProfile({
-        name: "Nguyễn Minh Tiến",
-        email: "mintzinfinity898@gmail.com",
-        phone: "0912 345 678",
-        address: "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
-        memberSince: "17-06-2026",
-        techvieId: "TV-992-88X",
-        shieldStatus: "Đang Kích Hoạt (Premium)",
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        memberSince: "",
+        techvieId: "",
+        shieldStatus: "Standard",
         role: "user",
+        authProvider: "credentials",
+        isEmailVerified: false,
       });
     }
   };
@@ -198,13 +211,14 @@ function AppContent() {
         setUserProfile({
           name: isSystemAdmin ? "ADMINISTRATOR" : email.split("@")[0].toUpperCase(),
           email: email,
-          phone: isSystemAdmin ? "" : "0912 345 678",
-          address: isSystemAdmin ? "" : "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
+          phone: "",
+          address: "",
           memberSince: "17-06-2026",
           techvieId: `TV-${(data.token || "").substring(10, 16).toUpperCase()}`,
           shieldStatus: "Standard",
           role: isSystemAdmin ? "admin" : "user",
           authProvider: "credentials",
+          isEmailVerified: false,
         });
         handleNavigate(isSystemAdmin ? "admin" : "account");
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -635,7 +649,7 @@ function AppContent() {
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={
               <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
-                <HomePage products={products} onNavigate={handleNavigate} onAddToCart={handleAddToCart} isLoggedIn={isLoggedIn} userEmail={userProfile.email} />
+                <HomePage products={products} onNavigate={handleNavigate} onAddToCart={handleAddToCart} isLoggedIn={isLoggedIn} userEmail={userProfile.email} userProfile={userProfile} />
               </motion.div>
             } />
             <Route path="/brand" element={

@@ -81,18 +81,8 @@ export default function AuthPage({
         }
       })
       .catch(err => {
-        console.warn('Backend login failed, using fallback mock login.', err);
-        // Fallback: If it's the admin demo, we'll pretend login succeeded
-        if (loginEmail === 'admin@techvie.com' && loginPassword === 'admin123') {
-          setIsLoggingIn(false);
-          onLoginSuccess(loginEmail, 'Bearer mock_admin_token');
-        } else if (loginEmail === 'mintzinfinity898@gmail.com' && loginPassword === '123456') {
-          setIsLoggingIn(false);
-          onLoginSuccess(loginEmail, 'Bearer mock_user_token');
-        } else {
-          setIsLoggingIn(false);
-          setLoginError(err.message || 'Lỗi kết nối máy chủ!');
-        }
+        setIsLoggingIn(false);
+        setLoginError(err.message || 'Lỗi kết nối máy chủ!');
       });
   };
 
@@ -111,12 +101,12 @@ export default function AuthPage({
         if (data.success && data.token) {
           onLoginSuccess(email, data.token);
         } else {
-          onLoginSuccess(email, email === 'admin@techvie.com' ? 'Bearer mock_admin_token' : 'Bearer mock_user_token');
+          setLoginError(data.message || 'Sai thông tin đăng nhập tài khoản demo!');
         }
       })
-      .catch(() => {
+      .catch((err) => {
         setIsLoggingIn(false);
-        onLoginSuccess(email, email === 'admin@techvie.com' ? 'Bearer mock_admin_token' : 'Bearer mock_user_token');
+        setLoginError(err.message || 'Lỗi kết nối máy chủ!');
       });
   };
 

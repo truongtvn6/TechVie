@@ -1,18 +1,18 @@
-import { 
-  User, 
-  BadgeCheck, 
-  QrCode, 
-  History, 
-  Laptop, 
-  Settings, 
+import {
+  User,
+  BadgeCheck,
+  QrCode,
+  History,
+  Laptop,
+  Settings,
   LogOut,
-  ShieldAlert
-} from 'lucide-react';
+  ShieldAlert,
+} from "lucide-react";
 
 interface AccountSidebarProps {
   userProfile: any;
-  accountTab: 'profile' | 'orders' | 'devices' | 'security';
-  setAccountTab: (tab: 'profile' | 'orders' | 'devices' | 'security') => void;
+  accountTab: "profile" | "orders" | "devices" | "security";
+  setAccountTab: (tab: "profile" | "orders" | "devices" | "security") => void;
   ordersCount: number;
   handleLogout: () => void;
   onNavigate?: (tab: string) => void;
@@ -26,33 +26,50 @@ export default function AccountSidebar({
   handleLogout,
   onNavigate,
 }: AccountSidebarProps) {
+  const isVerified =
+    userProfile.authProvider === "google" ||
+    userProfile.isEmailVerified ||
+    !!localStorage.getItem("verified_email_" + userProfile.email);
+
   return (
-    <div className="lg:col-span-4 flex flex-col gap-stack-gap">
-      
+    <div className="gap-stack-gap flex flex-col lg:col-span-4">
       {/* User Master Visual ID Card */}
-      <div className="bg-white/60 backdrop-blur-md border border-white/60 rounded-xl p-5 relative overflow-hidden group shadow-sm">
-        {/* Decorative top line */}
-        <div className="absolute top-0 inset-x-0 h-[2px] bg-gray-300" />
-        
-        <div className="flex flex-col items-center text-center space-y-3">
+      <div className="group relative overflow-hidden rounded-xl border border-white/60 bg-white/60 p-5 shadow-sm backdrop-blur-md">
+        <div className="flex flex-col items-center space-y-3 text-center">
           {/* Avatar */}
           <div className="relative mt-1">
-            <div className="w-16 h-16 bg-white/80 border border-white/60 rounded-full flex items-center justify-center overflow-hidden shadow-inner group-hover:border-gray-400 transition-colors duration-500">
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-white/80 shadow-inner transition-colors duration-500 group-hover:border-gray-400">
               <User size={32} className="text-[#4a5568]" />
             </div>
-            <div className="absolute bottom-0 right-0 w-5 h-5 bg-[#2d3748] border-2 border-white rounded-full flex items-center justify-center shadow-sm">
-              <BadgeCheck size={11} className="text-white" />
-            </div>
+
+            {/* Email Verification Status (Bottom-Right) */}
+            {isVerified ? (
+              <span
+                className="absolute right-0 bottom-0 drop-shadow-sm text-blue-500 rounded-full bg-white"
+                title="Tài khoản đã xác thực email"
+              >
+                <BadgeCheck size={18} />
+              </span>
+            ) : (
+              <span
+                className="absolute right-0 bottom-0 animate-pulse rounded-full bg-white text-amber-500 drop-shadow-sm"
+                title="Tài khoản chưa xác thực email"
+              >
+                <ShieldAlert size={18} />
+              </span>
+            )}
           </div>
-          
+
           {/* Name & Details */}
           <div className="space-y-0.5">
-            <h2 className="font-headline-md text-headline-md text-[#2d3748] uppercase tracking-wider flex items-center justify-center gap-2">
+            <h2 className="font-headline-md text-headline-md flex items-center justify-center gap-2 tracking-wider text-[#2d3748] uppercase">
               {userProfile.name}
             </h2>
-            <p className="font-tech-label text-tech-label text-[#4a5568]">MÃ SỐ: {userProfile.techvieId}</p>
+            <p className="font-tech-label text-tech-label text-[#4a5568]">
+              MÃ SỐ: {userProfile.techvieId}
+            </p>
           </div>
-          
+
           {/* Visual QR Code Area */}
           {/* <div className="w-full mt-2.5 p-3 bg-white/50 border border-white/60 rounded-xl flex items-center gap-3">
             <div className="w-8 h-8 bg-[#2d3748] rounded flex items-center justify-center flex-shrink-0">
@@ -64,109 +81,136 @@ export default function AccountSidebar({
             </div>
           </div> */}
         </div>
-        
+
         {/* Metadata */}
-        <div className="mt-4 pt-3 border-t border-white/60 flex flex-col gap-1.5 font-sans text-sm">
-          <div className="flex justify-between items-center">
+        <div className="mt-4 flex flex-col gap-1.5 border-t border-white/60 pt-3 font-sans text-sm">
+          <div className="flex items-center justify-between">
             <span className="text-[#4a5568]">Thành viên từ:</span>
-            <span className="font-tech-label text-tech-label !text-sm !tracking-normal">{userProfile.memberSince}</span>
+            <span className="font-tech-label text-tech-label !text-sm !tracking-normal">
+              {userProfile.memberSince}
+            </span>
           </div>
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <span className="text-[#4a5568]">Đặc quyền:</span>
-            <span className={`font-tech-label text-tech-label !text-sm !tracking-normal border-none ${
-              userProfile.shieldStatus === 'Đang Kích Hoạt (Premium)' || userProfile.shieldStatus === 'Premium'
-                ? 'text-emerald-700' 
-                : 'text-blue-700'
-            }`}>
-              {userProfile.shieldStatus || 'Standard'}
+            <span
+              className={`font-tech-label text-tech-label border-none !text-sm !tracking-normal ${
+                userProfile.shieldStatus === "Đang Kích Hoạt (Premium)" ||
+                userProfile.shieldStatus === "Premium"
+                  ? "text-emerald-700"
+                  : "text-blue-700"
+              }`}
+            >
+              {userProfile.shieldStatus || "Standard"}
             </span>
           </div>
         </div>
       </div>
-      
+
       {/* Navigation Sidebar */}
-      <nav className="bg-white/60 backdrop-blur-md border border-white/60 rounded-xl p-2 flex flex-col shadow-sm gap-1">
+      <nav className="flex flex-col gap-1 rounded-xl border border-white/60 bg-white/60 p-2 shadow-sm backdrop-blur-md">
         <button
           type="button"
-          onClick={() => setAccountTab('profile')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
-            accountTab === 'profile'
-              ? 'bg-white/80 border border-white/60 shadow-md text-black'
-              : 'text-[#4a5568] hover:text-black hover:bg-white/40 hover:shadow-sm'
+          onClick={() => setAccountTab("profile")}
+          className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-all ${
+            accountTab === "profile"
+              ? "border border-white/60 bg-white/80 text-black shadow-md"
+              : "text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
           }`}
         >
           <User size={18} />
-          <span className="font-headline-sm font-bold uppercase tracking-widest text-[13px]">Hồ sơ cá nhân</span>
-          {accountTab === 'profile' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
+          <span className="font-headline-sm text-[13px] font-bold tracking-widest uppercase">
+            Hồ sơ cá nhân
+          </span>
+          {accountTab === "profile" && (
+            <div className="ml-auto h-5 w-[3px] rounded-full bg-black" />
+          )}
         </button>
 
         <button
           type="button"
-          onClick={() => setAccountTab('orders')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
-            accountTab === 'orders'
-              ? 'bg-white/80 border border-white/60 shadow-md text-black'
-              : 'text-[#4a5568] hover:text-black hover:bg-white/40 hover:shadow-sm'
+          onClick={() => setAccountTab("orders")}
+          className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-all ${
+            accountTab === "orders"
+              ? "border border-white/60 bg-white/80 text-black shadow-md"
+              : "text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
           }`}
         >
           <History size={18} />
-          <span className="font-headline-sm font-bold uppercase tracking-widest text-[13px]">Lịch sử đặt hàng</span>
+          <span className="font-headline-sm text-[13px] font-bold tracking-widest uppercase">
+            Lịch sử đặt hàng
+          </span>
           {ordersCount > 0 && (
-            <span className={`font-tech-label text-tech-label bg-gray-150 px-2 py-0.5 rounded text-black ${accountTab === 'orders' ? 'ml-2' : 'ml-auto'}`}>
+            <span
+              className={`font-tech-label text-tech-label bg-gray-150 rounded px-2 py-0.5 text-black ${accountTab === "orders" ? "ml-2" : "ml-auto"}`}
+            >
               {ordersCount}
             </span>
           )}
-          {accountTab === 'orders' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
+          {accountTab === "orders" && (
+            <div className="ml-auto h-5 w-[3px] rounded-full bg-black" />
+          )}
         </button>
 
         <button
           type="button"
-          onClick={() => setAccountTab('devices')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
-            accountTab === 'devices'
-              ? 'bg-white/80 border border-white/60 shadow-md text-black'
-              : 'text-[#4a5568] hover:text-black hover:bg-white/40 hover:shadow-sm'
+          onClick={() => setAccountTab("devices")}
+          className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-all ${
+            accountTab === "devices"
+              ? "border border-white/60 bg-white/80 text-black shadow-md"
+              : "text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
           }`}
         >
           <Laptop size={18} />
-          <span className="font-headline-sm font-bold uppercase tracking-widest text-[13px]">Bảo hành sản phẩm</span>
-          {accountTab === 'devices' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
+          <span className="font-headline-sm text-[13px] font-bold tracking-widest uppercase">
+            Bảo hành sản phẩm
+          </span>
+          {accountTab === "devices" && (
+            <div className="ml-auto h-5 w-[3px] rounded-full bg-black" />
+          )}
         </button>
 
         <button
           type="button"
-          onClick={() => setAccountTab('security')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
-            accountTab === 'security'
-              ? 'bg-white/80 border border-white/60 shadow-md text-black'
-              : 'text-[#4a5568] hover:text-black hover:bg-white/40 hover:shadow-sm'
+          onClick={() => setAccountTab("security")}
+          className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-all ${
+            accountTab === "security"
+              ? "border border-white/60 bg-white/80 text-black shadow-md"
+              : "text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
           }`}
         >
           <Settings size={18} />
-          <span className="font-headline-sm font-bold uppercase tracking-widest text-[13px]">cập nhật mật khẩu</span>
-          {accountTab === 'security' && <div className="ml-auto w-[3px] h-5 bg-black rounded-full" />}
+          <span className="font-headline-sm text-[13px] font-bold tracking-widest uppercase">
+            Cài đặt bảo mật
+          </span>
+          {accountTab === "security" && (
+            <div className="ml-auto h-5 w-[3px] rounded-full bg-black" />
+          )}
         </button>
 
-        <div className="h-px w-full bg-white/60 my-2" />
-        
-        {userProfile?.role === 'admin' && onNavigate && (
+        <div className="my-2 h-px w-full bg-white/60" />
+
+        {userProfile?.role === "admin" && onNavigate && (
           <button
             type="button"
-            onClick={() => onNavigate('admin')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-indigo-100 bg-indigo-500 hover:bg-indigo-700 hover:shadow-sm transition-all duration-300 cursor-pointer"
+            onClick={() => onNavigate("admin")}
+            className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-indigo-500 px-4 py-3 text-indigo-100 transition-all duration-300 hover:bg-indigo-700 hover:shadow-sm"
           >
             <ShieldAlert size={18} />
-            <span className="font-headline-sm font-extrabold uppercase tracking-widest text-[13px]">Quản trị hệ thống</span>
+            <span className="font-headline-sm text-[13px] font-extrabold tracking-widest uppercase">
+              Quản trị hệ thống
+            </span>
           </button>
         )}
-        
+
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 hover:shadow-sm transition-all duration-300 cursor-pointer"
+          className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-red-600 transition-all duration-300 hover:bg-red-50 hover:shadow-sm"
         >
           <LogOut size={18} />
-          <span className="font-headline-sm font-bold uppercase tracking-widest text-[13px]">Đăng xuất</span>
+          <span className="font-headline-sm text-[13px] font-bold tracking-widest uppercase">
+            Đăng xuất
+          </span>
         </button>
       </nav>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { MapPin, ArrowRight, Copy, Check, Loader2 } from "lucide-react";
-import { updateUserProfile } from "../../services/api";
+import { MapPin, ArrowRight, Copy, Check, Loader2, ShieldCheck, ShieldAlert, MailCheck } from "lucide-react";
+import { updateUserProfile, sendEmailVerification } from "../../services/api";
+import { toast } from "react-hot-toast";
 
 interface TabProfileProps {
   userProfile: any;
@@ -13,6 +14,11 @@ export default function TabProfile({
 }: TabProfileProps) {
   const [copied, setCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const isEmailVerified =
+    userProfile.authProvider === "google" ||
+    userProfile.isEmailVerified ||
+    !!localStorage.getItem(`verified_email_${userProfile.email}`);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -45,6 +51,24 @@ export default function TabProfile({
     navigator.clipboard.writeText(userProfile.email || "");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleVerifyEmail = async () => {
+    setIsVerifying(true);
+    try {
+      const res = await sendEmailVerification();
+      if (res.success) {
+        toast.success(res.message, {
+          icon: "✉️",
+        });
+      } else {
+        toast.error(res.message || "Không thể gửi email xác thực.");
+      }
+    } catch (error) {
+      toast.error("Đã xảy ra lỗi khi gửi yêu cầu xác thực email.");
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   return (
@@ -104,9 +128,31 @@ export default function TabProfile({
 
         {/* Input: Email (Readonly) */}
         <div className="space-y-1.5 md:col-span-2">
-          <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">
-            EMAIL ĐĂNG KÝ
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="font-tech-label text-tech-label text-xs text-[#4a5568]">
+              EMAIL ĐĂNG KÝ
+            </label>
+            {isEmailVerified ? (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-250/20 px-2 py-0.5 rounded-md font-tech-label tracking-normal">
+                <ShieldCheck size={12} className="text-emerald-600" />
+                {userProfile.authProvider === "google" ? "ĐÃ XÁC THỰC (GOOGLE)" : "ĐÃ XÁC THỰC"}
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={handleVerifyEmail}
+                disabled={isVerifying}
+                className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100/80 border border-amber-250/20 px-2 py-0.5 rounded-md font-tech-label tracking-normal transition-colors cursor-pointer"
+              >
+                {isVerifying ? (
+                  <Loader2 size={12} className="animate-spin text-amber-600" />
+                ) : (
+                  <ShieldAlert size={12} className="text-amber-600" />
+                )}
+                CHƯA XÁC THỰC (CLICK ĐỂ XÁC THỰC)
+              </button>
+            )}
+          </div>
           <div className="relative mt-1.5 flex items-center">
             <input
               className="w-full bg-gray-100/50 border border-gray-200/50 rounded-lg pl-3.5 pr-12 py-2.5 text-[#4a5568] text-[15px] cursor-not-allowed shadow-sm"

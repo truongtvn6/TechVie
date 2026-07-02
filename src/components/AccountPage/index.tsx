@@ -16,8 +16,8 @@ import backgroundImage from '/image/huum-8fSitumSVw8-unsplash.jpg';
 const defaultUserProfile = {
   name: 'Khách hàng TechVie',
   email: '',
-  phone: 'Chưa cung cấp',
-  address: 'Chưa cung cấp',
+  phone: '',
+  address: '',
   memberSince: '01/07/2026',
   techvieId: 'TV-MEMBER',
   shieldStatus: 'Đang hoạt động',

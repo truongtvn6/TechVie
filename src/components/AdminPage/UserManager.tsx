@@ -74,7 +74,7 @@ export default function UserManager({
       id: `usr-${Date.now()}`,
       name: newUsrName.trim(),
       email: newUsrEmail.trim().toLowerCase(),
-      phone: newUsrPhone.trim() || 'Chưa cung cấp',
+      phone: newUsrPhone.trim() || '',
       role: newUsrRole,
       vipStatus: newUsrVip,
       status: 'active',

@@ -815,3 +815,18 @@ export async function getCheckoutPaymentStatus(orderId: number | string): Promis
     return { success: false, message: error.message || 'Không thể kiểm tra trạng thái thanh toán.' };
   }
 }
+
+// Gửi yêu cầu xác thực email (gửi email thật qua SMTP)
+export async function sendEmailVerification(): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/send-verification-email`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    const data = await response.json();
+    return { success: data.success, message: data.message || 'Yêu cầu gửi mail thành công!' };
+  } catch (error: any) {
+    console.error('Lỗi khi gửi yêu cầu xác thực email:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}

@@ -22,6 +22,7 @@ interface HomePageProps {
   onAddToCart: (product: Product) => void;
   isLoggedIn?: boolean;
   userEmail?: string;
+  userProfile?: any;
 }
 
 const normalizeProduct = (p: any): Product => {
@@ -66,11 +67,15 @@ export default function HomePage({
   onAddToCart,
   isLoggedIn = false,
   userEmail = "",
+  userProfile,
 }: HomePageProps) {
   const allProducts = (products || []).map(normalizeProduct);
+  const isPremium = isLoggedIn && (userProfile?.shieldStatus === "Đang Kích Hoạt (Premium)" || userProfile?.shieldStatus === "Premium");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState("");
-  const [showSubscriptionSuccess, setShowSubscriptionSuccess] = useState(false);
+  const [showSubscriptionSuccess, setShowSubscriptionSuccess] = useState(
+    !!localStorage.getItem("techvie_subscribed")
+  );
   const [isSubmittingSubscription, setIsSubmittingSubscription] =
     useState(false);
   const [isLoadedFromApi, setIsLoadedFromApi] = useState(false);
@@ -182,11 +187,9 @@ export default function HomePage({
     try {
       const res = await subscribeNewsletter(emailToSubscribe);
       if (res.success) {
+        localStorage.setItem("techvie_subscribed", "true");
         setShowSubscriptionSuccess(true);
         setNewsletterEmail("");
-        setTimeout(() => {
-          setShowSubscriptionSuccess(false);
-        }, 5000);
       }
     } catch (err) {
       console.error(err);
@@ -413,22 +416,22 @@ export default function HomePage({
       </section>
 
       {/* Luxurious Newsletter subscription matching modern grid template details */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-none mb-6">
-              Nhận Ưu Đãi <br />
-              Độc Quyền
-            </h2>
-            <p className="text-gray-650 font-sans text-md leading-relaxed max-w-md text-justify">
-              Đăng ký email để không bỏ lỡ các mã Freeship, voucher giảm giá và
-              thông tin mới nhất về các bộ sưu tập đồ setup từ TechVie.
-            </p>
-          </div>
+      {!isPremium && !showSubscriptionSuccess && (
+        <section className="py-24 px-6 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-none mb-6">
+                Nhận Ưu Đãi <br />
+                Độc Quyền
+              </h2>
+              <p className="text-gray-655 font-sans text-md leading-relaxed max-w-md text-justify">
+                Đăng ký email để không bỏ lỡ các mã Freeship, voucher giảm giá và
+                thông tin mới nhất về các bộ sưu tập đồ setup từ TechVie.
+              </p>
+            </div>
 
-          <div>
-            <AnimatePresence mode="wait">
-              {!showSubscriptionSuccess ? (
+            <div>
+              <AnimatePresence mode="wait">
                 <motion.form
                   key="subscribe-form"
                   initial={{ opacity: 0 }}
@@ -472,31 +475,11 @@ export default function HomePage({
                     {!isSubmittingSubscription && <Send size={14} />}
                   </button>
                 </motion.form>
-              ) : (
-                <motion.div
-                  key="subscribe-success"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="bg-emerald-50 border border-emerald-200 rounded-[2rem] p-8 text-center max-w-md"
-                >
-                  <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mx-auto mb-4">
-                    <Check size={24} />
-                  </div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-2">
-                    Đăng Ký Thành Công!
-                  </h4>
-                  <p className="text-xs text-gray-600 font-sans leading-relaxed">
-                    Chào mừng bạn đến với hệ sinh thái TechVie. Thư mời đặc
-                    quyền dành cho thành viên VIP và các thông số ưu đãi sẽ sớm
-                    gửi tới hòm thư của bạn.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              </AnimatePresence>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Product Detail Specs Modal */}
       <ProductDetail
