@@ -138,9 +138,21 @@ const authController = {
         password: hashedPassword,
       });
 
+      // Tạo mã JWT Token tự động khi đăng ký thành công
+      const token = jwt.sign(
+        { 
+          id: newUser.id, 
+          email: newUser.email, 
+          role: newUser.role || "user" 
+        },
+        process.env.JWT_SECRET || "techvie_jwt_secret_key_2026",
+        { expiresIn: "24h" }
+      );
+
       return res.status(201).json({
         success: true,
         message: "Đăng ký tài khoản thành công!",
+        token: `Bearer ${token}`,
         user: newUser,
       });
     } catch (error) {
@@ -338,6 +350,14 @@ const authController = {
           success: true,
           message:
             "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu. Vui lòng kiểm tra hộp thư!",
+        });
+      }
+
+      // Ngăn chặn tài khoản liên kết Google sử dụng chức năng khôi phục mật khẩu
+      if (user.auth_provider === "google") {
+        return res.status(409).json({
+          success: false,
+          message: "Tài khoản của bạn đăng ký bằng Google. Vui lòng đăng nhập trực tiếp qua nút Đăng nhập bằng Google.",
         });
       }
 
