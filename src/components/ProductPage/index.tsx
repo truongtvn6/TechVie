@@ -1,7 +1,7 @@
 import { useState, MouseEvent, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, TabType } from '../../types';
-import { Plus, Check, SlidersHorizontal, Eye, Cpu, Search, ArrowUpDown, X, Laptop, Smartphone, Watch, Headphones, Keyboard, LayoutGrid } from 'lucide-react';
+import { Plus, Check, SlidersHorizontal, Eye, Cpu, Search, ArrowUpDown, X, Laptop, Smartphone, Watch, Headphones, Keyboard, LayoutGrid, Filter } from 'lucide-react';
 import { getCategories, getProducts } from '../../services/api';
 import ProductDetail from './ProductDetail';
 import ProductCard from './ProductCard';
@@ -31,7 +31,8 @@ const normalizeProduct = (p: any): Product => {
     image: p.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
     category: p.category || 'Thiết bị',
     description: p.description || 'Mô tả đang được cập nhật.',
-    specs: safeSpecs
+    specs: safeSpecs,
+    colors: Array.isArray(p.colors) ? p.colors : (typeof p.colors === 'string' ? p.colors.split(',').map((c: string) => c.trim()) : [])
   };
 };
 
@@ -51,6 +52,21 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem("techvie_token");
+
+  // Advanced Filter state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000000]);
+
+  const availableColors = Array.from(new Set(allProducts.flatMap(p => p.colors || []))).filter(Boolean);
+  const maxProductPrice = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.price)) : 100000000;
+  
+  useEffect(() => {
+    if (allProducts.length > 0) {
+      const maxPrice = Math.max(...allProducts.map(p => p.price));
+      setPriceRange(prev => [prev[0], prev[1] === 100000000 ? maxPrice : prev[1]]);
+    }
+  }, [allProducts.length]);
 
   // Magnetic Ripple and Attraction state managers
   const [ripples, setRipples] = useState<{ id: number; productId: string; x: number; y: number }[]>([]);
@@ -163,6 +179,13 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
       p.specs.some(s => s.value.toLowerCase().includes(query))
     );
   }
+
+  // Apply advanced filters
+  filteredProducts = filteredProducts.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+  if (selectedColors.length > 0) {
+    filteredProducts = filteredProducts.filter(p => p.colors?.some(c => selectedColors.includes(c)));
+  }
+
   if (sortBy === 'price-asc') {
     filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
   } else if (sortBy === 'price-desc') {
@@ -190,7 +213,7 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
       </div>
 
       {/* Categories filter tabs */}
-      <div className="space-y-6 pb-8 mb-12 border-b border-gray-200">
+      <div className="space-y-6 pb-8 mb-12">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="flex flex-wrap gap-2.5">
             {categories.map((cat) => {
@@ -221,14 +244,10 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
             })}
           </div>
 
-          <div className="hidden lg:flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest bg-gray-50 border border-gray-150 rounded-full px-4 py-2">
-            <SlidersHorizontal size={13} className="text-gray-500" />
-            <span>Hiển thị: <strong>{filteredProducts.length}</strong> / {allProducts.length}</span>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-          <div className="md:col-span-7 relative">
+          <div className="md:col-span-9 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <input
               type="text"
@@ -251,78 +270,137 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
           <div className="md:col-span-3 relative">
             <button
               type="button"
-              onClick={() => setIsSortOpen(!isSortOpen)}
-              className="w-full text-sm font-sans pl-12 pr-10 py-3 bg-gray-50 rounded-full focus:outline-none focus:bg-white focus:ring-1 focus:ring-black text-gray-700 font-bold flex items-center justify-between cursor-pointer transition-all hover:bg-gray-100 text-left relative border border-gray-400"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className={`w-full text-sm font-sans py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black text-gray-700 font-bold flex items-center justify-center cursor-pointer transition-all border border-gray-400 ${isFilterOpen ? 'bg-black text-white hover:bg-gray-800 border-black' : 'bg-gray-50 hover:bg-gray-100'}`}
             >
-              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                <ArrowUpDown size={14} />
-              </div>
-              <span className="truncate">{currentSortOption.label}</span>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform duration-300" style={{ transform: isSortOpen ? 'translateY(0%) rotate(180deg)' : 'translateY(0%)' }}>
-                <svg className="w-3 h-3 fill-none stroke-current" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
-              </div>
-            </button>
-            
-            <AnimatePresence>
-              {isSortOpen && (
-                <>
-                  <div 
-                    className="fixed inset-0 z-30" 
-                    onClick={() => setIsSortOpen(false)}
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 left-0 mt-2 bg-white border border-gray-400 rounded-2xl shadow-xl z-40 overflow-hidden"
-                  >
-                    <div className="py-1.5">
-                      {sortOptions.map((option) => {
-                        const isSelected = sortBy === option.value;
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => {
-                              setSortBy(option.value as any);
-                              setIsSortOpen(false);
-                            }}
-                            className={`w-full text-left px-5 py-3 text-xs font-sans font-extrabold flex items-center justify-between transition-colors hover:bg-gray-50 ${
-                              isSelected ? 'text-black bg-gray-50/70' : 'text-gray-500'
-                            }`}
-                          >
-                            <span>{option.label}</span>
-                            {isSelected && <Check size={14} className="text-black shrink-0 ml-2" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <div className="md:col-span-2">
-            <button
-              disabled={selectedCategory === 'Tất cả' && searchQuery === '' && sortBy === 'default'}
-              onClick={() => {
-                setSelectedCategory('Tất cả');
-                setSearchQuery('');
-                setSortBy('default');
-              }}
-              className="w-full py-3 px-4 bg-transparent text-gray-900 hover:text-black disabled:opacity-40 disabled:hover:text-gray-400 text-sm font-sans  font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:cursor-not-allowed border border-gray-400 rounded-full"
-            >
-              <X size={13} />
-              Đặt Lại
+              <Filter size={16} className="mr-2" />
+              {isFilterOpen ? 'Đóng bộ lọc' : 'Bộ lọc nâng cao'}
             </button>
           </div>
         </div>
 
-        {(selectedCategory !== 'Tất cả' || searchQuery !== '' || sortBy !== 'default') && (
+        {/* Filter Panel */}
+        <AnimatePresence>
+          {isFilterOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0, marginTop: 0 }}
+              animate={{ height: 'auto', opacity: 1, marginTop: 24 }}
+              exit={{ height: 0, opacity: 0, marginTop: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-gray-50 border border-gray-200 rounded-3xl p-5 grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Price Range */}
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-3">Khoảng Giá</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] font-mono">Từ</span>
+                        <input
+                          type="number"
+                          value={priceRange[0]}
+                          onChange={(e) => setPriceRange([Number(e.target.value) || 0, priceRange[1]])}
+                          className="w-full bg-white border border-gray-300 rounded-lg pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-black"
+                        />
+                      </div>
+                      <span className="text-gray-400 text-xs">-</span>
+                      <div className="flex-1 relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] font-mono">Đến</span>
+                        <input
+                          type="number"
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value) || maxProductPrice])}
+                          className="w-full bg-white border border-gray-300 rounded-lg pl-9 pr-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-black"
+                        />
+                      </div>
+                    </div>
+                    <input 
+                      type="range" 
+                      min={0} 
+                      max={maxProductPrice} 
+                      value={priceRange[1]} 
+                      onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                      className="w-full accent-black h-1.5"
+                    />
+                  </div>
+                </div>
+
+                {/* Colors */}
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-3">Màu sắc</h3>
+                  {availableColors.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {availableColors.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => {
+                            if (selectedColors.includes(color)) {
+                              setSelectedColors(selectedColors.filter(c => c !== color));
+                            } else {
+                              setSelectedColors([...selectedColors, color]);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border ${
+                            selectedColors.includes(color)
+                              ? 'bg-black text-white border-black'
+                              : 'bg-white text-gray-600 border-gray-300 hover:border-gray-500'
+                          }`}
+                        >
+                          {color}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500 italic">Không có lựa chọn màu sắc.</p>
+                  )}
+                </div>
+
+                {/* Sắp xếp & Actions */}
+                <div className="flex flex-col h-full">
+                  <div>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-3">Sắp xếp</h3>
+                    <div className="relative">
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as any)}
+                        className="w-full text-xs font-sans px-3 py-2.5 bg-white rounded-lg focus:outline-none focus:ring-1 focus:ring-black text-gray-700 font-bold border border-gray-300 appearance-none cursor-pointer"
+                      >
+                        {sortOptions.map((option) => (
+                          <option key={option.value} value={option.value}>{option.label}</option>
+                        ))}
+                      </select>
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                        <ArrowUpDown size={12} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto pt-4 ml-auto">
+                    {/* <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
+                      <SlidersHorizontal size={12} /> Hiển thị {filteredProducts.length} / {allProducts.length}
+                    </span> */}
+                    <button
+                      disabled={selectedCategory === 'Tất cả' && searchQuery === '' && sortBy === 'default' && selectedColors.length === 0 && priceRange[0] === 0 && priceRange[1] === maxProductPrice}
+                      onClick={() => {
+                        setSelectedCategory('Tất cả');
+                        setSearchQuery('');
+                        setSortBy('default');
+                        setSelectedColors([]);
+                        setPriceRange([0, maxProductPrice]);
+                      }}
+                      className="text-[12px] font-bold text-white bg-black hover:bg-gray-800 px-4 py-2 rounded-lg uppercase tracking-wider disabled:opacity-40 disabled:hover:bg-black transition-colors flex items-center gap-1.5"
+                    >
+                      <X size={14} />
+                      Đặt lại
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {(selectedCategory !== 'Tất cả' || searchQuery !== '' || sortBy !== 'default' || selectedColors.length > 0 || priceRange[0] > 0 || priceRange[1] < maxProductPrice) && (
           <div className="flex flex-wrap items-center gap-2 mt-4 text-md text-gray-500 font-sans">
             <span>Đang lọc theo:</span>
             {selectedCategory !== 'Tất cả' && (
@@ -343,7 +421,22 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
                 <X size={10} className="cursor-pointer" onClick={() => setSortBy('default')} />
               </span>
             )}
-            <span className="text-gray-400 ml-auto font-mono text-[11px]">Tìm thấy {filteredProducts.length} kết quả</span>
+            {selectedColors.map(c => (
+              <span key={c} className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
+                Màu: {c}
+                <X size={10} className="cursor-pointer" onClick={() => setSelectedColors(selectedColors.filter(color => color !== c))} />
+              </span>
+            ))}
+            {(priceRange[0] > 0 || priceRange[1] < maxProductPrice) && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
+                Giá: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ
+                <X size={10} className="cursor-pointer" onClick={() => setPriceRange([0, maxProductPrice])} />
+              </span>
+            )}
+            <span className="text-[13px] font-mono text-gray-900 uppercase tracking-wide flex items-center gap-1.5 ml-auto">
+              <SlidersHorizontal size={12} /> Hiển thị: {filteredProducts.length}/{allProducts.length} sản phẩm
+            </span>
+            {/* <span className="text-gray-400 ml-auto font-mono text-[11px]">Hiển thị {filteredProducts.length} / {allProducts.length}</span> */}
           </div>
         )}
       </div>
