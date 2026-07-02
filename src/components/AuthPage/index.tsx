@@ -17,7 +17,7 @@ interface AuthPageProps {
   initialMode: 'login' | 'register';
   onNavigate: (tab: any) => void;
   onLoginSuccess: (email: string, token?: string) => void;
-  onRegisterSuccess: (email: string, name: string) => void;
+  onRegisterSuccess: (email: string, name: string, token?: string) => void;
 }
 
 export default function AuthPage({ 
@@ -149,7 +149,7 @@ export default function AuthPage({
       .then(data => {
         setIsRegistering(false);
         if (data.success) {
-          onRegisterSuccess(regEmail, regFullName);
+          onRegisterSuccess(regEmail, regFullName, data.token);
         } else {
           setRegisterError(data.message || 'Đăng ký thất bại!');
         }

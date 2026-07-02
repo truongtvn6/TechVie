@@ -114,7 +114,7 @@ export default function AccountSidebar({
           className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-all ${
             accountTab === "profile"
               ? "border border-white/60 bg-white/80 text-black shadow-md"
-              : "text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
+              : "border border-transparent text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
           }`}
         >
           <User size={18} />
@@ -132,7 +132,7 @@ export default function AccountSidebar({
           className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-all ${
             accountTab === "orders"
               ? "border border-white/60 bg-white/80 text-black shadow-md"
-              : "text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
+              : "border border-transparent text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
           }`}
         >
           <History size={18} />
@@ -157,7 +157,7 @@ export default function AccountSidebar({
           className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-all ${
             accountTab === "devices"
               ? "border border-white/60 bg-white/80 text-black shadow-md"
-              : "text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
+              : "border border-transparent text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
           }`}
         >
           <Laptop size={18} />
@@ -175,7 +175,7 @@ export default function AccountSidebar({
           className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-all ${
             accountTab === "security"
               ? "border border-white/60 bg-white/80 text-black shadow-md"
-              : "text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
+              : "border border-transparent text-[#4a5568] hover:bg-white/40 hover:text-black hover:shadow-sm"
           }`}
         >
           <Settings size={18} />

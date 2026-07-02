@@ -704,7 +704,11 @@ function AppContent() {
                     handleNavigate("account");
                     toast.success(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
                   }
-                }} onRegisterSuccess={(email, name) => {
+                }} onRegisterSuccess={(email, name, userToken) => {
+                  if (userToken) {
+                    setToken(userToken);
+                    localStorage.setItem("techvie_token", userToken);
+                  }
                   setUserProfile((prev) => ({
                     ...prev,
                     email: email,
@@ -739,7 +743,11 @@ function AppContent() {
                     handleNavigate("account");
                     toast.success(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
                   }
-                }} onRegisterSuccess={(email, name) => {
+                }} onRegisterSuccess={(email, name, userToken) => {
+                  if (userToken) {
+                    setToken(userToken);
+                    localStorage.setItem("techvie_token", userToken);
+                  }
                   setUserProfile((prev) => ({
                     ...prev,
                     email: email,
