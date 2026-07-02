@@ -9,7 +9,7 @@ interface FooterProps {
 
 export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
   return (
-    <footer className="w-full bg-white border-t border-gray-200 pt-16 pb-6 mt-20 relative z-10">
+    <footer className="w-full bg-white border-t border-gray-200 pt-16 pb-6 mt-20 relative z-10 select-none">
       <div className="max-w-none mx-auto px-4 md:px-10 lg:px-16 grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Description summary */}
         <div className="space-y-4">

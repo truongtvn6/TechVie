@@ -13,8 +13,11 @@ import {
   Watch,
   Headphones,
   Keyboard,
+  FileSpreadsheet,
+  FileText
 } from "lucide-react";
 import { Product } from "../../types";
+import * as XLSX from "xlsx";
 
 interface OrderManagerProps {
   orders: any[];
@@ -133,6 +136,133 @@ export default function OrderManager({
   products = [],
 }: OrderManagerProps) {
   const d = isDarkMode;
+  const [confirmAction, setConfirmAction] = useState<{ [orderId: number]: 'success' | 'cancelled' | null }>({});
+
+  const handleExportExcel = () => {
+    if (!orders || orders.length === 0) {
+      console.log('Không có dữ liệu đơn hàng để xuất Excel.');
+      return;
+    }
+
+    // Map dữ liệu đơn hàng sang format bảng biểu đẹp mắt
+    const excelRows = orders.map((ord: any) => {
+      // Nối danh sách sản phẩm thành một chuỗi text duy nhất
+      const productsText = ord.items
+        ?.map((item: any) => {
+          const name = item.product?.name || "Sản phẩm không rõ";
+          return `${name} (SL: ${item.quantity})`;
+        })
+        .join("\n") || "";
+
+      // Định dạng trạng thái tiếng Việt
+      let statusVi = ord.status;
+      if (ord.statusType === 'pending') statusVi = 'Chờ xử lý';
+      else if (ord.statusType === 'processing') statusVi = 'Đang chuẩn bị gửi';
+      else if (ord.statusType === 'shipping') statusVi = 'Đang giao bưu tá';
+      else if (ord.statusType === 'success') statusVi = 'Hoàn tất bàn giao';
+      else if (ord.statusType === 'cancelled') statusVi = 'Đã hủy đơn';
+
+      return {
+        "Mã Đơn Hàng": `#${ord.orderId}`,
+        "Họ Tên Khách Hàng": ord.fullName,
+        "Số Điện Thoại": ord.phone,
+        "Địa Chỉ Giao Hàng": ord.address,
+        "Chi Tiết Sản Phẩm": productsText,
+        "Tổng Tiền (VNĐ)": ord.totalPrice || ord.items?.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0) || 0,
+        "Trạng Thái Đơn Hàng": statusVi,
+        "Phương Thức Thanh Toán": ord.paymentMethod === 'cod' ? 'Thanh toán COD' : 'Chuyển khoản Banking',
+        "Thời Gian Đặt Hàng": new Date(ord.createdAt).toLocaleString("vi-VN")
+      };
+    });
+
+    // Tạo worksheet và workbook từ mảng đối tượng
+    const worksheet = XLSX.utils.json_to_sheet(excelRows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sổ Đơn Hàng");
+
+    // Tự động căn rộng cột tương ứng với độ dài dữ liệu
+    const maxColsWidth = [
+      { wch: 15 }, // Mã Đơn Hàng
+      { wch: 25 }, // Họ Tên Khách Hàng
+      { wch: 15 }, // Số Điện Thoại
+      { wch: 45 }, // Địa Chỉ Giao Hàng
+      { wch: 40 }, // Chi Tiết Sản Phẩm
+      { wch: 18 }, // Tổng Tiền (VNĐ)
+      { wch: 20 }, // Trạng Thái Đơn Hàng
+      { wch: 25 }, // Phương Thức Thanh Toán
+      { wch: 22 }  // Thời Gian Đặt Hàng
+    ];
+    worksheet["!cols"] = maxColsWidth;
+
+    // Kích hoạt trình tải xuống file Excel
+    const fileName = `Bao_cao_don_hang_${new Date().toISOString().slice(0,10)}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+    console.log(`Xuất thành công file Excel báo cáo đơn hàng: ${fileName}`);
+  };
+
+  const handleExportCsv = () => {
+    if (!orders || orders.length === 0) {
+      console.log('Không có dữ liệu đơn hàng để xuất CSV.');
+      return;
+    }
+
+    const headers = [
+      "Mã Đơn Hàng",
+      "Họ Tên Khách Hàng",
+      "Số Điện Thoại",
+      "Địa Chỉ Giao Hàng",
+      "Chi Tiết Sản Phẩm",
+      "Tổng Tiền (VNĐ)",
+      "Trạng Thái Đơn Hàng",
+      "Phương Thức Thanh Toán",
+      "Thời Gian Đặt Hàng"
+    ];
+
+    const csvRows = orders.map((ord: any) => {
+      const productsText = ord.items
+        ?.map((item: any) => {
+          const name = item.product?.name || "Sản phẩm không rõ";
+          return `${name} (SL: ${item.quantity})`;
+        })
+        .join("; ") || "";
+
+      let statusVi = ord.status;
+      if (ord.statusType === 'pending') statusVi = 'Chờ xử lý';
+      else if (ord.statusType === 'processing') statusVi = 'Đang chuẩn bị gửi';
+      else if (ord.statusType === 'shipping') statusVi = 'Đang giao bưu tá';
+      else if (ord.statusType === 'success') statusVi = 'Hoàn tất bàn giao';
+      else if (ord.statusType === 'cancelled') statusVi = 'Đã hủy đơn';
+
+      const totalPrice = ord.totalPrice || ord.items?.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0) || 0;
+
+      // Escape quotes and wrap with double quotes to support CSV structure
+      return [
+        `"${ord.orderId}"`,
+        `"${ord.fullName.replace(/"/g, '""')}"`,
+        `"${ord.phone}"`,
+        `"${ord.address.replace(/"/g, '""')}"`,
+        `"${productsText.replace(/"/g, '""')}"`,
+        totalPrice,
+        `"${statusVi}"`,
+        `"${ord.paymentMethod === 'cod' ? 'Thanh toán COD' : 'Chuyển khoản Banking'}"`,
+        `"${new Date(ord.createdAt).toLocaleString("vi-VN")}"`
+      ].join(",");
+    });
+
+    // Merge headers and rows with UTF-8 BOM to prevent Vietnamese font corruption in Excel
+    const csvContent = "\uFEFF" + headers.join(",") + "\n" + csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    const fileName = `Bao_cao_don_hang_${new Date().toISOString().slice(0,10)}.csv`;
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    console.log(`Xuất thành công file CSV báo cáo đơn hàng: ${fileName}`);
+  };
 
   return (
     <div className="space-y-6 animate-fade-in font-sans">
@@ -157,6 +287,32 @@ export default function OrderManager({
 
         <div className="flex items-center gap-3">
           <button
+            onClick={handleExportExcel}
+            className={`h-12 px-5 border flex items-center justify-center gap-2 rounded-xl transition-all cursor-pointer text-xs font-bold uppercase tracking-wider ${
+              d
+                ? "bg-[#21262d] border-[#30363d] hover:bg-[#30363d] text-emerald-400"
+                : "bg-white border-gray-200 hover:bg-gray-50 text-emerald-600 shadow-xs"
+            }`}
+            title="Xuất báo cáo định dạng Excel (.xlsx)"
+          >
+            <FileSpreadsheet size={16} />
+            <span>Xuất Excel</span>
+          </button>
+
+          <button
+            onClick={handleExportCsv}
+            className={`h-12 px-5 border flex items-center justify-center gap-2 rounded-xl transition-all cursor-pointer text-xs font-bold uppercase tracking-wider ${
+              d
+                ? "bg-[#21262d] border-[#30363d] hover:bg-[#30363d] text-indigo-400"
+                : "bg-white border-gray-200 hover:bg-gray-50 text-indigo-600 shadow-xs"
+            }`}
+            title="Xuất báo cáo định dạng CSV (.csv)"
+          >
+            <FileText size={16} />
+            <span>Xuất CSV</span>
+          </button>
+
+          <button
             onClick={onRefreshOrders}
             className={`w-12 h-12 border flex items-center justify-center rounded-xl transition-all cursor-pointer ${
               d
@@ -167,7 +323,6 @@ export default function OrderManager({
           >
             <RotateCcw size={16} />
           </button>
-
         </div>
       </div>
 
@@ -228,63 +383,66 @@ export default function OrderManager({
                     : "bg-gray-50/70 border-gray-150/80"
                 }`}
               >
-                <div className="flex flex-wrap items-center gap-4">
-                  <div>
+                {/* Grid layout chia 4 cột: 1. Mã đơn, 2. Khách hàng, 3. Thời gian, 4. Thành tiền */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 items-center w-full max-w-4xl">
+                  {/* Cột 1: Mã đơn hàng */}
+                  <div className="flex flex-col">
                     <span
-                      className={`text-[9px] uppercase font-bold tracking-wider ${d ? "text-gray-500" : "text-gray-400"}`}
+                      className={`text-[9px] uppercase font-bold tracking-wider block mb-1.5 ${d ? "text-gray-500" : "text-gray-400"}`}
                     >
-                      MÃ ĐƠN HÀNG
+                      Mã đơn hàng
                     </span>
                     <strong
-                      className={`block font-mono text-sm font-extrabold ${d ? "text-white" : "text-gray-950"}`}
+                      className={`block font-mono text-sm font-extrabold truncate ${d ? "text-white" : "text-gray-955"}`}
+                      title={ord.orderId}
                     >
                       #{ord.orderId}
                     </strong>
                   </div>
-                  <div
-                    className={`h-6 w-px hidden sm:block ${d ? "bg-[#30363d]" : "bg-gray-250"}`}
-                  />
-                  <div>
+                  
+                  {/* Cột 2: Khách hàng */}
+                  <div className="flex flex-col">
                     <span
-                      className={`text-[9px] uppercase font-bold tracking-wider ${d ? "text-gray-500" : "text-gray-400"}`}
+                      className={`text-[9px] uppercase font-bold tracking-wider block mb-1.5 ${d ? "text-gray-500" : "text-gray-400"}`}
                     >
                       Khách hàng
                     </span>
                     <strong
-                      className={`block font-bold ${d ? "text-white" : "text-gray-900"}`}
+                      className={`block font-bold text-sm truncate ${d ? "text-white" : "text-gray-900"}`}
+                      title={ord.fullName}
                     >
                       {ord.fullName}
                     </strong>
                   </div>
-                  <div
-                    className={`h-6 w-px hidden sm:block ${d ? "bg-[#30363d]" : "bg-gray-250"}`}
-                  />
-                  <div>
+
+                  {/* Cột 3: Thời gian */}
+                  <div className="flex flex-col">
                     <span
-                      className={`text-[9px] uppercase font-bold tracking-wider ${d ? "text-gray-500" : "text-gray-400"}`}
+                      className={`text-[9px] uppercase font-bold tracking-wider block mb-1.5 ${d ? "text-gray-500" : "text-gray-400"}`}
+                    >
+                      Thời gian
+                    </span>
+                    <strong
+                      className={`block font-mono text-sm font-bold ${d ? "text-gray-300" : "text-gray-900"}`}
+                    >
+                      {new Date(ord.createdAt).toLocaleString("vi-VN")}
+                    </strong>
+                  </div>
+                  
+                  {/* Cột 4: Thành tiền */}
+                  <div className="flex flex-col">
+                    <span
+                      className={`text-[9px] uppercase font-bold tracking-wider block mb-1.5 ${d ? "text-gray-500" : "text-gray-400"}`}
                     >
                       Thành tiền
                     </span>
                     <strong
-                      className={`block font-mono font-black text-sm text-indigo-500 ${d ? "text-indigo-400" : "text-indigo-650"}`}
+                      className={`block font-mono font-black text-sm text-indigo-500 ${d ? "text-indigo-400" : "text-indigo-600"}`}
                     >
-                      {ord.finalTotal}
+                      {typeof ord.finalTotal === 'number' 
+                        ? ord.finalTotal.toLocaleString("vi-VN") + "₫" 
+                        : parseInt(String(ord.finalTotal || '0').replace(/[^0-9]/g, '')).toLocaleString("vi-VN") + "₫"}
                     </strong>
-                  </div>
-                  <div
-                    className={`h-6 w-px hidden sm:block ${d ? "bg-[#30363d]" : "bg-gray-250"}`}
-                  />
-                  <div>
-                    <span
-                      className={`text-[9px] uppercase font-bold tracking-wider block ${d ? "text-gray-500" : "text-gray-400"}`}
-                    >
-                      Thời gian
-                    </span>
-                    <span
-                      className={`shrink-0 font-mono ${d ? "text-gray-400" : "text-gray-650"}`}
-                    >
-                      {new Date(ord.createdAt).toLocaleString("vi-VN")}
-                    </span>
                   </div>
                 </div>
 
@@ -397,15 +555,12 @@ export default function OrderManager({
                             </h5>
                             <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
                               <span className="text-[9px] text-gray-400 font-mono">
-                                {item.product?.price?.toLocaleString("vi-VN")}₫
-                              </span>
-                              <span className="text-[8px] text-gray-300 font-sans">•</span>
-                              <span className={`text-[9px] font-mono font-bold ${d ? 'text-indigo-400' : 'text-indigo-650'}`}>
-                                Thành tiền: {((item.product?.price || 0) * (item.quantity || 0)).toLocaleString("vi-VN")}₫
+                                Đơn giá: {item.product?.price?.toLocaleString("vi-VN")}₫
                               </span>
                             </div>
                           </div>
                         </div>
+                        
                         <span
                           className={`font-mono font-bold px-2.5 py-1 rounded shrink-0 ml-2 border ${
                             d
@@ -413,7 +568,7 @@ export default function OrderManager({
                               : "bg-white border-gray-200 text-gray-850"
                           }`}
                         >
-                          Số lượng: {item.quantity}
+                          SL: {item.quantity}
                         </span>
                       </div>
                     ))}
@@ -468,35 +623,77 @@ export default function OrderManager({
                     <Truck size={11} /> Giao bưu tá
                   </button>
 
-                  <button
-                    onClick={() =>
-                      onUpdateOrderStatus(
-                        ord.orderId,
-                        "Hoàn tất bàn giao",
-                        "success",
-                      )
-                    }
-                    className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
-                      d
-                        ? "bg-emerald-950/40 hover:bg-emerald-900/60 border-emerald-900/30 text-emerald-400"
-                        : "bg-emerald-50 hover:bg-emerald-100 border-emerald-200/40 text-emerald-700"
-                    }`}
-                  >
-                    <CheckCircle size={11} /> Đóng dấu Hoàn tất
-                  </button>
+                  {confirmAction[ord.orderId] === "success" ? (
+                    <div className="space-y-1.5 p-2 rounded-xl border border-emerald-500/25 bg-emerald-500/5">
+                      <p className="text-[9px] uppercase font-bold text-center text-emerald-500">Xác nhận hoàn tất đơn hàng?</p>
+                      <div className="flex gap-1.5">
+                        <button
+                          onClick={() => {
+                            onUpdateOrderStatus(ord.orderId, "Hoàn tất bàn giao", "success");
+                            setConfirmAction(prev => ({ ...prev, [ord.orderId]: null }));
+                          }}
+                          className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wider text-[9px] rounded cursor-pointer"
+                        >
+                          Đồng ý
+                        </button>
+                        <button
+                          onClick={() => setConfirmAction(prev => ({ ...prev, [ord.orderId]: null }))}
+                          className={`flex-1 py-1.5 font-bold uppercase tracking-wider text-[9px] rounded cursor-pointer ${
+                            d ? "bg-[#21262d] hover:bg-[#30363d] text-gray-300" : "bg-white hover:bg-gray-100 border border-gray-200 text-gray-700"
+                          }`}
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                  ) : confirmAction[ord.orderId] === "cancelled" ? (
+                    <div className="space-y-1.5 p-2 rounded-xl border border-rose-500/25 bg-rose-500/5">
+                      <p className="text-[9px] uppercase font-bold text-center text-rose-500">Xác nhận hủy đơn hàng?</p>
+                      <div className="flex gap-1.5">
+                        <button
+                          onClick={() => {
+                            onUpdateOrderStatus(ord.orderId, "Hủy bỏ", "cancelled");
+                            setConfirmAction(prev => ({ ...prev, [ord.orderId]: null }));
+                          }}
+                          className="flex-1 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold uppercase tracking-wider text-[9px] rounded cursor-pointer"
+                        >
+                          Đồng ý
+                        </button>
+                        <button
+                          onClick={() => setConfirmAction(prev => ({ ...prev, [ord.orderId]: null }))}
+                          className={`flex-1 py-1.5 font-bold uppercase tracking-wider text-[9px] rounded cursor-pointer ${
+                            d ? "bg-[#21262d] hover:bg-[#30363d] text-gray-300" : "bg-white hover:bg-gray-100 border border-gray-200 text-gray-700"
+                          }`}
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setConfirmAction(prev => ({ ...prev, [ord.orderId]: "success" }))}
+                        className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                          d
+                            ? "bg-emerald-950/40 hover:bg-emerald-900/60 border-emerald-900/30 text-emerald-400"
+                            : "bg-emerald-50 hover:bg-emerald-100 border-emerald-200/40 text-emerald-700"
+                        }`}
+                      >
+                        <CheckCircle size={11} /> Đóng dấu Hoàn tất
+                      </button>
 
-                  <button
-                    onClick={() =>
-                      onUpdateOrderStatus(ord.orderId, "Hủy bỏ", "cancelled")
-                    }
-                    className={`w-full py-2 font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
-                      d
-                        ? "bg-rose-950/30 hover:bg-rose-900/40 text-rose-400"
-                        : "bg-rose-50 hover:bg-rose-100 text-rose-600"
-                    }`}
-                  >
-                    <X size={11} /> Hủy bỏ đơn
-                  </button>
+                      <button
+                        onClick={() => setConfirmAction(prev => ({ ...prev, [ord.orderId]: "cancelled" }))}
+                        className={`w-full py-2 font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                          d
+                            ? "bg-rose-950/30 hover:bg-rose-900/40 text-rose-400"
+                            : "bg-rose-50 hover:bg-rose-100 text-rose-600"
+                        }`}
+                      >
+                        <X size={11} /> Hủy bỏ đơn
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

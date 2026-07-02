@@ -32,7 +32,7 @@ export default function Header({
   setIsMobileMenuOpen,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.02)]">
+    <header className="sticky top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.02)] select-none">
       <style>{`
         .nav-btn {
           position: relative;

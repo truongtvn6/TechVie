@@ -9,7 +9,8 @@ import {
   ArrowLeft, 
   Sun, 
   Moon,
-  FolderTree
+  FolderTree,
+  Search
 } from 'lucide-react';
 
 // @ts-ignore
@@ -29,6 +30,7 @@ interface AdminSidebarProps {
   promosCount: number;
   usersCount: number;
   onNavigate: (tab: any) => void;
+  onSearch?: (query: string) => void;
 }
 
 export default function AdminSidebar({
@@ -42,10 +44,12 @@ export default function AdminSidebar({
   messagesCount,
   promosCount,
   usersCount,
-  onNavigate
+  onNavigate,
+  onSearch
 }: AdminSidebarProps) {
   const [lightBgUrl, setLightBgUrl] = useState<string>(localLightBg);
   const [darkBgUrl, setDarkBgUrl] = useState<string>(localDarkBg);
+  const [localSearch, setLocalSearch] = useState('');
 
   useEffect(() => {
     const imgLight = new Image();
@@ -120,6 +124,39 @@ export default function AdminSidebar({
             </button>
           </div>
         </div>
+
+        {/* Global Admin Search Bar */}
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            console.log('Sidebar Search query submitted:', localSearch);
+            onSearch?.(localSearch);
+          }}
+          className="relative"
+        >
+          <input
+            type="text"
+            value={localSearch}
+            onChange={(e) => {
+              setLocalSearch(e.target.value);
+              onSearch?.(e.target.value); // Tìm kiếm real-time khi gõ
+            }}
+            placeholder="Tìm kiếm nhanh..."
+            className={`w-full rounded-xl pl-9 pr-3 py-2 outline-none text-xs font-semibold transition-all duration-300 border ${
+              isDarkMode
+                ? 'bg-black/20 border-white/10 text-white focus:bg-black/35 focus:border-indigo-500 placeholder-gray-500'
+                : 'bg-white/40 border-black/10 text-gray-900 focus:bg-white/80 focus:border-black placeholder-gray-400'
+            }`}
+          />
+          <Search 
+            size={14} 
+            className={`absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer ${
+              isDarkMode ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black'
+            }`}
+            onClick={() => onSearch?.(localSearch)}
+          />
+        </form>
+
         <div className="space-y-4">
           {/* Nhóm 1: BÁO CÁO & THỐNG KÊ */}
           <div>

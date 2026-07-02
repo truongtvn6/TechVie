@@ -383,10 +383,10 @@ export default function UserManager({
                       ${
                         d
                           ? isRoleDropdownOpen
-                            ? "bg-[#161b22] border-white ring-1 ring-white text-white shadow-sm"
+                            ? "bg-[#161b22] border-indigo-500 text-white shadow-sm"
                             : "bg-[#161b22] border-[#30363d] text-white hover:border-gray-700 hover:bg-[#21262d]/50"
                           : isRoleDropdownOpen
-                            ? "bg-white border-black ring-1 ring-black text-gray-905 shadow-sm"
+                            ? "bg-white border-black text-gray-905 shadow-sm"
                             : "bg-white border-gray-200 text-gray-955 hover:border-gray-300 hover:bg-gray-50/50"
                       }
                     `}
@@ -452,10 +452,10 @@ export default function UserManager({
                       ${
                         d
                           ? isVipDropdownOpen
-                            ? "bg-[#161b22] border-white ring-1 ring-white text-white shadow-sm"
+                            ? "bg-[#161b22] border-indigo-500 text-white shadow-sm"
                             : "bg-[#161b22] border-[#30363d] text-white hover:border-gray-700 hover:bg-[#21262d]/50"
                           : isVipDropdownOpen
-                            ? "bg-white border-black ring-1 ring-black text-gray-905 shadow-sm"
+                            ? "bg-white border-black text-gray-905 shadow-sm"
                             : "bg-white border-gray-200 text-gray-955 hover:border-gray-300 hover:bg-gray-50/50"
                       }
                     `}

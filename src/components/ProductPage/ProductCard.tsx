@@ -66,7 +66,7 @@ export default function ProductCard({
     >
       <div>
         {/* Header section with category badge and premium tag */}
-        <div className="flex justify-between items-start mb-4">
+        <div className="flex justify-between items-start mb-4 select-none">
           <div className="flex flex-wrap gap-1.5">
             <span className="text-[9px] uppercase font-mono font-black tracking-wider bg-gray-50 border border-gray-150 text-gray-500 px-3 py-1 rounded-full">
               {product.category}
@@ -87,7 +87,7 @@ export default function ProductCard({
 
         {/* Product image container with smooth scale */}
         <div 
-          className="w-full aspect-[4/5] flex items-center justify-center cursor-pointer relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50/50 to-gray-100/30 group-hover:from-gray-100/40 group-hover:to-gray-200/20 transition-all duration-300 border border-transparent group-hover:border-gray-100" 
+          className="w-full aspect-[4/5] flex items-center justify-center cursor-pointer relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50/50 to-gray-100/30 group-hover:from-gray-100/40 group-hover:to-gray-200/20 transition-all duration-300 border border-transparent group-hover:border-gray-100 select-none" 
           onClick={() => onSelect(product)}
         >
           <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

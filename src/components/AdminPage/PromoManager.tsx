@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Ticket, Plus } from 'lucide-react';
 
 interface Promo {
@@ -30,6 +30,26 @@ export default function PromoManager({
   const [newPromoDiscount, setNewPromoDiscount] = useState<number>(10); // in percent
   const [newPromoDesc, setNewPromoDesc] = useState('');
   const [newPromoMinOrder, setNewPromoMinOrder] = useState<number>(0);
+  
+  // Custom Dropdown State & Ref
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,25 +102,79 @@ export default function PromoManager({
               />
             </div>
 
-            <div className="space-y-1.5 flex flex-col text-left">
+            <div className="space-y-1.5 flex flex-col text-left" ref={dropdownRef}>
               <label className="text-[10px] uppercase font-bold text-gray-400">Mức chiết khấu (%)</label>
-              <select
-                value={newPromoDiscount}
-                onChange={(e) => setNewPromoDiscount(parseInt(e.target.value))}
-                className={`w-full rounded-xl px-4 py-3 outline-none text-xs font-semibold transition-all duration-300 border ${
-                  d
-                    ? 'bg-[#161b22] border-[#30363d] text-white focus:border-indigo-500'
-                    : 'bg-slate-50 border-slate-200 focus:border-black focus:bg-white text-gray-905'
-                }`}
-              >
-                <option value={5}>Giảm 5%</option>
-                <option value={10}>Giảm 10%</option>
-                <option value={15}>Giảm 15%</option>
-                <option value={20}>Giảm 20%</option>
-                <option value={25}>Giảm 25%</option>
-                <option value={30}>Giảm 30%</option>
-                <option value={50}>Giảm cực hạn 50%</option>
-              </select>
+              
+              <div className="relative w-full">
+                {/* Custom Dropdown Trigger */}
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border text-left transition-all duration-200 cursor-pointer
+                    ${
+                      d
+                        ? isDropdownOpen
+                          ? "bg-[#161b22] border-indigo-500 text-white shadow-sm"
+                          : "bg-[#0d1117]/60 border-[#30363d] text-white hover:border-gray-700 hover:bg-[#21262d]/50"
+                        : isDropdownOpen
+                          ? "bg-white border-black text-gray-905 shadow-sm"
+                          : "bg-slate-50 border-slate-200 text-gray-905 hover:border-gray-300 hover:bg-gray-50/50"
+                    }
+                  `}
+                >
+                  <span className="font-bold text-xs">
+                    Giảm {newPromoDiscount}%
+                  </span>
+                  
+                  {/* Arrow Icon */}
+                  <svg
+                    className={`w-4 h-4 text-gray-450 transition-transform duration-300 ${isDropdownOpen ? "rotate-180 text-black" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Custom Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div
+                    className={`absolute top-full left-0 z-50 w-full mt-2 rounded-2xl shadow-xl py-2 animate-fade-in text-xs transition-all duration-350 border ${
+                      d
+                        ? "bg-[#161b22] border-[#30363d] text-white shadow-[0_12px_40px_rgba(0,0,0,0.5)]"
+                        : "bg-white border-gray-200 text-gray-900 shadow-xl"
+                    }`}
+                  >
+                    <ul className="max-h-60 overflow-auto scrollbar-none space-y-1">
+                      {[5, 10, 15, 20, 25, 30, 50].map((discountVal) => (
+                        <li
+                          key={discountVal}
+                          onClick={() => {
+                            setNewPromoDiscount(discountVal);
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors mx-2 rounded-xl group
+                            ${
+                              newPromoDiscount === discountVal
+                                ? d
+                                  ? "bg-[#21262d] text-white font-black hover:bg-white/10"
+                                  : "bg-slate-100 text-black font-black hover:bg-black hover:text-white"
+                                : d
+                                  ? "text-gray-350 hover:bg-[#21262d] hover:text-white font-bold"
+                                  : "text-gray-600 hover:bg-black hover:text-white font-bold"
+                            }
+                          `}
+                        >
+                          <span>
+                            {discountVal === 50 ? 'Giảm cực hạn 50%' : `Giảm ${discountVal}%`}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="space-y-1.5 flex flex-col text-left">

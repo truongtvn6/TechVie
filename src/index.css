@@ -7,6 +7,15 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+/* Ngăn chặn bôi đen và kéo thả các tài nguyên giao diện chung */
+button, svg, img, input[type="range"], .select-none {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-drag: none;
+}
+
 /* Glassmorphism custom classes */
 .glass-card {
   background: rgba(255, 255, 255, 0.45);

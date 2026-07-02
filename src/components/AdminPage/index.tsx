@@ -257,6 +257,38 @@ export default function AdminPage({
     }
   };
 
+  // Tìm kiếm nhanh toàn hệ thống qua Sidebar
+  const handleSidebarSearch = (query: string) => {
+    console.log('[AdminPage] Global sidebar search triggered with query:', query);
+    const lowerQuery = query.toLowerCase().trim();
+    
+    if (activeSubTab === 'categories') {
+      if (!lowerQuery) {
+        fetchCategories();
+      } else {
+        setAllCategories(prev => prev.filter(c => c.name.toLowerCase().includes(lowerQuery)));
+      }
+    } else if (activeSubTab === 'products') {
+      if (!lowerQuery) {
+        // Gọi lại api sản phẩm mặc định
+        getProducts().then(res => {
+          if (res.success) setAdminProducts(res.products);
+        });
+      } else {
+        setAdminProducts(prev => prev.filter(p => p.name.toLowerCase().includes(lowerQuery) || p.category.toLowerCase().includes(lowerQuery)));
+      }
+    } else if (activeSubTab === 'orders') {
+      if (!lowerQuery) {
+        fetchOrders();
+      } else {
+        setOrders(prev => prev.filter(o => 
+          o.orderId.toLowerCase().includes(lowerQuery) || 
+          o.fullName.toLowerCase().includes(lowerQuery)
+        ));
+      }
+    }
+  };
+
   // Dynamic Promo Campaigns local state with localStorage persistence
   const [promos, setPromos] = useState<any[]>(() => {
     try {
@@ -578,6 +610,7 @@ export default function AdminPage({
             promosCount={promos.length}
             usersCount={systemUsers.length}
             onNavigate={onNavigate}
+            onSearch={handleSidebarSearch}
           />
         </div>
       </div>

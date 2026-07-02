@@ -50,7 +50,7 @@ export default function ProductManager({
             }`}
           >
             <FileSpreadsheet size={16} />
-            Nhập CSV
+            Nhập Excel / CSV
           </button>
 
           <button
@@ -194,7 +194,7 @@ export default function ProductManager({
       <CsvImportModal
         isOpen={isCsvModalOpen}
         onClose={() => setIsCsvModalOpen(false)}
-        title="Nhập danh sách sản phẩm từ CSV"
+        title="Nhập danh sách sản phẩm từ Excel / CSV"
         templateHeaders={["name", "price", "category", "image", "description", "specs"]}
         templateRows={[
           [
