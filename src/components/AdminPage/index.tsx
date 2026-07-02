@@ -12,7 +12,9 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
-  restoreCategory
+  restoreCategory,
+  toggleCategory,
+  hardDeleteCategory
 } from '../../services/api';
 import AdminSidebar from './AdminSidebar';
 
@@ -175,16 +177,22 @@ export default function AdminPage({
   // Admin active sub tab
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'categories' | 'products' | 'orders' | 'messages' | 'promos' | 'users'>('overview');
 
-  // Product categories state
-  const [categories, setCategories] = useState<any[]>([]);
+  // Product categories state (always fetch all, including soft-deleted)
+  const [allCategories, setAllCategories] = useState<any[]>([]);
 
   const fetchCategories = () => {
-    getBackendCategories(showDeletedItems).then(res => {
+    // Always fetch all categories (including deleted) so the UI can show both states
+    getBackendCategories(true).then(res => {
       if (res.success && res.categories) {
-        setCategories(res.categories);
+        setAllCategories(res.categories);
       }
     });
   };
+
+  // Filter categories based on showDeletedItems toggle
+  const categories = showDeletedItems
+    ? allCategories  // Show all (including deleted)
+    : allCategories.filter(c => !c.isDeleted);  // Only show active
 
   const handleCreateCategory = async (name: string) => {
     const res = await createCategory(name);
@@ -206,29 +214,43 @@ export default function AdminPage({
     }
   };
 
-  const handleDeleteCategory = async (id: string) => {
-    const target = categories.find(c => c._id === id);
+  // Toggle bật/tắt danh mục
+  const handleToggleCategory = async (id: string) => {
+    const target = allCategories.find(c => c._id === id);
     const name = target ? target.name : id;
-    if (confirm(`Bạn chắn chắn muốn xóa danh mục "${name}"?`)) {
-      const res = await deleteCategory(id);
+    const wasDeleted = target?.isDeleted;
+    try {
+      const res = await toggleCategory(id);
       if (res.success) {
-        addLog(`Đã xóa danh mục: "${name}"`);
+        addLog(wasDeleted ? `Đã bật lại danh mục: "${name}"` : `Đã tắt danh mục: "${name}"`);
         fetchCategories();
       } else {
-        addLog(`Lỗi khi xóa danh mục: ${res.message}`);
+        addLog(`Lỗi khi thay đổi trạng thái danh mục: ${res.message}`);
       }
+    } catch (err) {
+      console.error('[CategoryManager] Toggle error:', err);
+      addLog(`Lỗi toggle danh mục: ${err}`);
     }
   };
 
-  const handleRestoreCategory = async (id: string) => {
-    const res = await restoreCategory(id);
-    const target = categories.find(c => c._id === id);
+  // Xóa hẳn danh mục khỏi cơ sở dữ liệu
+  const handleHardDeleteCategory = async (id: string) => {
+    const target = allCategories.find(c => c._id === id);
     const name = target ? target.name : id;
-    if (res.success) {
-      addLog(`Đã khôi phục danh mục: "${name}"`);
-      fetchCategories();
-    } else {
-      addLog(`Lỗi khi khôi phục danh mục: ${res.message}`);
+    const confirmed = window.confirm(`⚠️ Hành động này không thể hoàn tác!\n\nBạn chắc chắn muốn XÓA HẲNG danh mục "${name}" khỏi cơ sở dữ liệu?`);
+    if (confirmed) {
+      try {
+        const res = await hardDeleteCategory(id);
+        if (res.success) {
+          addLog(`Đã xóa hẳn danh mục: "${name}" khỏi CSDL`);
+          fetchCategories();
+        } else {
+          addLog(`Lỗi khi xóa hẳn danh mục: ${res.message}`);
+        }
+      } catch (err) {
+        console.error('[CategoryManager] Hard delete error:', err);
+        addLog(`Lỗi xóa hẳn danh mục: ${err}`);
+      }
     }
   };
 
@@ -426,9 +448,8 @@ export default function AdminPage({
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    fetchCategories();
-  }, [showDeletedItems]);
+
+  // No need to refetch categories on showDeletedItems change — filtering is done client-side
 
   // Total Revenue calculations based on orders
   const totalRevenue = orders.reduce((sum, ord) => {
@@ -609,12 +630,11 @@ export default function AdminPage({
 
           {activeSubTab === 'categories' && (
             <CategoryManager
-              categories={categories}
+              categories={allCategories}
               onCreateCategory={handleCreateCategory}
               onUpdateCategory={handleUpdateCategory}
-              onDeleteCategory={handleDeleteCategory}
-              onRestoreCategory={handleRestoreCategory}
-              showDeletedItems={showDeletedItems}
+              onToggleCategory={handleToggleCategory}
+              onHardDeleteCategory={handleHardDeleteCategory}
               isDarkMode={isDarkMode}
             />
           )}

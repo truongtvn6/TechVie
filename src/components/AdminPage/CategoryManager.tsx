@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FolderTree, Plus, Edit2, Trash2, RotateCcw, Check, X } from 'lucide-react';
+import { FolderTree, Plus, Edit2, Trash2, Check, X } from 'lucide-react';
 
 interface Category {
   _id: string;
@@ -12,9 +12,8 @@ interface CategoryManagerProps {
   categories: Category[];
   onCreateCategory: (name: string) => Promise<void>;
   onUpdateCategory: (id: string, name: string) => Promise<void>;
-  onDeleteCategory: (id: string) => Promise<void>;
-  onRestoreCategory: (id: string) => Promise<void>;
-  showDeletedItems: boolean;
+  onToggleCategory: (id: string) => Promise<void>;
+  onHardDeleteCategory: (id: string) => Promise<void>;
   isDarkMode?: boolean;
 }
 
@@ -22,15 +21,15 @@ export default function CategoryManager({
   categories,
   onCreateCategory,
   onUpdateCategory,
-  onDeleteCategory,
-  onRestoreCategory,
-  showDeletedItems,
+  onToggleCategory,
+  onHardDeleteCategory,
   isDarkMode = false,
 }: CategoryManagerProps) {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +67,24 @@ export default function CategoryManager({
     }
   };
 
+  const handleToggle = async (id: string) => {
+    setTogglingIds(prev => new Set(prev).add(id));
+    try {
+      await onToggleCategory(id);
+    } finally {
+      setTogglingIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
+
   const d = isDarkMode;
+
+  // Separate active and inactive categories
+  const activeCategories = categories.filter(c => !c.isDeleted);
+  const inactiveCategories = categories.filter(c => c.isDeleted);
 
   return (
     <div className="space-y-8 animate-fade-in font-sans">
@@ -107,7 +123,7 @@ export default function CategoryManager({
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full h-12 px-6 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all duration-300 shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
+              className={`w-full h-12 px-6 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all duration-300 shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
                 isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
               } ${
                 d ? 'bg-white! hover:bg-gray-100! text-black' : 'bg-black hover:bg-slate-900 text-white'
@@ -117,6 +133,24 @@ export default function CategoryManager({
               Thêm danh mục
             </button>
           </form>
+
+          {/* Stats summary */}
+          <div className={`mt-4 pt-4 border-t space-y-2 transition-all duration-300 ${
+            d ? 'border-[#30363d]' : 'border-gray-100'
+          }`}>
+            <div className="flex justify-between items-center">
+              <span className={`text-[10px] uppercase font-bold tracking-wider ${d ? 'text-gray-500' : 'text-gray-400'}`}>Đang hoạt động</span>
+              <span className={`text-xs font-mono font-extrabold px-2.5 py-0.5 rounded-full ${
+                d ? 'bg-emerald-950/40 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
+              }`}>{activeCategories.length}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className={`text-[10px] uppercase font-bold tracking-wider ${d ? 'text-gray-500' : 'text-gray-400'}`}>Đã tắt</span>
+              <span className={`text-xs font-mono font-extrabold px-2.5 py-0.5 rounded-full ${
+                d ? 'bg-rose-950/40 text-rose-400' : 'bg-rose-50 text-rose-600'
+              }`}>{inactiveCategories.length}</span>
+            </div>
+          </div>
         </div>
 
         {/* List of categories (8 cols) */}
@@ -126,10 +160,10 @@ export default function CategoryManager({
           }`}>
             <div className="text-left">
               <h3 className={`font-extrabold text-base uppercase tracking-wider transition-colors duration-300 ${d ? 'text-white' : 'text-gray-955'}`}>
-                {showDeletedItems ? 'Dữ liệu danh mục lưu trữ' : 'Danh mục đang hoạt động'}
+                Quản lý danh mục
               </h3>
               <p className={`text-xs md:text-[13px] font-sans mt-1.5 leading-relaxed transition-colors duration-300 ${d ? 'text-gray-400' : 'text-gray-405'}`}>
-                Danh sách các danh mục hàng hóa trong cơ sở dữ liệu hệ thống.
+                Bật/tắt trạng thái hoặc xóa hẳn danh mục khỏi hệ thống.
               </p>
             </div>
             <span className={`text-xs font-mono font-bold px-4 py-2 rounded-full border transition-all duration-300 ${
@@ -148,9 +182,7 @@ export default function CategoryManager({
                 Chưa có danh mục nào
               </p>
               <p className={`text-xs transition-colors duration-300 ${d ? 'text-gray-400' : 'text-gray-400'}`}>
-                {showDeletedItems 
-                  ? 'Không tìm thấy danh mục nào bị xóa trong hệ thống.' 
-                  : 'Hãy khởi tạo danh mục đầu tiên từ bảng bên trái.'}
+                Hãy khởi tạo danh mục đầu tiên từ bảng bên trái.
               </p>
             </div>
           ) : (
@@ -160,7 +192,7 @@ export default function CategoryManager({
                   key={c._id} 
                   className={`p-5 rounded-3xl shadow-sm transition-all duration-300 flex flex-col justify-between min-h-[140px] border ${
                     d ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-gray-200'
-                  } ${c.isDeleted ? 'opacity-65' : 'hover:border-black/15'}`}
+                  } ${c.isDeleted ? 'opacity-60' : 'hover:border-black/15'}`}
                 >
                   <div className="text-left w-full">
                     {/* Header item info */}
@@ -170,11 +202,27 @@ export default function CategoryManager({
                       <span className="text-[10px] text-gray-400 uppercase tracking-widest font-mono">
                         {c.created_at ? new Date(c.created_at).toLocaleDateString('vi-VN') : 'Mặc định'}
                       </span>
-                      {c.isDeleted && (
-                        <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 font-extrabold">
-                          Đã xóa mềm
-                        </span>
-                      )}
+                      
+                      {/* Toggle Switch */}
+                      <button
+                        type="button"
+                        onClick={() => handleToggle(c._id)}
+                        disabled={togglingIds.has(c._id)}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 cursor-pointer focus:outline-none ${
+                          togglingIds.has(c._id) ? 'opacity-50 cursor-wait' : ''
+                        } ${
+                          !c.isDeleted
+                            ? (d ? 'bg-emerald-500' : 'bg-emerald-500')
+                            : (d ? 'bg-gray-700' : 'bg-gray-300')
+                        }`}
+                        title={c.isDeleted ? 'Bật danh mục' : 'Tắt danh mục'}
+                      >
+                        <span
+                          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                            !c.isDeleted ? 'translate-x-4.5' : 'translate-x-0.5'
+                          }`}
+                        />
+                      </button>
                     </div>
 
                     {editingId === c._id ? (
@@ -203,11 +251,27 @@ export default function CategoryManager({
                         </button>
                       </div>
                     ) : (
-                      <h4 className={`font-black text-sm tracking-tight transition-colors duration-300 ${
-                        d ? 'text-white' : 'text-gray-955'
-                      }`}>
-                        {c.name}
-                      </h4>
+                      <div className="flex items-center gap-2">
+                        <h4 className={`font-black text-sm tracking-tight transition-colors duration-300 ${
+                          d ? 'text-white' : 'text-gray-955'
+                        } ${c.isDeleted ? 'line-through' : ''}`}>
+                          {c.name}
+                        </h4>
+                        {c.isDeleted && (
+                          <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-extrabold ${
+                            d ? 'bg-rose-500/15 text-rose-400' : 'bg-rose-500/10 text-rose-500'
+                          }`}>
+                            TẮT
+                          </span>
+                        )}
+                        {!c.isDeleted && (
+                          <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-extrabold ${
+                            d ? 'bg-emerald-500/15 text-emerald-400' : 'bg-emerald-500/10 text-emerald-600'
+                          }`}>
+                            BẬT
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -215,35 +279,24 @@ export default function CategoryManager({
                   <div className={`flex items-center justify-end gap-3 pt-3 border-t text-xs transition-all duration-300 ${
                     d ? 'border-[#30363d]' : 'border-gray-50'
                   }`}>
-                    {c.isDeleted ? (
+                    {editingId !== c._id && (
                       <button
                         type="button"
-                        onClick={() => onRestoreCategory(c._id)}
-                        className="text-indigo-500 hover:text-indigo-700 font-black uppercase tracking-wider text-[10px] cursor-pointer flex items-center gap-1"
+                        onClick={() => startEditing(c)}
+                        className="text-amber-600 hover:text-amber-800 font-black uppercase tracking-wider text-[10px] cursor-pointer flex items-center gap-1"
                       >
-                        <RotateCcw size={11} />
-                        Khôi phục
+                        <Edit2 size={11} />
+                        Đổi tên
                       </button>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => startEditing(c)}
-                          className="text-amber-600 hover:text-amber-800 font-black uppercase tracking-wider text-[10px] cursor-pointer flex items-center gap-1"
-                        >
-                          <Edit2 size={11} />
-                          Đổi tên
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onDeleteCategory(c._id)}
-                          className="text-rose-500 hover:text-rose-700 font-black uppercase tracking-wider text-[10px] cursor-pointer flex items-center gap-1"
-                        >
-                          <Trash2 size={11} />
-                          Xóa mềm
-                        </button>
-                      </>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => onHardDeleteCategory(c._id)}
+                      className="text-rose-500 hover:text-rose-700 font-black uppercase tracking-wider text-[10px] cursor-pointer flex items-center gap-1"
+                    >
+                      <Trash2 size={11} />
+                      Xóa hẳn
+                    </button>
                   </div>
 
                 </div>

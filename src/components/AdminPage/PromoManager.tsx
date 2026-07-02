@@ -135,7 +135,7 @@ export default function PromoManager({
 
             <button
               type="submit"
-              className={`w-full h-12 px-6 text-white font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all duration-300 shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
+              className={`w-full h-12 px-6 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all duration-300 shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
                 d ? 'bg-white! hover:bg-gray-100! text-black' : 'bg-black hover:bg-slate-900 text-white'
               }`}
             >

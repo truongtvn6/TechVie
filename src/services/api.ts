@@ -721,3 +721,31 @@ export async function restoreCategory(id: string): Promise<{ success: boolean; c
     return { success: false, message: error.message };
   }
 }
+
+// Toggle bật/tắt danh mục (Chỉ cho Admin)
+export async function toggleCategory(id: string): Promise<{ success: boolean; category?: any; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/categories/${id}/toggle`, {
+      method: 'PATCH',
+      headers: getAuthHeaders()
+    });
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi toggle danh mục:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+// Xóa hẳn danh mục khỏi cơ sở dữ liệu (Chỉ cho Admin)
+export async function hardDeleteCategory(id: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/categories/${id}/permanent`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return await response.json();
+  } catch (error: any) {
+    console.error('Lỗi xóa hẳn danh mục:', error);
+    return { success: false, message: error.message };
+  }
+}
