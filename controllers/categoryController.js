@@ -88,6 +88,107 @@ const categoryController = {
       });
     }
   },
+  
+  // Tạo danh mục mới (Chỉ cho Admin)
+  createCategory: async (req, res) => {
+    try {
+      const { name } = req.body;
+      if (!name || name.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: "Tên danh mục không được để trống!",
+        });
+      }
+
+      // Kiểm tra trùng tên (không phân biệt hoa thường)
+      const existingCategory = await Category.findOne({
+        name: { $regex: new RegExp("^" + name.trim() + "$", "i") }
+      });
+
+      if (existingCategory) {
+        if (existingCategory.isDeleted) {
+          // Khôi phục nếu đã bị xóa mềm trước đó
+          existingCategory.isDeleted = false;
+          await existingCategory.save();
+          return res.status(200).json({
+            success: true,
+            message: "Danh mục đã tồn tại trước đó và đã được khôi phục thành công!",
+            category: existingCategory,
+          });
+        }
+        return res.status(400).json({
+          success: false,
+          message: "Tên danh mục đã tồn tại!",
+        });
+      }
+
+      const newCategory = await Category.create({ name: name.trim() });
+      return res.status(201).json({
+        success: true,
+        message: "Tạo danh mục mới thành công!",
+        category: newCategory,
+      });
+    } catch (error) {
+      console.error("Lỗi tạo danh mục:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Có lỗi xảy ra khi tạo danh mục!",
+        error: error.message,
+      });
+    }
+  },
+
+  // Cập nhật danh mục (Chỉ cho Admin)
+  updateCategory: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name } = req.body;
+
+      if (!name || name.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: "Tên danh mục không được để trống!",
+        });
+      }
+
+      const category = await Category.findById(id);
+      if (!category) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy danh mục!",
+        });
+      }
+
+      // Kiểm tra trùng tên với danh mục khác
+      const duplicateCategory = await Category.findOne({
+        _id: { $ne: id },
+        name: { $regex: new RegExp("^" + name.trim() + "$", "i") }
+      });
+
+      if (duplicateCategory) {
+        return res.status(400).json({
+          success: false,
+          message: "Tên danh mục đã tồn tại ở một danh mục khác!",
+        });
+      }
+
+      category.name = name.trim();
+      await category.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Cập nhật danh mục thành công!",
+        category,
+      });
+    } catch (error) {
+      console.error("Lỗi cập nhật danh mục:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Có lỗi xảy ra khi cập nhật danh mục!",
+        error: error.message,
+      });
+    }
+  },
 };
 
 module.exports = categoryController;

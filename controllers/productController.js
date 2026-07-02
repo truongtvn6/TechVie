@@ -72,7 +72,7 @@ const productController = {
   // 2. Thêm mới sản phẩm (kèm upload ảnh Cloudinary)
   createProduct: async (req, res) => {
     try {
-      const { name, price, category, description, specs } = req.body;
+      const { name, price, category, description, specs, colors } = req.body;
 
       if (!name || !price || !category) {
         return res.status(400).json({
@@ -111,6 +111,17 @@ const productController = {
         }
       }
 
+      // Parse colors từ JSON string hoặc mảng
+      let parsedColors = [];
+      if (colors) {
+        try {
+          parsedColors = typeof colors === "string" ? JSON.parse(colors) : colors;
+        } catch (e) {
+          console.warn("Lỗi parse colors JSON:", e);
+          parsedColors = [];
+        }
+      }
+
       const newProduct = new Product({
         _id: uniqueId,
         name,
@@ -119,6 +130,7 @@ const productController = {
         image: imageUrl,
         description: description || "",
         specs: parsedSpecs,
+        colors: parsedColors,
       });
 
       await newProduct.save();
@@ -142,7 +154,7 @@ const productController = {
   updateProduct: async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, price, category, description, specs } = req.body;
+      const { name, price, category, description, specs, colors } = req.body;
 
       const product = await Product.findById(id);
       if (!product) {
@@ -162,6 +174,14 @@ const productController = {
           product.specs = typeof specs === "string" ? JSON.parse(specs) : specs;
         } catch (e) {
           console.warn("Lỗi parse specs JSON khi update:", e);
+        }
+      }
+
+      if (colors) {
+        try {
+          product.colors = typeof colors === "string" ? JSON.parse(colors) : colors;
+        } catch (e) {
+          console.warn("Lỗi parse colors JSON khi update:", e);
         }
       }
 

@@ -1,14 +1,41 @@
 const express = require("express");
 const router = express.Router();
 const categoryController = require("../controllers/categoryController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 // Lấy danh sách danh mục (Công khai)
 router.get("/", categoryController.getCategories);
 
-// Xóa danh mục (Soft Delete)
-router.delete("/:id", categoryController.deleteCategory);
+// Tạo danh mục mới (Chỉ cho Admin)
+router.post(
+  "/",
+  authMiddleware,
+  authMiddleware.adminOnly,
+  categoryController.createCategory
+);
 
-// Khôi phục danh mục
-router.patch("/:id/restore", categoryController.restoreCategory);
+// Cập nhật danh mục (Chỉ cho Admin)
+router.put(
+  "/:id",
+  authMiddleware,
+  authMiddleware.adminOnly,
+  categoryController.updateCategory
+);
+
+// Xóa danh mục (Soft Delete - Chỉ cho Admin)
+router.delete(
+  "/:id",
+  authMiddleware,
+  authMiddleware.adminOnly,
+  categoryController.deleteCategory
+);
+
+// Khôi phục danh mục (Chỉ cho Admin)
+router.patch(
+  "/:id/restore",
+  authMiddleware,
+  authMiddleware.adminOnly,
+  categoryController.restoreCategory
+);
 
 module.exports = router;
