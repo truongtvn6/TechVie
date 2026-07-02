@@ -108,6 +108,22 @@ app.use("/api/checkout", checkoutRoutes);
 // 13. Định nghĩa API Search Logs (Phổ biến & Lịch sử)
 app.use("/api/search", searchRoutes);
 
+// Endpoint nhận log từ Client và in ra CMD của server
+app.post("/api/logs", (req, res) => {
+  const { level, message, details } = req.body;
+  const time = new Date().toLocaleTimeString('vi-VN');
+  const detailStr = details ? JSON.stringify(details) : '';
+  
+  if (level === 'error') {
+    console.error(`\x1b[31m[CLIENT ERROR][${time}] ${message}\x1b[0m`, detailStr);
+  } else if (level === 'warn') {
+    console.warn(`\x1b[33m[CLIENT WARN][${time}] ${message}\x1b[0m`, detailStr);
+  } else {
+    console.log(`\x1b[36m[CLIENT LOG][${time}] ${message}\x1b[0m`, detailStr);
+  }
+  return res.status(200).json({ success: true });
+});
+
 // Endpoint GET /api/hero-images truy xuất ảnh từ thư mục wallpaper-slideshow-for-homePage trên Cloudinary
 app.get("/api/hero-images", async (req, res) => {
   const fallbackImages = [

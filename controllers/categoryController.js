@@ -194,9 +194,11 @@ const categoryController = {
   toggleCategory: async (req, res) => {
     try {
       const { id } = req.params;
+      console.log('[BACKEND] toggleCategory requested for ID:', id);
       const category = await Category.findById(id);
 
       if (!category) {
+        console.warn('[BACKEND] toggleCategory: Category not found for ID:', id);
         return res.status(404).json({
           success: false,
           message: "Không tìm thấy danh mục!",
@@ -205,6 +207,7 @@ const categoryController = {
 
       category.isDeleted = !category.isDeleted;
       await category.save();
+      console.log('[BACKEND] toggleCategory: Success. New status (isDeleted):', category.isDeleted);
 
       return res.status(200).json({
         success: true,
@@ -214,7 +217,7 @@ const categoryController = {
         category,
       });
     } catch (error) {
-      console.error("Lỗi toggle danh mục:", error);
+      console.error("[BACKEND] Lỗi toggle danh mục:", error);
       return res.status(500).json({
         success: false,
         message: "Có lỗi xảy ra khi thay đổi trạng thái danh mục!",
@@ -227,9 +230,11 @@ const categoryController = {
   hardDeleteCategory: async (req, res) => {
     try {
       const { id } = req.params;
+      console.log('[BACKEND] hardDeleteCategory requested for ID:', id);
       const category = await Category.findById(id);
 
       if (!category) {
+        console.warn('[BACKEND] hardDeleteCategory: Category not found for ID:', id);
         return res.status(404).json({
           success: false,
           message: "Không tìm thấy danh mục!",
@@ -237,13 +242,14 @@ const categoryController = {
       }
 
       await Category.findByIdAndDelete(id);
+      console.log('[BACKEND] hardDeleteCategory: Successfully deleted from database for ID:', id);
 
       return res.status(200).json({
         success: true,
         message: `Đã xóa hẳn danh mục "${category.name}" khỏi cơ sở dữ liệu!`,
       });
     } catch (error) {
-      console.error("Lỗi xóa hẳn danh mục:", error);
+      console.error("[BACKEND] Lỗi xóa hẳn danh mục:", error);
       return res.status(500).json({
         success: false,
         message: "Có lỗi xảy ra khi xóa hẳn danh mục!",

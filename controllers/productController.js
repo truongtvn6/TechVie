@@ -25,15 +25,42 @@ const productController = {
       
       if (includeDeleted !== 'true') {
         query.isDeleted = { $ne: true };
+        
+        // Tự động ẩn các sản phẩm thuộc danh mục đã bị tắt (soft deleted/disabled)
+        try {
+          const Category = require("../models/Category");
+          const disabledCategories = await Category.find({ isDeleted: true }, 'name');
+          if (disabledCategories.length > 0) {
+            const disabledNames = disabledCategories.map(cat => cat.name);
+            console.log('[BACKEND] Hiding products under disabled categories:', disabledNames);
+            query.category = { $nin: disabledNames };
+          }
+        } catch (catError) {
+          console.error("Lỗi khi tìm danh mục bị tắt:", catError);
+        }
       }
       
       if (search) {
         const searchRegex = new RegExp(search.trim(), "i");
-        query.$or = [
+        // Nếu đã có điều kiện category, ta gộp lại bằng $and để tránh đè query
+        const searchOrCond = [
           { name: searchRegex },
-          { category: searchRegex },
           { description: searchRegex }
         ];
+        
+        // Nếu category không bị cấm do đã tắt, cho phép tìm kiếm theo category
+        if (!query.category) {
+          searchOrCond.push({ category: searchRegex });
+        }
+        
+        if (query.category) {
+          query.$and = [
+            { category: query.category },
+            { $or: searchOrCond }
+          ];
+        } else {
+          query.$or = searchOrCond;
+        }
 
         // Ghi log tìm kiếm để tính phổ biến & lịch sử gần đây
         try {
