@@ -38,4 +38,20 @@ router.patch(
   categoryController.restoreCategory
 );
 
+// Toggle bật/tắt danh mục (Chỉ cho Admin)
+router.patch(
+  "/:id/toggle",
+  authMiddleware,
+  authMiddleware.adminOnly,
+  categoryController.toggleCategory
+);
+
+// Xóa hẳn danh mục (Permanent Delete - Chỉ cho Admin)
+router.delete(
+  "/:id/permanent",
+  authMiddleware,
+  authMiddleware.adminOnly,
+  categoryController.hardDeleteCategory
+);
+
 module.exports = router;

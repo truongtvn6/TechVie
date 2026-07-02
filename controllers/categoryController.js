@@ -189,6 +189,68 @@ const categoryController = {
       });
     }
   },
+
+  // Toggle trạng thái bật/tắt danh mục (isDeleted = true/false)
+  toggleCategory: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const category = await Category.findById(id);
+
+      if (!category) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy danh mục!",
+        });
+      }
+
+      category.isDeleted = !category.isDeleted;
+      await category.save();
+
+      return res.status(200).json({
+        success: true,
+        message: category.isDeleted
+          ? "Đã tắt danh mục thành công!"
+          : "Đã bật lại danh mục thành công!",
+        category,
+      });
+    } catch (error) {
+      console.error("Lỗi toggle danh mục:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Có lỗi xảy ra khi thay đổi trạng thái danh mục!",
+        error: error.message,
+      });
+    }
+  },
+
+  // Xóa hẳn danh mục khỏi cơ sở dữ liệu (Permanent Delete)
+  hardDeleteCategory: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const category = await Category.findById(id);
+
+      if (!category) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy danh mục!",
+        });
+      }
+
+      await Category.findByIdAndDelete(id);
+
+      return res.status(200).json({
+        success: true,
+        message: `Đã xóa hẳn danh mục "${category.name}" khỏi cơ sở dữ liệu!`,
+      });
+    } catch (error) {
+      console.error("Lỗi xóa hẳn danh mục:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Có lỗi xảy ra khi xóa hẳn danh mục!",
+        error: error.message,
+      });
+    }
+  },
 };
 
 module.exports = categoryController;
