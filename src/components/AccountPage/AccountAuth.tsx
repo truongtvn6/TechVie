@@ -33,20 +33,20 @@ export default function AccountAuth({ onNavigate, setIsLoggedIn }: AccountAuthPr
         
         <div className="flex flex-col gap-3 pt-2">
           <a
-            href="#dang-nhap"
+            href="#login"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('dang-nhap');
+              onNavigate('login');
             }}
             className="w-full py-4 bg-black hover:bg-gray-800 text-white rounded-lg font-tech-label text-tech-label text-center transition-all shadow-md active:scale-95 cursor-pointer block"
           >
             ĐĂNG NHẬP
           </a>
           <a
-            href="#dang-ky"
+            href="#register"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('dang-ky');
+              onNavigate('register');
             }}
             className="w-full py-4 bg-white/70 hover:bg-white text-[#2d3748] border border-gray-200/50 rounded-lg font-tech-label text-tech-label text-center transition-all active:scale-95 cursor-pointer block"
           >

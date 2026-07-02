@@ -154,18 +154,18 @@ export default function Header({
             )}
 
             <a 
-              href={!isLoggedIn ? '#dang-nhap' : '#account'}
+              href={!isLoggedIn ? '#login' : '#account'}
               onClick={(e) => {
                 e.preventDefault();
                 if (!isLoggedIn) {
-                  setActiveTab('dang-nhap');
+                  setActiveTab('login');
                 } else {
                   setActiveTab('account');
                 }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative cursor-pointer ${
-                activeTab === 'account' || activeTab === 'dang-nhap' || activeTab === 'dang-ky'
+                activeTab === 'account' || activeTab === 'login' || activeTab === 'register'
                   ? 'bg-black text-white shadow-md' 
                   : 'hover:bg-gray-200 hover:backdrop-blur-sm text-gray-950 border border-transparent/0'
               }`}
@@ -213,30 +213,30 @@ export default function Header({
               {!isLoggedIn ? (
                 <div className="pt-4 border-t border-gray-200 flex flex-col gap-2">
                   <a
-                    href="#dang-nhap"
+                    href="#login"
                     onClick={(e) => {
                       e.preventDefault();
-                      setActiveTab('dang-nhap');
+                      setActiveTab('login');
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 font-bold ${
-                      activeTab === 'dang-nhap' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
+                      activeTab === 'login' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
                     }`}
                   >
                     {/* <User size={16} />  */}
                     ĐĂNG NHẬP
                   </a>
                   <a
-                    href="#dang-ky"
+                    href="#register"
                     onClick={(e) => {
                       e.preventDefault();
-                      setActiveTab('dang-ky');
+                      setActiveTab('register');
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     className={`text-left text-sm uppercase tracking-widest font-black py-2.5 flex items-center gap-2 font-bold ${
-                      activeTab === 'dang-ky' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
+                      activeTab === 'register' ? 'text-indigo-600 font-extrabold' : 'text-gray-600'
                     }`}
                   >
                     ĐĂNG KÝ

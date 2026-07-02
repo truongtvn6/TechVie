@@ -1,4 +1,4 @@
-export type TabType = 'home' | 'brand' | 'products' | 'news' | 'contact' | 'checkout' | 'account' | 'dang-nhap' | 'dang-ky' | 'admin' | 'policy';
+export type TabType = 'home' | 'brand' | 'products' | 'news' | 'contact' | 'checkout' | 'account' | 'login' | 'register' | 'admin' | 'policy' | 'reset-password';
 
 export interface Product {
   id: string;
@@ -11,6 +11,7 @@ export interface Product {
     label: string;
     value: string;
   }[];
+  colors?: string[];
 }
 
 export interface CartItem {

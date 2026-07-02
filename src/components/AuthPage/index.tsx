@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
-import SocialConnect from './SocialConnect';
-import DemoLoginPanel from './DemoLoginPanel';
+import DemoLoginPanel from '../../demo/DemoLoginPanel';
+import { IS_DEMO_ENABLED } from '../../demo/demoConfig';
 import ForgotPassword from './ForgotPassword';
+import SocialConnect from './SocialConnect';
+
 
 const userImage = "https://res.cloudinary.com/dxrenbivs/image/upload/v1782828396/jakub-zerdzicki-VfZj-4H5D48-unsplash_jwnyq3.jpg";
 
@@ -58,7 +61,7 @@ export default function AuthPage({
     }
 
     setIsLoggingIn(true);
-    fetch('http://localhost:5000/api/auth/login', {
+    fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: loginEmail, password: loginPassword })
@@ -97,7 +100,7 @@ export default function AuthPage({
     setLoginEmail(email);
     setLoginPassword(password);
     setIsLoggingIn(true);
-    fetch('http://localhost:5000/api/auth/login', {
+    fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -142,7 +145,7 @@ export default function AuthPage({
     }
 
     setIsRegistering(true);
-    fetch('http://localhost:5000/api/auth/register', {
+    fetch(`${API_BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: regFullName, email: regEmail, password: regPassword })
@@ -531,7 +534,7 @@ export default function AuthPage({
                   }`}
                   onClick={() => {
                     setMode('login');
-                    onNavigate('dang-nhap');
+                    onNavigate('login');
                   }}
                 >
                   ĐĂNG NHẬP
@@ -543,7 +546,7 @@ export default function AuthPage({
                   }`}
                   onClick={() => {
                     setMode('register');
-                    onNavigate('dang-ky');
+                    onNavigate('register');
                   }}
                 >
                   ĐĂNG KÝ
@@ -608,7 +611,7 @@ export default function AuthPage({
       </div>
 
       {/* Floating Developer Quick-Login Panel */}
-      <DemoLoginPanel onDemoLogin={handleDemoLogin} />
+      {IS_DEMO_ENABLED && <DemoLoginPanel onDemoLogin={handleDemoLogin} />}
     </div>
   );
 }

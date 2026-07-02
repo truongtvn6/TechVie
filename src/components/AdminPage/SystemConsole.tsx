@@ -7,7 +7,7 @@ interface SystemConsoleProps {
 
 export default function SystemConsole({ logs, onClearLogs }: SystemConsoleProps) {
   return (
-    <div className="lg:col-span-8 bg-slate-950 text-slate-100 rounded-3xl p-6 shadow-md overflow-hidden relative border border-slate-900 flex flex-col justify-between min-h-[300px]">
+    <div className="lg:col-span-12 bg-slate-950 text-slate-100 rounded-3xl p-6 shadow-md overflow-hidden relative border border-slate-900 flex flex-col justify-between min-h-[300px]">
       <div className="absolute top-0 right-0 p-4 opacity-10">
         <Sparkles size={120} className="text-indigo-400" />
       </div>

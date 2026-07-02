@@ -9,9 +9,9 @@ import {
   ArrowRight,
   Check,
   Send,
-  Plus
+  Plus,
 } from "lucide-react";
-import { subscribeNewsletter } from "../services/api";
+import { subscribeNewsletter, API_BASE_URL } from "../services/api";
 import ProductCard from "./ProductPage/ProductCard";
 import ProductDetail from "./ProductPage/ProductDetail";
 
@@ -27,28 +27,35 @@ const normalizeProduct = (p: any): Product => {
   let safeSpecs: { label: string; value: string }[] = [];
   if (Array.isArray(p.specs)) {
     safeSpecs = p.specs.map((s: any) => ({
-      label: s && typeof s.label === 'string' ? s.label : 'Thông số',
-      value: s && typeof s.value === 'string' ? s.value : (typeof s === 'string' ? s : 'Đang cập nhật')
+      label: s && typeof s.label === "string" ? s.label : "Thông số",
+      value:
+        s && typeof s.value === "string"
+          ? s.value
+          : typeof s === "string"
+            ? s
+            : "Đang cập nhật",
     }));
-  } else if (p.specs && typeof p.specs === 'object') {
+  } else if (p.specs && typeof p.specs === "object") {
     safeSpecs = Object.entries(p.specs).map(([key, val]) => ({
       label: key,
-      value: String(val)
+      value: String(val),
     }));
   }
-  
+
   while (safeSpecs.length < 2) {
-    safeSpecs.push({ label: 'Thông số', value: 'Đang cập nhật' });
+    safeSpecs.push({ label: "Thông số", value: "Đang cập nhật" });
   }
 
   return {
     id: p.id || p._id || String(Math.random()),
-    name: p.name || 'Sản phẩm TechVie',
-    price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
-    image: p.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
-    category: p.category || 'Thiết bị',
-    description: p.description || 'Mô tả đang được cập nhật.',
-    specs: safeSpecs
+    name: p.name || "Sản phẩm TechVie",
+    price: typeof p.price === "number" ? p.price : Number(p.price) || 0,
+    image:
+      p.image ||
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
+    category: p.category || "Thiết bị",
+    description: p.description || "Mô tả đang được cập nhật.",
+    specs: safeSpecs,
   };
 };
 
@@ -69,9 +76,14 @@ export default function HomePage({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [justAddedId, setJustAddedId] = useState<string | null>(null);
   const [magneticRefId, setMagneticRefId] = useState<string | null>(null);
-  const [flyingParticles, setFlyingParticles] = useState<{ id: number; startX: number; startY: number; image: string }[]>([]);
+  const [flyingParticles, setFlyingParticles] = useState<
+    { id: number; startX: number; startY: number; image: string }[]
+  >([]);
 
-  const handleAddToCartWithSuccess = (product: Product, e?: React.MouseEvent<HTMLButtonElement>) => {
+  const handleAddToCartWithSuccess = (
+    product: Product,
+    e?: React.MouseEvent<HTMLButtonElement>,
+  ) => {
     let startX = window.innerWidth / 2;
     let startY = window.innerHeight / 2;
 
@@ -82,18 +94,18 @@ export default function HomePage({
     }
 
     const particleId = Date.now() + Math.random();
-    setFlyingParticles(prev => [
+    setFlyingParticles((prev) => [
       ...prev,
       {
         id: particleId,
         startX: startX,
         startY: startY,
-        image: product.image
-      }
+        image: product.image,
+      },
     ]);
 
     setTimeout(() => {
-      setFlyingParticles(prev => prev.filter(p => p.id !== particleId));
+      setFlyingParticles((prev) => prev.filter((p) => p.id !== particleId));
     }, 950);
 
     setMagneticRefId(product.id);
@@ -118,7 +130,7 @@ export default function HomePage({
     let intervalId: NodeJS.Timeout;
 
     const fetchImages = () => {
-      fetch("http://localhost:5000/api/hero-images")
+      fetch(`${API_BASE_URL}/api/hero-images`)
         .then((res) => {
           if (!res.ok) throw new Error("API server unreachable");
           return res.json();
@@ -162,7 +174,8 @@ export default function HomePage({
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailToSubscribe = isLoggedIn && userEmail ? userEmail : newsletterEmail;
+    const emailToSubscribe =
+      isLoggedIn && userEmail ? userEmail : newsletterEmail;
     if (emailToSubscribe.trim() === "" || isSubmittingSubscription) return;
     setIsSubmittingSubscription(true);
     try {
@@ -258,17 +271,22 @@ export default function HomePage({
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => onNavigate("brand")}
-                  className="bg-black text-white hover:bg-gray-800 px-8 py-4 rounded-full font-sans font-black uppercase tracking-widest text-[13px] hover:scale-102 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  className="group group-hover:before:duration-500 group-hover:after:duration-500 after:duration-500 hover:border-rose-300 hover:before:[box-shadow:_20px_20px_20px_30px_#a21caf] duration-500 before:duration-500 hover:duration-500 underline underline-offset-2 hover:after:-right-8 hover:before:right-12 hover:before:-bottom-8 hover:before:blur hover:underline hover:underline-offset-4 origin-left hover:decoration-2 hover:text-rose-300 relative bg-neutral-800 h-16 w-64 border border-neutral-700 text-left p-3 text-gray-50 text-base font-bold rounded-lg overflow-hidden before:absolute before:w-12 before:h-12 before:content-[''] before:right-1 before:top-1 before:z-10 before:bg-violet-500 before:rounded-full before:blur-lg after:absolute after:z-10 after:w-20 after:h-20 after:content-[''] after:bg-rose-300 after:right-8 after:top-3 after:rounded-full after:blur-lg cursor-pointer flex items-center justify-between"
                 >
-                  Khám Phá Thương Hiệu
-                  <ArrowRight size={16} />
+                  <span className="relative z-[2] flex items-center gap-2">
+                    Khám phá
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform duration-300 group-hover:translate-x-1.5"
+                    />
+                  </span>
                 </button>
-                <button
+                {/* <button
                   onClick={() => onNavigate("products")}
                   className="bg-white/80 hover:bg-white text-gray-900 border border-gray-300 px-8 py-4 rounded-full font-sans font-extrabold uppercase tracking-wider text-[13px] transition-all flex items-center justify-center cursor-pointer"
                 >
                   Bộ Sưu Tập
-                </button>
+                </button> */}
               </div>
             </motion.div>
           </div>
@@ -434,7 +452,10 @@ export default function HomePage({
                     </>
                   ) : (
                     <div className="bg-white/40 backdrop-blur-md border border-gray-200/50 rounded-2xl px-6 py-4 font-sans text-sm text-gray-800">
-                      Đăng ký bằng tài khoản: <strong className="text-black font-extrabold">{userEmail}</strong>
+                      Đăng ký bằng tài khoản:{" "}
+                      <strong className="text-black font-extrabold">
+                        {userEmail}
+                      </strong>
                     </div>
                   )}
                   <button
@@ -488,32 +509,36 @@ export default function HomePage({
         {flyingParticles.map((particle) => (
           <motion.div
             key={particle.id}
-            initial={{ 
-              left: particle.startX - 24, 
-              top: particle.startY - 24, 
-              scale: 0.8, 
+            initial={{
+              left: particle.startX - 24,
+              top: particle.startY - 24,
+              scale: 0.8,
               opacity: 1,
               rotate: 0,
-              position: 'fixed'
+              position: "fixed",
             }}
-            animate={{ 
-              left: [particle.startX - 24, particle.startX - 80, window.innerWidth - 80],
-              top: [particle.startY - 24, particle.startY - 180, 24], 
+            animate={{
+              left: [
+                particle.startX - 24,
+                particle.startX - 80,
+                window.innerWidth - 80,
+              ],
+              top: [particle.startY - 24, particle.startY - 180, 24],
               scale: [0.8, 1.2, 0.12],
               opacity: [1, 1, 0],
-              rotate: [0, -30, 360]
+              rotate: [0, -30, 360],
             }}
-            transition={{ 
-              duration: 0.9, 
-              ease: [0.16, 1, 0.3, 1] 
+            transition={{
+              duration: 0.9,
+              ease: [0.16, 1, 0.3, 1],
             }}
             className="w-12 h-12 rounded-full overflow-hidden bg-white shadow-2xl border border-gray-250 flex items-center justify-center p-1"
           >
-            <img 
-              src={particle.image} 
-              alt="glowing-hardware" 
+            <img
+              src={particle.image}
+              alt="glowing-hardware"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-contain mix-blend-multiply" 
+              className="w-full h-full object-contain mix-blend-multiply"
             />
           </motion.div>
         ))}

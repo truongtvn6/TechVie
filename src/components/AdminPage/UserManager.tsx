@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, X, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, X, Sparkles, ChevronDown, Check, Shield, User as UserIcon } from 'lucide-react';
 
 interface User {
   id: string;
@@ -42,6 +42,27 @@ export default function UserManager({
   const [newUsrPhone, setNewUsrPhone] = useState('');
   const [newUsrRole, setNewUsrRole] = useState<'user' | 'admin'>('user');
   const [newUsrVip, setNewUsrVip] = useState<'Normal' | 'Premium'>('Normal');
+
+  // Custom Dropdown States & Refs
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const [isVipDropdownOpen, setIsVipDropdownOpen] = useState(false);
+  const roleDropdownRef = useRef<HTMLDivElement>(null);
+  const vipDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (roleDropdownRef.current && !roleDropdownRef.current.contains(event.target as Node)) {
+        setIsRoleDropdownOpen(false);
+      }
+      if (vipDropdownRef.current && !vipDropdownRef.current.contains(event.target as Node)) {
+        setIsVipDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const d = isDarkMode;
 
@@ -276,7 +297,11 @@ export default function UserManager({
 
       {/* New account registration Modal overlay */}
       {isNewUsrFormOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-[6px] z-[100] flex items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-[6px] z-[100] flex items-center justify-center p-4"
+          // Tính năng bấm ngoài form sẽ thoát
+          onClick={(e) => { if (e.target === e.currentTarget) setIsNewUsrFormOpen(false); }}
+        >
           <div className={`rounded-[2.5rem] p-8 max-w-md w-full relative shadow-2xl font-sans text-left border transition-all duration-300 ${
             d 
               ? 'bg-[#161b22] border border-[#30363d] text-white shadow-[0_24px_70px_rgba(0,0,0,0.4)]' 
@@ -348,36 +373,145 @@ export default function UserManager({
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
+                {/* Custom Role Dropdown */}
+                <div className="space-y-1 relative" ref={roleDropdownRef}>
                   <label className="text-[10px] uppercase font-bold text-gray-400">Phân quyền</label>
-                  <select
-                    value={newUsrRole}
-                    onChange={(e) => setNewUsrRole(e.target.value as 'user' | 'admin')}
-                    className={`w-full rounded-xl px-3 py-2 outline-none text-xs font-semibold transition-all border ${
-                      d 
-                        ? 'bg-[#161b22] border-[#30363d] text-white focus:!border-white focus:!ring-white' 
-                        : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905'
-                    }`}
+                  <button
+                    type="button"
+                    onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer text-xs font-semibold
+                      ${
+                        d
+                          ? isRoleDropdownOpen
+                            ? "bg-[#161b22] border-white ring-1 ring-white text-white shadow-sm"
+                            : "bg-[#161b22] border-[#30363d] text-white hover:border-gray-700 hover:bg-[#21262d]/50"
+                          : isRoleDropdownOpen
+                            ? "bg-white border-black ring-1 ring-black text-gray-905 shadow-sm"
+                            : "bg-white border-gray-200 text-gray-955 hover:border-gray-300 hover:bg-gray-50/50"
+                      }
+                    `}
                   >
-                    <option value="user">Standard User</option>
-                    <option value="admin">Administrator</option>
-                  </select>
+                    <div className="flex items-center gap-2">
+                      <span className={`p-1 rounded-lg transition-colors ${
+                        isRoleDropdownOpen
+                          ? d ? 'bg-[#21262d] text-white' : 'bg-slate-100 text-black'
+                          : d ? 'bg-[#0d1117] text-gray-400' : 'bg-slate-50 text-slate-500'
+                      }`}>
+                        {newUsrRole === 'admin' ? <Shield className="w-3.5 h-3.5" /> : <UserIcon className="w-3.5 h-3.5" />}
+                      </span>
+                      <span>
+                        {newUsrRole === 'admin' ? 'Administrator' : 'Standard User'}
+                      </span>
+                    </div>
+                    <ChevronDown size={14} className={`text-gray-400 transition-transform ${isRoleDropdownOpen ? 'rotate-180 text-black' : ''}`} />
+                  </button>
+
+                  {isRoleDropdownOpen && (
+                    <div className={`absolute bottom-full left-0 z-50 w-full mb-2 rounded-2xl shadow-xl py-1.5 animate-fade-in text-xs transition-all border ${
+                      d
+                        ? 'bg-[#161b22] border-[#30363d] text-white shadow-[0_12px_40px_rgba(0,0,0,0.5)]'
+                        : 'bg-white border-gray-200 text-gray-900 shadow-xl'
+                    }`}>
+                      <ul className="space-y-1">
+                        <li
+                          onClick={() => { setNewUsrRole('user'); setIsRoleDropdownOpen(false); }}
+                          className={`flex items-center justify-between px-3 py-2 cursor-pointer transition-colors mx-1.5 rounded-xl
+                            ${newUsrRole === 'user'
+                              ? d ? 'bg-[#21262d] text-white font-black' : 'bg-slate-150 text-black font-black'
+                              : d ? 'text-gray-350 hover:bg-[#21262d]' : 'text-gray-600 hover:bg-slate-50'
+                            }
+                          `}
+                        >
+                          <span>Standard User</span>
+                          {newUsrRole === 'user' && <Check size={12} />}
+                        </li>
+                        <li
+                          onClick={() => { setNewUsrRole('admin'); setIsRoleDropdownOpen(false); }}
+                          className={`flex items-center justify-between px-3 py-2 cursor-pointer transition-colors mx-1.5 rounded-xl
+                            ${newUsrRole === 'admin'
+                              ? d ? 'bg-[#21262d] text-white font-black' : 'bg-slate-150 text-black font-black'
+                              : d ? 'text-gray-350 hover:bg-[#21262d]' : 'text-gray-600 hover:bg-slate-50'
+                            }
+                          `}
+                        >
+                          <span>Administrator</span>
+                          {newUsrRole === 'admin' && <Check size={12} />}
+                        </li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
-                <div className="space-y-1">
+                {/* Custom VIP Dropdown */}
+                <div className="space-y-1 relative" ref={vipDropdownRef}>
                   <label className="text-[10px] uppercase font-bold text-gray-400">Hạng Thành viên</label>
-                  <select
-                    value={newUsrVip}
-                    onChange={(e) => setNewUsrVip(e.target.value as 'Normal' | 'Premium')}
-                    className={`w-full rounded-xl px-3 py-2 outline-none text-xs font-semibold transition-all border ${
-                      d 
-                        ? 'bg-[#161b22] border-[#30363d] text-white focus:!border-white focus:!ring-white' 
-                        : 'bg-slate-50 border-gray-200 focus:border-black focus:bg-white text-gray-905'
-                    }`}
+                  <button
+                    type="button"
+                    onClick={() => setIsVipDropdownOpen(!isVipDropdownOpen)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer text-xs font-semibold
+                      ${
+                        d
+                          ? isVipDropdownOpen
+                            ? "bg-[#161b22] border-white ring-1 ring-white text-white shadow-sm"
+                            : "bg-[#161b22] border-[#30363d] text-white hover:border-gray-700 hover:bg-[#21262d]/50"
+                          : isVipDropdownOpen
+                            ? "bg-white border-black ring-1 ring-black text-gray-905 shadow-sm"
+                            : "bg-white border-gray-200 text-gray-955 hover:border-gray-300 hover:bg-gray-50/50"
+                      }
+                    `}
                   >
-                    <option value="Normal">Normal</option>
-                    <option value="Premium">Premium VIP</option>
-                  </select>
+                    <div className="flex items-center gap-2">
+                      <span className={`p-1 rounded-lg transition-colors ${
+                        isVipDropdownOpen
+                          ? d ? 'bg-[#21262d] text-white' : 'bg-slate-100 text-black'
+                          : d ? 'bg-[#0d1117] text-gray-400' : 'bg-slate-50 text-slate-500'
+                      }`}>
+                        {newUsrVip === 'Premium' ? <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" /> : <UserIcon className="w-3.5 h-3.5" />}
+                      </span>
+                      <span>
+                        {newUsrVip === 'Premium' ? 'Premium VIP' : 'Normal'}
+                      </span>
+                    </div>
+                    <ChevronDown size={14} className={`text-gray-400 transition-transform ${isVipDropdownOpen ? 'rotate-180 text-black' : ''}`} />
+                  </button>
+
+                  {isVipDropdownOpen && (
+                    <div className={`absolute bottom-full left-0 z-50 w-full mb-2 rounded-2xl shadow-xl py-1.5 animate-fade-in text-xs transition-all border ${
+                      d
+                        ? 'bg-[#161b22] border-[#30363d] text-white shadow-[0_12px_40px_rgba(0,0,0,0.5)]'
+                        : 'bg-white border-gray-200 text-gray-900 shadow-xl'
+                    }`}>
+                      <ul className="space-y-1">
+                        <li
+                          onClick={() => { setNewUsrVip('Normal'); setIsVipDropdownOpen(false); }}
+                          className={`flex items-center justify-between px-3 py-2 cursor-pointer transition-colors mx-1.5 rounded-xl
+                            ${newUsrVip === 'Normal'
+                              ? d ? 'bg-[#21262d] text-white font-black' : 'bg-slate-150 text-black font-black'
+                              : d ? 'text-gray-350 hover:bg-[#21262d]' : 'text-gray-600 hover:bg-slate-50'
+                            }
+                          `}
+                        >
+                          <span>Normal</span>
+                          {newUsrVip === 'Normal' && <Check size={12} />}
+                        </li>
+                        <li
+                          onClick={() => { setNewUsrVip('Premium'); setIsVipDropdownOpen(false); }}
+                          className={`flex items-center justify-between px-3 py-2 cursor-pointer transition-colors mx-1.5 rounded-xl
+                            ${newUsrVip === 'Premium'
+                              ? d ? 'bg-[#21262d] text-white font-black' : 'bg-slate-150 text-black font-black'
+                              : d ? 'text-gray-350 hover:bg-[#21262d]' : 'text-gray-600 hover:bg-slate-50'
+                            }
+                          `}
+                        >
+                          <span className="flex items-center gap-1.5">
+                            <Sparkles size={11} className="text-amber-500" />
+                            Premium VIP
+                          </span>
+                          {newUsrVip === 'Premium' && <Check size={12} />}
+                        </li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
 

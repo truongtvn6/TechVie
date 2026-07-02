@@ -100,6 +100,24 @@ export default function ProductDetail({
               <p className="text-sm text-gray-600 leading-relaxed font-sans mb-6">
                 {product.description}
               </p>
+              {/* Select color option */}
+              {Array.isArray(product.colors) && product.colors.length > 0 && (
+                <div className="mb-6">
+                  <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest block mb-2.5">
+                    Màu sắc có sẵn:
+                  </span>
+                  <div className="flex gap-2 flex-wrap">
+                    {product.colors.map((color, idx) => (
+                      <span
+                        key={idx}
+                        className="px-3.5 py-1.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-800 bg-white shadow-xs"
+                      >
+                        {color}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Complete detailed tech specs table */}
               <div className="space-y-3 bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-6 text-xs">
@@ -168,7 +186,7 @@ export default function ProductDetail({
                   <button 
                     onClick={() => {
                       onClose();
-                      onNavigate("dang-nhap");
+                      onNavigate("login");
                     }}
                     className="px-6 py-2.5 bg-black text-white text-[11px] uppercase tracking-widest font-bold rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
                   >

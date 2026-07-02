@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   RotateCcw,
-  Plus,
   AlertCircle,
   MapPin,
   Clock,
@@ -21,7 +20,6 @@ interface OrderManagerProps {
   orders: any[];
   isLoadingOrders: boolean;
   onRefreshOrders: () => void;
-  onSeedOrder: () => void;
   onUpdateOrderStatus: (
     orderId: number,
     status: string,
@@ -130,7 +128,6 @@ export default function OrderManager({
   orders,
   isLoadingOrders,
   onRefreshOrders,
-  onSeedOrder,
   onUpdateOrderStatus,
   isDarkMode = false,
   products = [],
@@ -171,17 +168,6 @@ export default function OrderManager({
             <RotateCcw size={16} />
           </button>
 
-          <button
-            onClick={onSeedOrder}
-            className={`h-12 px-6 text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
-              d
-                ? "bg-white! hover:bg-gray-100! text-black"
-                : "bg-black hover:bg-gray-955 text-white"
-            }`}
-          >
-            <Plus size={16} />
-            Tạo 1 đơn ngẫu nhiên
-          </button>
         </div>
       </div>
 

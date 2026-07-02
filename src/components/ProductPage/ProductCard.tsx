@@ -107,6 +107,23 @@ export default function ProductCard({
         <p className="text-gray-550 font-sans text-xs leading-relaxed mt-2 line-clamp-2 h-8">
           {product.description}
         </p>
+
+        {/* Colors display */}
+        {Array.isArray(product.colors) && product.colors.length > 0 && (
+          <div className="mt-3.5 flex items-center gap-1.5 flex-wrap">
+            <span className="text-[9px] uppercase font-mono tracking-wider text-gray-400 font-extrabold mr-0.5">
+              Màu:
+            </span>
+            {product.colors.map((color, idx) => (
+              <span
+                key={idx}
+                className="px-2 py-0.5 rounded-full border border-gray-150 text-[9px] font-bold text-gray-600 bg-gray-50/50"
+              >
+                {color}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Basic specs indicator */}

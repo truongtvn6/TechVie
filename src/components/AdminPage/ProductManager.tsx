@@ -1,5 +1,7 @@
+import React, { useState } from 'react';
 import { Product } from '../../types';
-import { Plus, Edit3, Trash2 } from 'lucide-react';
+import { Plus, Edit3, Trash2, FileSpreadsheet } from 'lucide-react';
+import CsvImportModal from './CsvImportModal';
 
 interface ProductManagerProps {
   products: Product[];
@@ -7,6 +9,7 @@ interface ProductManagerProps {
   onOpenEditForm: (product: Product) => void;
   onDelete: (id: string, name: string) => void;
   onRestore?: (id: string) => void;
+  onImportProducts: (parsedData: any[]) => void;
   isDarkMode?: boolean;
 }
 
@@ -16,9 +19,11 @@ export default function ProductManager({
   onOpenEditForm,
   onDelete,
   onRestore,
+  onImportProducts,
   isDarkMode = false,
 }: ProductManagerProps) {
   const d = isDarkMode;
+  const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
 
   return (
     <div className="space-y-6 animate-fade-in font-sans">
@@ -34,15 +39,30 @@ export default function ProductManager({
           </p>
         </div>
 
-        <button
-          onClick={onOpenCreateForm}
-          className={`h-12 px-6 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
-            d ? ' bg-white! hover:bg-gray-100! text-black' : 'bg-black hover:bg-gray-900 text-white'
-          }`}
-        >
-          <Plus size={16} />
-          Thêm sản phẩm mới
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => setIsCsvModalOpen(true)}
+            className={`h-12 px-6 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 border ${
+              d 
+                ? 'border-indigo-900/30 bg-indigo-950/20 text-indigo-400 hover:bg-indigo-900/35' 
+                : 'border-indigo-150 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+            }`}
+          >
+            <FileSpreadsheet size={16} />
+            Nhập CSV
+          </button>
+
+          <button
+            onClick={onOpenCreateForm}
+            className={`h-12 px-6 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
+              d ? ' bg-white! hover:bg-gray-100! text-black' : 'bg-black hover:bg-gray-900 text-white'
+            }`}
+          >
+            <Plus size={16} />
+            Thêm sản phẩm mới
+          </button>
+        </div>
       </div>
 
       {/* Table list of active products */}
@@ -170,6 +190,50 @@ export default function ProductManager({
           </table>
         </div>
       </div>
+
+      <CsvImportModal
+        isOpen={isCsvModalOpen}
+        onClose={() => setIsCsvModalOpen(false)}
+        title="Nhập danh sách sản phẩm từ CSV"
+        templateHeaders={["name", "price", "category", "image", "description", "specs"]}
+        templateRows={[
+          [
+            "Bàn phím cơ Custom TechVie", 
+            "3500000", 
+            "Bàn phím", 
+            "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80", 
+            "Bàn phím custom chất lượng hi-end gõ cực kỳ êm ái.", 
+            "Switches: Linear Gateron Oil King | Layout: 75% compact"
+          ]
+        ]}
+        onImport={(data) => {
+          // Parse specs for each row from string to array of objects
+          const formattedData = data.map(item => {
+            const specs: { label: string; value: string }[] = [];
+            if (item.specs && typeof item.specs === 'string') {
+              item.specs.split('|').forEach((s: string) => {
+                const parts = s.split(':');
+                if (parts.length >= 2) {
+                  specs.push({
+                    label: parts[0].trim(),
+                    value: parts.slice(1).join(':').trim()
+                  });
+                }
+              });
+            }
+            return {
+              name: item.name || '',
+              price: Number(item.price) || 0,
+              category: item.category || 'Thiết bị',
+              image: item.image || '',
+              description: item.description || '',
+              specs: specs
+            };
+          });
+          onImportProducts(formattedData);
+        }}
+        isDarkMode={d}
+      />
     </div>
   );
 }

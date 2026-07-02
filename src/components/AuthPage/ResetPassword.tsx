@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 
 const userImage = "https://res.cloudinary.com/dxrenbivs/image/upload/v1782828396/jakub-zerdzicki-VfZj-4H5D48-unsplash_jwnyq3.jpg";
 
@@ -35,7 +36,7 @@ export default function ResetPassword({ token, onNavigate }: ResetPasswordProps)
     setIsLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/reset-password/${token}`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/reset-password/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newPassword }),
@@ -306,7 +307,7 @@ export default function ResetPassword({ token, onNavigate }: ResetPasswordProps)
                 </p>
                 <button
                   type="button"
-                  onClick={() => onNavigate('dang-nhap')}
+                  onClick={() => onNavigate('login')}
                   className="w-full py-4.5 bg-black text-white rounded-xl text-xs font-bold tracking-[0.2em] active:scale-[0.98] transition-all uppercase cursor-pointer glow-button"
                 >
                   Đăng nhập ngay

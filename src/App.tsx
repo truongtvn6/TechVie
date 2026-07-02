@@ -16,6 +16,7 @@ import {
   restoreProduct,
   restoreUser,
   getCurrentUser,
+  API_BASE_URL,
 } from "./services/api";
 import HomePage from "./components/HomePage";
 import BrandPage from "./components/BrandPage";
@@ -76,6 +77,7 @@ export default function App() {
     techvieId: "",
     shieldStatus: "Standard",
     role: "user",
+    authProvider: "credentials",
   });
 
   useEffect(() => {
@@ -102,7 +104,7 @@ export default function App() {
             email: res.user.email || "",
             phone: res.user.phone || "",
             address: res.user.address || "",
-            memberSince: new Date(res.user.created_at).toLocaleDateString("vi-VN") || "",
+            memberSince: res.user.created_at ? new Date(res.user.created_at).toLocaleDateString("vi-VN") : "",
             techvieId: `TV-${(res.user._id || res.user.id || "").substring(0, 6).toUpperCase()}`,
             shieldStatus: res.user.vipStatus === "Premium" ? "Đang Kích Hoạt (Premium)" : (res.user.vipStatus || "Standard"),
             role: res.user.role || "user",
@@ -115,6 +117,13 @@ export default function App() {
       });
     }
   }, [token, isLoggedIn]);
+
+  // Tự động chuyển về trang chủ nếu không phải admin nhưng activeTab là admin
+  useEffect(() => {
+    if (activeTab === "admin" && (!isLoggedIn || userProfile.role !== "admin")) {
+      setActiveTab("home");
+    }
+  }, [activeTab, isLoggedIn, userProfile.role]);
 
   useEffect(() => {
     getProducts().then((res) => {
@@ -136,7 +145,7 @@ export default function App() {
             role: u.role,
             vipStatus: u.vipStatus,
             status: u.status,
-            joinedDate: new Date(u.created_at).toLocaleDateString("vi-VN"),
+            joinedDate: u.created_at ? new Date(u.created_at).toLocaleDateString("vi-VN") : new Date().toLocaleDateString("vi-VN"),
           }));
           setSystemUsers(mapped);
         }
@@ -148,7 +157,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      if (activeTab !== ("reset-password" as any)) {
+      if (activeTab !== "reset-password") {
         localStorage.setItem("active_tab", activeTab);
       }
     } catch (e) {
@@ -171,6 +180,38 @@ export default function App() {
         shieldStatus: "Đang Kích Hoạt (Premium)",
         role: "user",
       });
+    }
+  };
+
+  const handleQuickSwitchAccount = async (email: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password: email === "admin@techvie.com" ? "admin123" : "123456" }),
+      });
+      const data = await response.json();
+      if (data.success && data.token) {
+        setToken(data.token);
+        localStorage.setItem("techvie_token", data.token);
+        setIsLoggedIn(true);
+        const isSystemAdmin = email === "admin@techvie.com";
+        setUserProfile({
+          name: isSystemAdmin ? "ADMINISTRATOR" : email.split("@")[0].toUpperCase(),
+          email: email,
+          phone: isSystemAdmin ? "" : "0912 345 678",
+          address: isSystemAdmin ? "" : "86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
+          memberSince: "17-06-2026",
+          techvieId: `TV-${(data.token || "").substring(10, 16).toUpperCase()}`,
+          shieldStatus: "Standard",
+          role: isSystemAdmin ? "admin" : "user",
+          authProvider: "credentials",
+        });
+        setActiveTab(isSystemAdmin ? "admin" : "account");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } catch (err) {
+      console.error("Lỗi quick switch account:", err);
     }
   };
 
@@ -338,7 +379,7 @@ export default function App() {
           role: res.user.role,
           vipStatus: res.user.vipStatus,
           status: res.user.status,
-          joinedDate: new Date(res.user.created_at).toLocaleDateString("vi-VN"),
+          joinedDate: res.user && res.user.created_at ? new Date(res.user.created_at).toLocaleDateString("vi-VN") : new Date().toLocaleDateString("vi-VN"),
         };
         setSystemUsers((prev) => [mappedUser, ...prev]);
         return { success: true, message: res.message, user: mappedUser };
@@ -362,7 +403,7 @@ export default function App() {
           role: res.user.role,
           vipStatus: res.user.vipStatus,
           status: res.user.status,
-          joinedDate: new Date(res.user.created_at).toLocaleDateString("vi-VN"),
+          joinedDate: res.user && res.user.created_at ? new Date(res.user.created_at).toLocaleDateString("vi-VN") : new Date().toLocaleDateString("vi-VN"),
         };
         setSystemUsers((prev) =>
           prev.map((u) => (u.id === id ? mappedUser : u)),
@@ -388,7 +429,7 @@ export default function App() {
           role: res.user.role,
           vipStatus: res.user.vipStatus,
           status: res.user.status,
-          joinedDate: new Date(res.user.created_at).toLocaleDateString("vi-VN"),
+          joinedDate: res.user && res.user.created_at ? new Date(res.user.created_at).toLocaleDateString("vi-VN") : new Date().toLocaleDateString("vi-VN"),
         };
         setSystemUsers((prev) =>
           prev.map((u) => (u.id === id ? mappedUser : u)),
@@ -414,7 +455,7 @@ export default function App() {
           role: res.user.role,
           vipStatus: res.user.vipStatus,
           status: res.user.status,
-          joinedDate: new Date(res.user.created_at).toLocaleDateString("vi-VN"),
+          joinedDate: res.user && res.user.created_at ? new Date(res.user.created_at).toLocaleDateString("vi-VN") : new Date().toLocaleDateString("vi-VN"),
         };
         setSystemUsers((prev) =>
           prev.map((u) => (u.id === id ? mappedUser : u)),
@@ -457,7 +498,7 @@ export default function App() {
               role: u.role,
               vipStatus: u.vipStatus,
               status: u.status,
-              joinedDate: new Date(u.created_at).toLocaleDateString("vi-VN"),
+              joinedDate: u.created_at ? new Date(u.created_at).toLocaleDateString("vi-VN") : new Date().toLocaleDateString("vi-VN"),
             }));
             setSystemUsers(mapped);
           }
@@ -519,8 +560,8 @@ export default function App() {
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const showHeaderFooter =
-    activeTab !== "dang-nhap" &&
-    activeTab !== "dang-ky" &&
+    activeTab !== "login" &&
+    activeTab !== "register" &&
     activeTab !== "admin" &&
     activeTab !== "reset-password";
 
@@ -689,9 +730,9 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === "dang-nhap" && (
+          {activeTab === "login" && (
             <motion.div
-              key="dang-nhap-route"
+              key="login-route"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
@@ -741,9 +782,9 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === "dang-ky" && (
+          {activeTab === "register" && (
             <motion.div
-              key="dang-ky-route"
+              key="register-route"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
@@ -862,6 +903,8 @@ export default function App() {
                 onToggleUserStatus={handleToggleUserStatus}
                 onDeleteUser={handleDeleteUser}
                 onRestoreUser={handleRestoreUser}
+                onSwitchAccount={handleQuickSwitchAccount}
+                onRefreshProducts={() => getProducts().then(res => res.success && setProducts(res.products))}
               />
             </motion.div>
           )}
@@ -904,8 +947,8 @@ export default function App() {
         {showScrollTop && 
          activeTab !== 'account' && 
          activeTab !== 'admin' && 
-         activeTab !== 'dang-nhap' && 
-         activeTab !== 'dang-ky' && (
+         activeTab !== 'login' && 
+         activeTab !== 'register' && (
           <motion.button
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

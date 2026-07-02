@@ -6,12 +6,14 @@ import {
   replyContactMessage,
   getAdminOrders,
   updateOrderStatus,
-  seedDummyOrder,
-  clearAllOrdersFromServer,
   getProducts,
-  getSystemUsers
+  getSystemUsers,
+  getBackendCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  restoreCategory
 } from '../../services/api';
-import { Plus, Package, Trash2, Eye } from 'lucide-react';
 import AdminSidebar from './AdminSidebar';
 
 // Sub-components imports
@@ -23,6 +25,9 @@ import ContactManager from './ContactManager';
 import ProductFormModal from './ProductFormModal';
 import PromoManager from './PromoManager';
 import UserManager from './UserManager';
+import CategoryManager from './CategoryManager';
+import AdminDemoPanel from '../../demo/AdminDemoPanel';
+import { IS_DEMO_ENABLED } from '../../demo/demoConfig';
 
 interface AdminPageProps {
   products: Product[];
@@ -39,6 +44,8 @@ interface AdminPageProps {
   token: string;
   onRestoreProduct: (id: string) => Promise<{ success: boolean; message: string }>;
   onRestoreUser: (id: string) => Promise<{ success: boolean; message: string }>;
+  onSwitchAccount: (email: string) => void;
+  onRefreshProducts: () => void;
 }
 
 export default function AdminPage({ 
@@ -55,7 +62,9 @@ export default function AdminPage({
   onDeleteUser,
   token,
   onRestoreProduct,
-  onRestoreUser
+  onRestoreUser,
+  onSwitchAccount,
+  onRefreshProducts
 }: AdminPageProps) {
   // Persistent Dark Mode state
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -110,7 +119,7 @@ export default function AdminPage({
             role: u.role,
             vipStatus: u.vipStatus,
             status: u.status,
-            joinedDate: new Date(u.created_at).toLocaleDateString('vi-VN'),
+            joinedDate: u.created_at ? new Date(u.created_at).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
             isDeleted: u.isDeleted
           }));
           setAdminUsers(mapped);
@@ -151,7 +160,7 @@ export default function AdminPage({
               role: u.role,
               vipStatus: u.vipStatus,
               status: u.status,
-              joinedDate: new Date(u.created_at).toLocaleDateString('vi-VN'),
+              joinedDate: u.created_at ? new Date(u.created_at).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
               isDeleted: u.isDeleted
             }));
             setAdminUsers(mapped);
@@ -164,7 +173,64 @@ export default function AdminPage({
   };
 
   // Admin active sub tab
-  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'products' | 'orders' | 'messages' | 'promos' | 'users'>('overview');
+  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'categories' | 'products' | 'orders' | 'messages' | 'promos' | 'users'>('overview');
+
+  // Product categories state
+  const [categories, setCategories] = useState<any[]>([]);
+
+  const fetchCategories = () => {
+    getBackendCategories(showDeletedItems).then(res => {
+      if (res.success && res.categories) {
+        setCategories(res.categories);
+      }
+    });
+  };
+
+  const handleCreateCategory = async (name: string) => {
+    const res = await createCategory(name);
+    if (res.success) {
+      addLog(`Thêm danh mục mới thành công: "${name}"`);
+      fetchCategories();
+    } else {
+      addLog(`Lỗi khi tạo danh mục: ${res.message}`);
+    }
+  };
+
+  const handleUpdateCategory = async (id: string, name: string) => {
+    const res = await updateCategory(id, name);
+    if (res.success) {
+      addLog(`Cập nhật tên danh mục thành công: "${name}"`);
+      fetchCategories();
+    } else {
+      addLog(`Lỗi khi cập nhật danh mục: ${res.message}`);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    const target = categories.find(c => c._id === id);
+    const name = target ? target.name : id;
+    if (confirm(`Bạn chắn chắn muốn xóa danh mục "${name}"?`)) {
+      const res = await deleteCategory(id);
+      if (res.success) {
+        addLog(`Đã xóa danh mục: "${name}"`);
+        fetchCategories();
+      } else {
+        addLog(`Lỗi khi xóa danh mục: ${res.message}`);
+      }
+    }
+  };
+
+  const handleRestoreCategory = async (id: string) => {
+    const res = await restoreCategory(id);
+    const target = categories.find(c => c._id === id);
+    const name = target ? target.name : id;
+    if (res.success) {
+      addLog(`Đã khôi phục danh mục: "${name}"`);
+      fetchCategories();
+    } else {
+      addLog(`Lỗi khi khôi phục danh mục: ${res.message}`);
+    }
+  };
 
   // Dynamic Promo Campaigns local state with localStorage persistence
   const [promos, setPromos] = useState<any[]>(() => {
@@ -205,7 +271,7 @@ export default function AdminPage({
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   // System logs feedback messages
-  const [logs, setLogs] = useState<string[]>(['Chào mừng Người quản lý. Hệ quản trị TECHVIE ID đã sẵn sàng.']);
+  const [logs, setLogs] = useState<string[]>(['Chào mừng Người quản lý. Hệ quản trị TECHVIE ADMIN đã sẵn sàng.']);
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString('vi-VN');
@@ -357,7 +423,12 @@ export default function AdminPage({
   useEffect(() => {
     fetchOrders();
     fetchMessages();
+    fetchCategories();
   }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [showDeletedItems]);
 
   // Total Revenue calculations based on orders
   const totalRevenue = orders.reduce((sum, ord) => {
@@ -432,66 +503,7 @@ export default function AdminPage({
       });
   };
 
-  // Clean all orders on Express
-  const handleClearAllOrders = () => {
-    if (confirm('Bạn muốn xoá sạch toàn bộ nhật ký đặt hàng của khách hàng trên máy chủ?')) {
-      clearAllOrdersFromServer()
-        .then(data => {
-          if (data.success) {
-            addLog('Đã dọn dẹp sạch toàn bộ sổ gọi đơn bưu kiện.');
-            fetchOrders();
-          }
-        });
-    }
-  };
 
-  // Seed sample orders for immediate demonstration of management features
-  const handleSeedOrders = () => {
-    const names = ['Nguyễn Kim Thư', 'Đỗ Nam Khánh', 'Phạm Quỳnh Anh', 'Bùi Xuân Huấn'];
-    const phones = ['0915 222 333', '0388 999 777', '0905 444 666', '0922 411 999'];
-    const addresses = [
-      '246 Phố Huế, Quận Hai Bà Trưng, Hà Nội',
-      '15 Trần Hưng Đạo, Quận Sơn Trà, Đà Nẵng',
-      '45 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh',
-      'Đại Lộ Hùng Vương, Việt Trì, Phú Thọ'
-    ];
-    const preselectedProducts = products.length > 0 ? products : [];
-    
-    if (preselectedProducts.length === 0) {
-      console.warn('Không có sản phẩm để tạo đơn mẫu. Hãy khôi phục danh mục.');
-      return;
-    }
-
-    // Pick random values
-    const idx = Math.floor(Math.random() * names.length);
-    const prodIdx = Math.floor(Math.random() * preselectedProducts.length);
-    const item = preselectedProducts[prodIdx];
-    const qty = Math.floor(Math.random() * 2) + 1;
-    const finalTotalNum = item.price * qty;
-
-    const dummyOrder = {
-      fullName: names[idx],
-      phone: phones[idx],
-      email: `${names[idx].toLowerCase().replace(/\s/g, '')}@gmail.com`,
-      address: addresses[idx],
-      notes: "Yêu cầu giao hàng nguyên seal, hỗ trợ kỹ thuật tận nơi.",
-      paymentMethod: "cod",
-      deliveryMethod: "express",
-      cart: [{ product: item, quantity: qty }],
-      finalTotal: `${finalTotalNum.toLocaleString('vi-VN')}₫`
-    };
-
-    seedDummyOrder(dummyOrder)
-      .then(data => {
-        if (data.success) {
-          addLog(`Tạo thành công đơn hàng thử nghiệm mới #${data.orderId} cho: ${names[idx]}`);
-          fetchOrders();
-        }
-      })
-      .catch(err => {
-        console.error('Error seeding orders:', err);
-      });
-  };
 
   return (
     <div className={`admin-dashboard-root min-h-screen bg-[#f7f9fb] text-gray-900 w-full flex flex-col md:flex-row ${isDarkMode ? 'dark' : ''}`}>
@@ -531,9 +543,11 @@ export default function AdminPage({
               setIsSidebarOpen(false); // Đóng menu mobile khi chọn tab
               if (tab === 'overview' || tab === 'orders') fetchOrders();
               if (tab === 'overview' || tab === 'messages') fetchMessages();
+              if (tab === 'overview' || tab === 'categories') fetchCategories();
             }}
             isDarkMode={isDarkMode}
             setIsDarkMode={setIsDarkMode}
+            categoriesCount={categories.length}
             productsCount={products.length}
             ordersCount={orders.length}
             messagesCount={messages.length}
@@ -551,10 +565,11 @@ export default function AdminPage({
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 border-b border-gray-200 pb-6">
             <div>
               <span className="text-[10px] uppercase tracking-[0.25em] text-gray-400 font-extrabold mb-1 block">
-                {activeSubTab === 'overview' ? 'DASHBOARD OVERVIEW' : activeSubTab === 'products' ? 'PRODUCT MANAGER' : activeSubTab === 'orders' ? 'LIVE ORDERS REGISTRY' : activeSubTab === 'messages' ? 'CUSTOMER INQUIRIES' : activeSubTab === 'promos' ? 'PROMO CAMPAIGNS' : 'USER ROLES & ACCOUNTS'}
+                {activeSubTab === 'overview' ? 'DASHBOARD OVERVIEW' : activeSubTab === 'categories' ? 'PRODUCT CATEGORIES' : activeSubTab === 'products' ? 'PRODUCT MANAGER' : activeSubTab === 'orders' ? 'LIVE ORDERS REGISTRY' : activeSubTab === 'messages' ? 'CUSTOMER INQUIRIES' : activeSubTab === 'promos' ? 'PROMO CAMPAIGNS' : 'USER ROLES & ACCOUNTS'}
               </span>
               <h1 className="text-3xl font-black text-gray-950 uppercase tracking-tighter flex items-center gap-2.5">
                 {activeSubTab === 'overview' && 'Bảng Tổng Quan Hệ Thống'}
+                {activeSubTab === 'categories' && 'Quản Lý Danh Mục'}
                 {activeSubTab === 'products' && 'Quản Lý Quầy Sản Phẩm'}
                 {activeSubTab === 'orders' && 'Sổ Ghi Đơn Hàng Thực'}
                 {activeSubTab === 'messages' && 'Thư Phản Hồi Khách Hàng'}
@@ -563,6 +578,7 @@ export default function AdminPage({
               </h1>
               <p className="text-xs text-gray-400 font-sans mt-1">
                 {activeSubTab === 'overview' && 'Giao diện tổng quan trạng thái, cập nhật dữ liệu máy chủ thực tế tức thời.'}
+                {activeSubTab === 'categories' && 'Thêm mới danh mục sản phẩm, đổi tên, xóa mềm và khôi phục danh mục hàng hóa.'}
                 {activeSubTab === 'products' && 'Đăng bán sản phẩm mới, cập nhật giá cả, thương hiệu và thông số cấu hình cụ thể.'}
                 {activeSubTab === 'orders' && 'Xem thông tin giao nhận, cập nhật trạng thái đơn hàng (đang xử lý, hoàn thành, hủy đơn).'}
                 {activeSubTab === 'messages' && 'Phản hồi ý kiến đóng góp, đề đạt yêu cầu làm đại lý hoặc câu hỏi hỗ trợ khách hàng.'}
@@ -585,50 +601,22 @@ export default function AdminPage({
               />
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Quick Actions Panel */}
-                <div className="lg:col-span-4 bg-white border border-gray-200 rounded-3xl p-6 shadow-sm space-y-5">
-                  <div>
-                    <h3 className="font-extrabold text-gray-900 text-sm uppercase tracking-wider">Hành động nhanh cho Manager</h3>
-                    <p className="text-[11px] text-gray-400 mt-1 font-sans">Các thao tác khẩn cấp, cập nhật cơ sở dữ liệu của hệ thống.</p>
-                  </div>
-
-                  <div className="flex flex-col gap-3 pt-2">
-                    <button
-                      onClick={handleSeedOrders}
-                      className={`w-full py-4.5 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-800`}
-                    >
-                      <Plus size={15} />
-                      Tạo đơn thử nghiệm (random)
-                    </button>
-
-                    <button
-                      onClick={openCreateForm}
-                      className={`w-full py-4.5 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 bg-green-100 hover:bg-green-200 text-green-700 border-transparent}`}
-                    >
-                      <Package size={15} />
-                      Đăng Thêm Thiết bị mới
-                    </button>
-
-                    <button
-                      onClick={handleClearAllOrders}
-                      disabled={orders.length === 0}
-                      className="w-full py-4.5 bg-rose-50 border border-rose-100/60 hover:bg-rose-100 disabled:opacity-40 text-rose-600 font-sans text-xs uppercase tracking-widest font-black rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      <Trash2 size={15} />
-                      Xoá sạch lịch sử đơn hàng
-                    </button>
-                  </div>
-
-                  {/* <div className="p-4 bg-gray-50 border border-gray-150 rounded-2xl text-[11px] text-gray-500 font-sans leading-relaxed">
-                    <strong className="text-gray-800 block mb-1">Ghi chú về bảo trợ:</strong>
-                    Cơ sở đặt hàng được tối ưu mượt mà dưới môi trường Full-stack in-memory của máy chủ Express.
-                  </div> */}
-                </div>
-
                 {/* System Log terminal stream */}
                 <SystemConsole logs={logs} onClearLogs={() => setLogs(['[LOG] Bàn phân tích khôi phục hoàn chỉnh.'])} />
               </div>
             </div>
+          )}
+
+          {activeSubTab === 'categories' && (
+            <CategoryManager
+              categories={categories}
+              onCreateCategory={handleCreateCategory}
+              onUpdateCategory={handleUpdateCategory}
+              onDeleteCategory={handleDeleteCategory}
+              onRestoreCategory={handleRestoreCategory}
+              showDeletedItems={showDeletedItems}
+              isDarkMode={isDarkMode}
+            />
           )}
 
           {activeSubTab === 'products' && (
@@ -638,6 +626,14 @@ export default function AdminPage({
               onOpenEditForm={openEditForm}
               onDelete={handleDelete}
               onRestore={handleRestoreProductWrapper}
+              onImportProducts={async (data) => {
+                addLog(`Bắt đầu nhập ${data.length} sản phẩm từ file CSV...`);
+                for (const item of data) {
+                  await onAddProduct(item, null);
+                }
+                addLog(`Đã nhập thành công ${data.length} sản phẩm mới.`);
+                onRefreshProducts();
+              }}
               isDarkMode={isDarkMode}
             />
           )}
@@ -647,7 +643,6 @@ export default function AdminPage({
               orders={orders}
               isLoadingOrders={isLoadingOrders}
               onRefreshOrders={fetchOrders}
-              onSeedOrder={handleSeedOrders}
               onUpdateOrderStatus={handleUpdateOrderStatus}
               isDarkMode={isDarkMode}
               products={products}
@@ -688,7 +683,6 @@ export default function AdminPage({
             />
           )}
 
-          {/* DYNAMIC FORM DRAWER: FOR ADDING / EDITING PRODUCTS */}
           <ProductFormModal
             isOpen={isFormOpen}
             onClose={() => { setIsFormOpen(false); setEditingProduct(null); }}
@@ -698,6 +692,16 @@ export default function AdminPage({
           />
         </div>
       </main>
+
+      {/* Floating Demo Control Panel for Admin */}
+      {IS_DEMO_ENABLED && (
+        <AdminDemoPanel
+          token={token}
+          onSwitchAccount={onSwitchAccount}
+          onRefreshProducts={onRefreshProducts}
+          onRefreshOrders={fetchOrders}
+        />
+      )}
     </div>
   );
 }
