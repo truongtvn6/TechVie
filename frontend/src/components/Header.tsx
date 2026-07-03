@@ -32,16 +32,8 @@ export default function Header({
   isMobileMenuOpen,
   setIsMobileMenuOpen,
 }: HeaderProps) {
-  const [scrolled, setScrolled] = useState(false);
   const [prevCartCount, setPrevCartCount] = useState(totalCartCount);
   const [cartBadgePop, setCartBadgePop] = useState(false);
-
-  // Scroll shrink effect
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   // Cart badge pop animation when count increases
   useEffect(() => {
@@ -56,11 +48,7 @@ export default function Header({
 
   return (
     <header
-      className={`sticky top-0 w-full z-50 select-none transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/85 backdrop-blur-xl border-b border-white/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.06)]'
-          : 'bg-white/70 backdrop-blur-md border-b border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.02)]'
-      }`}
+      className="sticky top-0 w-full z-50 select-none bg-white/80 backdrop-blur-xl border-b border-white/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.04)]"
     >
       <style>{`
         .nav-btn {
@@ -130,9 +118,7 @@ export default function Header({
       `}</style>
 
       <div
-        className={`flex justify-between items-center px-4 md:px-8 lg:px-10 max-w-none mx-auto relative w-full transition-all duration-300 ${
-          scrolled ? 'h-14' : 'h-18'
-        }`}
+        className="flex justify-between items-center px-4 md:px-8 lg:px-10 max-w-none mx-auto relative w-full h-18"
       >
         {/* Brand Logo */}
         <Link
@@ -143,9 +129,7 @@ export default function Header({
           <img
             src={Logo}
             alt="TechVie Logo"
-            className={`w-auto object-contain cursor-pointer transition-all duration-300 ${
-              scrolled ? 'h-10 md:h-11' : 'h-12 md:h-14 lg:h-16'
-            }`}
+            className="h-12 md:h-14 lg:h-16 w-auto object-contain cursor-pointer"
           />
         </Link>
 
@@ -171,22 +155,18 @@ export default function Header({
         <div className="flex items-center space-x-2 sm:space-x-4">
           <button
             onClick={() => setIsSearchOpen(true)}
-            className={`relative flex items-center justify-center rounded-full hover:bg-gray-200 transition-all duration-300 active:scale-95 cursor-pointer ${
-              scrolled ? 'w-10 h-10' : 'w-12 h-12'
-            }`}
+            className="relative flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-200 transition-all duration-300 active:scale-95 cursor-pointer"
             title="Tìm kiếm thiết bị"
           >
-            <Search size={scrolled ? 17 : 20} className="text-gray-900 transition-all duration-300" />
+            <Search size={20} className="text-gray-900" />
           </button>
 
           <button
             onClick={() => setIsCartOpen(true)}
-            className={`rounded-full flex items-center justify-center hover:bg-gray-200 hover:backdrop-blur-sm transition-all duration-300 relative cursor-pointer ${
-              scrolled ? 'w-10 h-10' : 'w-12 h-12'
-            }`}
+            className="rounded-full flex items-center justify-center w-12 h-12 hover:bg-gray-200 hover:backdrop-blur-sm transition-all duration-300 relative cursor-pointer"
             title="Giỏ hàng TechVie"
           >
-            <ShoppingBag size={scrolled ? 17 : 20} className="text-gray-900 transition-all duration-300" />
+            <ShoppingBag size={20} className="text-gray-900" />
             <AnimatePresence>
               {totalCartCount > 0 && (
                 <motion.span
@@ -213,25 +193,21 @@ export default function Header({
             <Link
               to={!isLoggedIn ? '/login' : '/account'}
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className={`rounded-full flex items-center justify-center transition-all duration-300 relative cursor-pointer ${
-                scrolled ? 'w-10 h-10' : 'w-12 h-12'
-              } ${
+              className={`rounded-full flex items-center justify-center w-12 h-12 transition-all duration-300 relative cursor-pointer ${
                 activeTab === 'account' || activeTab === 'login' || activeTab === 'register'
                   ? 'bg-black text-white shadow-md'
                   : 'hover:bg-gray-200 hover:backdrop-blur-sm text-gray-950 border border-transparent/0'
               }`}
               title="Tài khoản TechVie ID"
             >
-              <User size={scrolled ? 17 : 20} className="transition-all duration-300" />
+              <User size={20} className="transition-all duration-300" />
             </Link>
           </div>
 
           {/* Mobile hamburger */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`md:hidden rounded-full flex items-center justify-center hover:bg-gray-200 hover:backdrop-blur-sm transition-all duration-300 cursor-pointer ${
-              scrolled ? 'w-10 h-10' : 'w-12 h-12'
-            }`}
+            className="md:hidden rounded-full flex items-center justify-center w-12 h-12 hover:bg-gray-200 hover:backdrop-blur-sm transition-all duration-300 cursor-pointer"
             title="Danh mục menu"
           >
             <AnimatePresence mode="wait" initial={false}>

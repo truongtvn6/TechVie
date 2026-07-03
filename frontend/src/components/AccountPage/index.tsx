@@ -1,30 +1,29 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import AdminButton from './AdminButton';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import AdminButton from "./AdminButton";
 
 // Modular sub-components
-import AccountAuth from './AccountAuth';
-import AccountSidebar from './AccountSidebar';
-import TabProfile from './TabProfile';
-import TabOrders from './TabOrders';
-import TabDevices from './TabDevices';
-import TabSecurity from './TabSecurity';
+import AccountAuth from "./AccountAuth";
+import AccountSidebar from "./AccountSidebar";
+import TabProfile from "./TabProfile";
+import TabOrders from "./TabOrders";
+import TabDevices from "./TabDevices";
+import TabSecurity from "./TabSecurity";
 
-// @ts-ignore
-import backgroundImage from '/image/huum-8fSitumSVw8-unsplash.jpg';
+import backgroundImage from "../../assets/images/huum-8fSitumSVw8-unsplash.jpg";
 
 const defaultUserProfile = {
-  name: 'Khách hàng TechVie',
-  email: '',
-  phone: '',
-  address: '',
-  memberSince: '01/07/2026',
-  techvieId: 'TV-MEMBER',
-  shieldStatus: 'Đang hoạt động',
-  role: 'user',
+  name: "Khách hàng TechVie",
+  email: "",
+  phone: "",
+  address: "",
+  memberSince: "01/07/2026",
+  techvieId: "TV-MEMBER",
+  shieldStatus: "Đang hoạt động",
+  role: "user",
 };
 
-import { getUserOrders, getUserDevices } from '../../services/api';
+import { getUserOrders, getUserDevices } from "../../services/api";
 
 interface AccountPageProps {
   onNavigate: (tab: any) => void;
@@ -35,7 +34,7 @@ interface AccountPageProps {
   token?: string;
 }
 
-export default function AccountPage({ 
+export default function AccountPage({
   onNavigate,
   isLoggedIn: externalIsLoggedIn,
   setIsLoggedIn: externalSetIsLoggedIn,
@@ -44,28 +43,28 @@ export default function AccountPage({
   token = "",
 }: AccountPageProps) {
   const [localIsLoggedIn, localSetIsLoggedIn] = useState(false);
-  const isLoggedIn = externalIsLoggedIn !== undefined ? externalIsLoggedIn : localIsLoggedIn;
-  const setIsLoggedIn = externalSetIsLoggedIn !== undefined ? externalSetIsLoggedIn : localSetIsLoggedIn;
-  
-  // Dynamic background URL state with online Unsplash fallback
-  const [bgUrl, setBgUrl] = useState<string>(backgroundImage);
+  const isLoggedIn =
+    externalIsLoggedIn !== undefined ? externalIsLoggedIn : localIsLoggedIn;
+  const setIsLoggedIn =
+    externalSetIsLoggedIn !== undefined
+      ? externalSetIsLoggedIn
+      : localSetIsLoggedIn;
 
-  useEffect(() => {
-    const img = new Image();
-    img.src = backgroundImage;
-    img.onerror = () => {
-      console.warn("Local background image failed to load, falling back to online Unsplash URL.");
-      setBgUrl("https://images.unsplash.com/photo-1616440347437-b1c73416efc2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
-    };
-  }, []);
+
 
   // Active sub-tab inside dashboard
-  const [accountTab, setAccountTab] = useState<'profile' | 'orders' | 'devices' | 'security'>('profile');
+  const [accountTab, setAccountTab] = useState<
+    "profile" | "orders" | "devices" | "security"
+  >("profile");
 
   // Interactive user data state matching Premium TechVie standards
   const [localUserProfile, localSetUserProfile] = useState(defaultUserProfile);
-  const userProfile = externalUserProfile !== undefined ? externalUserProfile : localUserProfile;
-  const setUserProfile = externalSetUserProfile !== undefined ? externalSetUserProfile : localSetUserProfile;
+  const userProfile =
+    externalUserProfile !== undefined ? externalUserProfile : localUserProfile;
+  const setUserProfile =
+    externalSetUserProfile !== undefined
+      ? externalSetUserProfile
+      : localSetUserProfile;
 
   // Real orders synced dynamically from MongoDB
   const [orders, setOrders] = useState<any[]>([]);
@@ -87,21 +86,23 @@ export default function AccountPage({
 
       // Polling thông minh: tải lại dữ liệu đơn hàng mỗi 10 giây nếu tab trình duyệt đang hoạt động
       const intervalId = setInterval(() => {
-        if (document.visibilityState === 'visible') {
+        if (document.visibilityState === "visible") {
           fetchOrders();
         }
         // Thêm thời gian vào để quét liên tục
       }, 10000);
 
       setIsLoadingDevices(true);
-      getUserDevices().then((res) => {
-        if (res.success && res.devices) {
-          setDevices(res.devices);
-        }
-        setIsLoadingDevices(false);
-      }).catch(() => {
-        setIsLoadingDevices(false);
-      });
+      getUserDevices()
+        .then((res) => {
+          if (res.success && res.devices) {
+            setDevices(res.devices);
+          }
+          setIsLoadingDevices(false);
+        })
+        .catch(() => {
+          setIsLoadingDevices(false);
+        });
 
       return () => {
         clearInterval(intervalId);
@@ -114,11 +115,9 @@ export default function AccountPage({
   };
 
   return (
-    <div className="relative min-h-screen w-full font-body-sm text-body-sm overflow-x-hidden selection:bg-black selection:text-white pb-12">
+    <div className="font-body-sm text-body-sm relative isolate min-h-screen w-full overflow-x-hidden pb-12 selection:bg-black selection:text-white">
       {/* Local Liquid Glass Style Definitions */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800;900&family=JetBrains+Mono:wght@700&display=swap');
-        
         .font-tech-label {
           font-family: 'JetBrains Mono', monospace;
           font-size: 10px;
@@ -234,38 +233,58 @@ export default function AccountPage({
         }
       `}</style>
 
-      {/* Fixed Background Layer */}
-      <div 
-        className="fixed inset-0 z-0 bg-cover bg-center" 
-        style={{ backgroundImage: `url(${bgUrl})` }}
+      {/* Absolute Background Layer */}
+      <div
+        className="absolute inset-0 -z-10 bg-cover bg-center pointer-events-none"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
       />
       {/* Atmospheric Blur Overlay for Text Legibility */}
-      <div className="fixed inset-0 z-0 bg-white/40 backdrop-blur-[10px]" />
+      <div className="absolute inset-0 -z-10 bg-white/40 backdrop-blur-[10px] pointer-events-none" />
+
+      {/* FULL PAGE GLASS LOADING OVERLAY */}
+      <AnimatePresence>
+        {isLoggedIn && userProfile.name === "" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/40 backdrop-blur-2xl pointer-events-auto"
+          >
+            <div className="relative w-14 h-14 mb-4 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-4 border-black/10"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-black animate-spin"></div>
+            </div>
+            <p className="font-tech-label text-black/80 uppercase tracking-widest text-[11px] animate-pulse">
+              Đang tải dữ liệu tài khoản...
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Layout Container */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-container-margin py-12 md:py-20 flex items-center justify-center min-h-[85vh]">
+      <div className="px-container-margin relative z-10 mx-auto flex min-h-[85vh] max-w-[1400px] items-center justify-center py-12 md:py-20">
         <AnimatePresence mode="wait">
-          
           {/* CASE 1: USER NOT SIGNED IN */}
           {!isLoggedIn ? (
             <AccountAuth onNavigate={onNavigate} />
           ) : (
-            <motion.div 
+            <motion.div
               key="dashboard-view"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
               className="w-full"
             >
               {/* Liquid Glass Master Container */}
-              <div className="w-full relative bg-white/85 backdrop-blur-[40px] border border-white/60 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden">
+              <div className="relative w-full overflow-hidden rounded-xl border border-white/60 bg-white/85 shadow-[0_20px_50px_rgba(0,0,0,0.05)] backdrop-blur-[40px]">
                 {/* Specular Highlight Top Edge */}
-                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-white/80 via-white/50 to-transparent" />
-                
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-grid-gutter p-card-padding">
-                  
+                <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-white/80 via-white/50 to-transparent" />
+
+                <div className="gap-grid-gutter p-card-padding grid grid-cols-1 lg:grid-cols-12">
                   {/* LEFT SIDEBAR: User ID & Navigation */}
-                  <AccountSidebar 
+                  <AccountSidebar
                     userProfile={userProfile}
                     accountTab={accountTab}
                     setAccountTab={setAccountTab}
@@ -273,11 +292,11 @@ export default function AccountPage({
                     handleLogout={handleLogout}
                     onNavigate={onNavigate}
                   />
-                  
+
                   {/* RIGHT MAIN PANEL: Dynamic Content Section */}
-                  <div className="lg:col-span-8 mt-8 lg:mt-0">
+                  <div className="mt-8 lg:col-span-8 lg:mt-0">
                     <AnimatePresence mode="wait">
-                      {accountTab === 'profile' && (
+                      {accountTab === "profile" && (
                         <motion.div
                           key="profile-tab"
                           initial={{ opacity: 0, y: 10 }}
@@ -285,11 +304,14 @@ export default function AccountPage({
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <TabProfile userProfile={userProfile} setUserProfile={setUserProfile} />
+                          <TabProfile
+                            userProfile={userProfile}
+                            setUserProfile={setUserProfile}
+                          />
                         </motion.div>
                       )}
 
-                      {accountTab === 'orders' && (
+                      {accountTab === "orders" && (
                         <motion.div
                           key="orders-tab"
                           initial={{ opacity: 0, y: 10 }}
@@ -301,7 +323,7 @@ export default function AccountPage({
                         </motion.div>
                       )}
 
-                       {accountTab === 'devices' && (
+                      {accountTab === "devices" && (
                         <motion.div
                           key="devices-tab"
                           initial={{ opacity: 0, y: 10 }}
@@ -310,11 +332,14 @@ export default function AccountPage({
                           transition={{ duration: 0.3 }}
                           className="w-full"
                         >
-                          <TabDevices devices={devices} isLoading={isLoadingDevices} />
+                          <TabDevices
+                            devices={devices}
+                            isLoading={isLoadingDevices}
+                          />
                         </motion.div>
                       )}
 
-                      {accountTab === 'security' && (
+                      {accountTab === "security" && (
                         <motion.div
                           key="security-tab"
                           initial={{ opacity: 0, y: 10 }}

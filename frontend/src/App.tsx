@@ -774,7 +774,7 @@ function AppContent() {
               </motion.div>
             } />
             <Route path="/account" element={
-              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="w-full">
                 <AccountPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} setIsLoggedIn={handleSetIsLoggedIn} userProfile={userProfile} setUserProfile={setUserProfile} token={token} />
               </motion.div>
             } />

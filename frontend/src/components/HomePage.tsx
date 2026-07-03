@@ -15,13 +15,12 @@ import { subscribeNewsletter, API_BASE_URL } from "../services/api";
 import ProductCard from "./ProductPage/ProductCard";
 import ProductDetail from "./ProductPage/ProductDetail";
 import SloganQuote from "./SloganQuote";
-import slide1 from '../assets/slideshow/slide1.png';
-import slide2 from '../assets/slideshow/slide2.png';
-import slide3 from '../assets/slideshow/slide3.png';
-import slide4 from '../assets/slideshow/slide4.png';
-import slide5 from '../assets/slideshow/slide5.png';
-import img_card from '../assets/images/home_page_card.png';
-
+import slide1 from "../assets/slideshow/slide1.png";
+import slide2 from "../assets/slideshow/slide2.png";
+import slide3 from "../assets/slideshow/slide3.png";
+import slide4 from "../assets/slideshow/slide4.png";
+import slide5 from "../assets/slideshow/slide5.png";
+import img_card from "../assets/images/home_page_card.png";
 
 interface HomePageProps {
   products?: Product[];
@@ -65,9 +64,13 @@ const normalizeProduct = (p: any): Product => {
     category: p.category || "Thiết bị",
     description: p.description || "Mô tả đang được cập nhật.",
     specs: safeSpecs,
-    colors: Array.isArray(p.colors) ? p.colors : (typeof p.colors === 'string' ? p.colors.split(',').map((c: string) => c.trim()) : []),
-    averageRating: typeof p.averageRating === 'number' ? p.averageRating : 0,
-    reviewCount: typeof p.reviewCount === 'number' ? p.reviewCount : 0,
+    colors: Array.isArray(p.colors)
+      ? p.colors
+      : typeof p.colors === "string"
+        ? p.colors.split(",").map((c: string) => c.trim())
+        : [],
+    averageRating: typeof p.averageRating === "number" ? p.averageRating : 0,
+    reviewCount: typeof p.reviewCount === "number" ? p.reviewCount : 0,
   };
 };
 
@@ -80,11 +83,14 @@ export default function HomePage({
   userProfile,
 }: HomePageProps) {
   const allProducts = (products || []).map(normalizeProduct);
-  const isPremium = isLoggedIn && (userProfile?.shieldStatus === "Đang Kích Hoạt (Premium)" || userProfile?.shieldStatus === "Premium");
+  const isPremium =
+    isLoggedIn &&
+    (userProfile?.shieldStatus === "Đang Kích Hoạt (Premium)" ||
+      userProfile?.shieldStatus === "Premium");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [showSubscriptionSuccess, setShowSubscriptionSuccess] = useState(
-    !!localStorage.getItem("techvie_subscribed")
+    !!localStorage.getItem("techvie_subscribed"),
   );
   const [isSubmittingSubscription, setIsSubmittingSubscription] =
     useState(false);
@@ -103,14 +109,16 @@ export default function HomePage({
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
+            entry.target.classList.add("revealed");
             observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
     );
-    revealRefs.current.forEach((el) => { if (el) observer.observe(el); });
+    revealRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
     return () => observer.disconnect();
   }, []);
 
@@ -159,7 +167,7 @@ export default function HomePage({
     slide2,
     slide3,
     slide4,
-    slide5
+    slide5,
   ]);
 
   // Fetch slider images dynamically from backend express API (port 5000)
@@ -234,8 +242,8 @@ export default function HomePage({
   return (
     <div className="w-full">
       {/* Hero Slideshow Section */}
-      <section className="relative h-screen w-full overflow-hidden bg-gray-150 -mt-18">
-        <div className="absolute inset-0 w-full h-full">
+      <section className="bg-gray-150 relative h-screen w-full overflow-hidden -mt-18">
+        <div className="absolute inset-0 h-full w-full">
           <AnimatePresence>
             <motion.img
               key={images[currentSlide] || currentSlide}
@@ -246,7 +254,7 @@ export default function HomePage({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1 }}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </AnimatePresence>
           {/* Lớp phủ màu đen mờ giúp tăng độ tương phản cho slideshow */}
@@ -254,61 +262,61 @@ export default function HomePage({
         </div>
 
         {/* Ambient Overlay & Radial highlight, matching Vietnamese TechVie presentation card */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/35 via-transparent to-black/10 backdrop-brightness-95 flex items-center justify-start px-6 md:px-margin-desktop z-10 pt-18">
-          <div className="max-w-7xl mx-auto w-full flex">
+        <div className="md:px-margin-desktop absolute inset-0 z-10 flex items-center justify-start bg-gradient-to-r from-white/35 via-transparent to-black/10 px-6 backdrop-brightness-95">
+          <div className="mx-auto flex w-full max-w-7xl">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="max-w-2xl bg-white/45 backdrop-blur-[35px] p-6 sm:p-8 md:p-10 lg:p-14 rounded-2xl sm:rounded-3xl border border-white/60 shadow-[0_30px_70px_rgba(0,0,0,0.1)] relative"
+              className="relative max-w-2xl rounded-2xl border border-white/60 bg-white/45 p-6 shadow-[0_30px_70px_rgba(0,0,0,0.1)] backdrop-blur-[35px] sm:rounded-3xl sm:p-8 md:p-10 lg:p-14"
             >
               {/* <div className="absolute top-0 right-0 p-6 flex flex-col items-end opacity-35 text-[9px] font-mono tracking-widest text-gray-800">
                 <span>MÃ LƯỚI: 48.85 / 2.35</span>
                 <div className="w-12 h-px bg-gray-800 mt-1"></div>
               </div> */}
 
-              <div className="absolute -left-px top-1/4 h-24 w-1 bg-gradient-to-b from-transparent via-secondary/40 to-transparent"></div>
+              <div className="via-secondary/40 absolute top-1/4 -left-px h-24 w-1 bg-gradient-to-b from-transparent to-transparent"></div>
 
-              <span className="text-xs sm:text-sm uppercase tracking-[0.25em] text-secondary font-bold mb-4 lg:mb-6 block">
-                <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+              <span className="text-secondary mb-4 block text-xs font-bold tracking-[0.25em] uppercase sm:text-sm lg:mb-6">
+                <span className="bg-secondary h-2.5 w-2.5 animate-pulse rounded-full"></span>
                 PHỤ KIỆN & ĐỒ SETUP AESTHETIC
               </span>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans font-black tracking-tighter text-gray-900 mb-4 lg:mb-6 leading-[1.05]">
+              <h1 className="mb-4 font-sans text-3xl leading-[1.05] font-black tracking-tighter text-gray-900 sm:text-4xl md:text-5xl lg:mb-6 lg:text-6xl">
                 Góc Làm Việc <br />
                 Đậm Chất Riêng
               </h1>
 
-              <p className="font-sans text-gray-650 text-sm sm:text-md leading-relaxed mb-4 lg:mb-8 max-w-md text-justify">
+              <p className="text-gray-650 sm:text-md mb-4 max-w-md text-justify font-sans text-sm leading-relaxed lg:mb-8">
                 Khơi nguồn cảm hứng với các combo phụ kiện tiện ích và ốp lưng
                 custom độc quyền. TechVie đồng hành cùng bạn kiến tạo góc làm
                 việc tối giản, bảo vệ sức khỏe và thể hiện cá tính.
               </p>
 
               {/* Specification stats box in vietnamese template */}
-              <div className="grid grid-cols-2 gap-4 sm:gap-8 mb-4 lg:mb-8 py-1 lg:py-2">
+              <div className="mb-4 grid grid-cols-2 gap-4 py-1 sm:gap-8 lg:mb-8 lg:py-2">
                 <div>
-                  <div className="text-[12px] sm:text-[15px] font-extrabold uppercase tracking-widest text-gray-900 mb-1">
+                  <div className="mb-1 text-[12px] font-extrabold tracking-widest text-gray-900 uppercase sm:text-[15px]">
                     BẢO HÀNH 1-ĐỔI-1
                   </div>
-                  <div className="text-[11px] sm:text-[13px] text-gray-500 flex items-baseline gap-1">
+                  <div className="flex items-baseline gap-1 text-[11px] text-gray-500 sm:text-[13px]">
                     Lỗi từ nhà sản xuất
                   </div>
                 </div>
                 <div>
-                  <div className="text-[12px] sm:text-[15px] font-extrabold uppercase tracking-widest text-gray-900 mb-1">
+                  <div className="mb-1 text-[12px] font-extrabold tracking-widest text-gray-900 uppercase sm:text-[15px]">
                     ĐÓNG GÓI GIFT BOX
                   </div>
-                  <div className="text-[11px] sm:text-[13px] text-gray-500 flex items-baseline gap-1">
+                  <div className="flex items-baseline gap-1 text-[11px] text-gray-500 sm:text-[13px]">
                     Trải nghiệm unbox khác biệt
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row">
                 <button
                   onClick={() => onNavigate("brand")}
-                  className="group group-hover:before:duration-500 group-hover:after:duration-500 after:duration-500  duration-500 before:duration-500 hover:duration-500  hover:after:-right-6 hover:before:right-8 hover:before:-bottom-8 hover:before:blur origin-left hover:decoration-2 hover:text-white relative bg-neutral-800 h-16 text-right p-8 text-gray-50 text-base font-bold rounded-2xl overflow-hidden before:absolute before:w-12 before:h-12 before:content-[''] before:right-1 before:top-1 before:z-10 before:bg-white/40 before:rounded-full before:blur-lg after:absolute after:z-10 after:w-20 after:h-20 after:content-[''] after:bg-amber-100 after:right-8 after:top-3 after:rounded-full after:blur-lg cursor-pointer flex items-center justify-between w-full shadow-amber-100 shadow-2xl"
+                  className="group relative flex h-16 w-full origin-left cursor-pointer items-center justify-between overflow-hidden rounded-2xl bg-neutral-800 p-8 text-right text-base font-bold text-gray-50 shadow-2xl shadow-amber-100 duration-500 before:absolute before:top-1 before:right-1 before:z-10 before:h-12 before:w-12 before:rounded-full before:bg-white/40 before:blur-lg before:duration-500 before:content-[''] group-hover:before:duration-500 after:absolute after:top-3 after:right-8 after:z-10 after:h-20 after:w-20 after:rounded-full after:bg-amber-100 after:blur-lg after:duration-500 after:content-[''] group-hover:after:duration-500 hover:text-white hover:decoration-2 hover:duration-500 hover:before:right-8 hover:before:-bottom-8 hover:before:blur hover:after:-right-6"
                 >
                   <span className="relative z-[2] flex items-center gap-2 uppercase transition-all duration-300 group-hover:[text-shadow:0_0_8px_rgba(255,255,255,0.8)]">
                     Khám phá thương hiệu
@@ -330,15 +338,15 @@ export default function HomePage({
         </div>
 
         {/* Circular progress indicators underneath matching vietnamese design dot indicators */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex space-x-3 z-20">
+        <div className="absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 space-x-3">
           {images.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
-              className={`h-2.5 rounded-full transition-all duration-300 shadow-md border border-black/10 ${
+              className={`h-2.5 rounded-full border border-black/10 shadow-md transition-all duration-300 ${
                 currentSlide === idx
-                  ? "bg-white w-8 scale-110"
-                  : "bg-white/50 hover:bg-white/80 w-2.5"
+                  ? "w-8 scale-110 bg-white"
+                  : "w-2.5 bg-white/50 hover:bg-white/80"
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
@@ -348,35 +356,41 @@ export default function HomePage({
 
       {/* Featured Electronics Collection */}
       <section
-        ref={(el) => { revealRefs.current[0] = el; }}
-        className="reveal py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto"
+        ref={(el) => {
+          revealRefs.current[0] = el;
+        }}
+        className="reveal mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24"
       >
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 sm:mb-14">
+        <div className="mb-10 flex flex-col items-start justify-between sm:mb-14 sm:flex-row sm:items-end">
           <div>
-            <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
+            <span className="text-secondary mb-3 block text-xs font-bold tracking-[0.3em] uppercase">
               SẢN PHẨM NỔI BẬT
             </span>
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
+            <h2 className="font-sans text-2xl font-extrabold tracking-tighter text-gray-950 sm:text-3xl md:text-5xl">
               Góc Setup Trendy & Tiện Ích
             </h2>
           </div>
           <button
             onClick={() => onNavigate("products")}
-            className="mt-4 sm:mt-0 text-[13px] uppercase tracking-[0.3em] font-black border-b-2 border-primary pb-1.5 hover:opacity-75 transition-opacity cursor-pointer"
+            className="border-primary mt-4 cursor-pointer border-b-2 pb-1.5 text-[13px] font-black tracking-[0.3em] uppercase transition-opacity hover:opacity-75 sm:mt-0"
           >
             Gian Trưng Bày
           </button>
         </div>
 
         {/* Products grid — 1 col xs, 2 col sm, 3 col md+ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-8 md:grid-cols-3">
           {allProducts.slice(0, 3).map((product, idx) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.45, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{
+                duration: 0.45,
+                delay: idx * 0.1,
+                ease: [0.22, 1, 0.36, 1],
+              }}
             >
               <ProductCard
                 product={product}
@@ -394,46 +408,48 @@ export default function HomePage({
 
       {/* Exquisite Brand Promo Card Banner */}
       <section
-        ref={(el) => { revealRefs.current[1] = el; }}
-        className="reveal reveal-delay-1 px-4 sm:px-6 max-w-7xl mx-auto mb-16 sm:mb-20 mt-24 sm:mt-40"
+        ref={(el) => {
+          revealRefs.current[1] = el;
+        }}
+        className="reveal reveal-delay-1 mx-auto mt-24 mb-16 max-w-7xl px-4 sm:mt-40 sm:mb-20 sm:px-6"
       >
-        <div className="bg-linear-to-l from-black/5 to-white/90 rounded-[3rem] p-8 md:p-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 items-center gap-12 rounded-[3rem] bg-linear-to-l from-black/5 to-white/90 p-8 md:p-16 lg:grid-cols-2">
           <div>
-            <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
+            <span className="text-secondary mb-3 block text-xs font-bold tracking-[0.3em] uppercase">
               TRẢI NGHIỆM MUA SẮM KHÁC BIỆT
             </span>
-            <h2 className="text-3xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-tight">
+            <h2 className="font-sans text-3xl leading-tight font-black tracking-tighter text-gray-950 md:text-5xl">
               Nâng Tầm Cảm Xúc Khi Mở Hộp
             </h2>
-            <p className="text-gray-650 font-sans text-md leading-relaxed mt-6 mb-8 text-justify">
+            <p className="text-gray-650 text-md mt-6 mb-8 text-justify font-sans leading-relaxed">
               Không chỉ cung cấp phụ kiện, TechVie chú trọng vào trải nghiệm của
               bạn. Mọi sản phẩm đều được kiểm tra kỹ lưỡng (QC 100%) và đóng gói
               dưới dạng hộp quà tặng (Gift box) chỉn chu kèm thiệp viết tay.
             </p>
-            <div className="flex flex-wrap gap-8 mb-8 border-t border-gray-200 pt-8">
+            <div className="mb-8 flex flex-wrap gap-8 border-t border-gray-200 pt-8">
               <div className="flex items-center gap-3">
-                <div className="w-15 h-10 rounded-xl flex items-center justify-center text-secondary">
+                <div className="text-secondary flex h-10 w-15 items-center justify-center rounded-xl">
                   <Activity size={20} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg text-gray-900">
+                  <h4 className="text-lg font-bold text-gray-900">
                     Đóng Gói Aesthetic
                   </h4>
-                  <p className="text-sm text-gray-500 max-w-xs">
+                  <p className="max-w-xs text-sm text-gray-500">
                     Bao bì chống sốc an toàn, thiết kế tối giản, mang lại sự
                     tinh tế ngay từ cái nhìn đầu tiên
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-15 h-10 rounded-xl flex items-center justify-center text-secondary">
+                <div className="text-secondary flex h-10 w-15 items-center justify-center rounded-xl">
                   <Cpu size={20} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg text-gray-900">
+                  <h4 className="text-lg font-bold text-gray-900">
                     Dịch Vụ Custom
                   </h4>
-                  <p className="text-sm text-gray-500 max-w-xs">
+                  <p className="max-w-xs text-sm text-gray-500">
                     Hỗ trợ in ấn tên, hình vẽ lên ốp lưng theo yêu cầu để bạn tự
                     do sáng tạo cái tôi độc bản
                   </p>
@@ -443,19 +459,19 @@ export default function HomePage({
             <div className="flex justify-end">
               <button
                 onClick={() => onNavigate("brand")}
-                className="bg-black text-white hover:bg-gray-800 font-sans text-xs uppercase tracking-widest font-black px-8 py-3.5 rounded-full flex items-center gap-2 cursor-pointer"
+                className="flex cursor-pointer items-center gap-2 rounded-full bg-black px-8 py-3.5 font-sans text-xs font-black tracking-widest text-white uppercase hover:bg-gray-800"
               >
                 TÌM HIỂU THÊM
                 <ArrowRight size={14} />
               </button>
             </div>
           </div>
-          <div className="aspect-video lg:aspect-square overflow-hidden rounded-[2rem] shadow relative hover:-translate-y-2 transition-all duration-300 shadow-2xl">
+          <div className="relative aspect-video overflow-hidden rounded-[2rem] shadow shadow-2xl transition-all duration-300 hover:-translate-y-2 lg:aspect-square">
             <img
               src={img_card}
               alt="TechVie Laboratory equipment"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover transition-all"
+              className="h-full w-full object-cover transition-all"
             />
           </div>
         </div>
@@ -464,18 +480,20 @@ export default function HomePage({
       {/* Luxurious Newsletter subscription matching modern grid template details */}
       {!isPremium && !showSubscriptionSuccess && (
         <section
-          ref={(el) => { revealRefs.current[2] = el; }}
-          className="reveal reveal-delay-2 py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto"
+          ref={(el) => {
+            revealRefs.current[2] = el;
+          }}
+          className="reveal reveal-delay-2 mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
             <div>
-              <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-none mb-6">
+              <h2 className="mb-6 font-sans text-4xl leading-none font-black tracking-tighter text-gray-950 md:text-5xl">
                 Nhận Ưu Đãi <br />
                 Độc Quyền
               </h2>
-              <p className="text-gray-655 font-sans text-md leading-relaxed max-w-md text-justify">
-                Đăng ký email để không bỏ lỡ các mã Freeship, voucher giảm giá và
-                thông tin mới nhất về các bộ sưu tập đồ setup từ TechVie.
+              <p className="text-gray-655 text-md max-w-md text-justify font-sans leading-relaxed">
+                Đăng ký email để không bỏ lỡ các mã Freeship, voucher giảm giá
+                và thông tin mới nhất về các bộ sưu tập đồ setup từ TechVie.
               </p>
             </div>
 
@@ -487,7 +505,7 @@ export default function HomePage({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onSubmit={handleSubscribe}
-                  className="flex flex-col gap-4 max-w-md w-full"
+                  className="flex w-full max-w-md flex-col gap-4"
                 >
                   {!isLoggedIn ? (
                     <>
@@ -502,13 +520,13 @@ export default function HomePage({
                         onChange={(e) => setNewsletterEmail(e.target.value)}
                         required
                         disabled={isSubmittingSubscription}
-                        className="bg-white/50 backdrop-blur-md border border-gray-300 focus:border-black rounded-2xl px-6 py-4 outline-none font-sans text-base placeholder:text-gray-400 transition-colors disabled:opacity-60"
+                        className="rounded-2xl border border-gray-300 bg-white/50 px-6 py-4 font-sans text-base backdrop-blur-md transition-colors outline-none placeholder:text-gray-400 focus:border-black disabled:opacity-60"
                       />
                     </>
                   ) : (
-                    <div className="bg-white/40 backdrop-blur-md border border-gray-200/50 rounded-2xl px-6 py-4 font-sans text-sm text-gray-800">
+                    <div className="rounded-2xl border border-gray-200/50 bg-white/40 px-6 py-4 font-sans text-sm text-gray-800 backdrop-blur-md">
                       Đăng ký bằng tài khoản:{" "}
-                      <strong className="text-black font-extrabold">
+                      <strong className="font-extrabold text-black">
                         {userEmail}
                       </strong>
                     </div>
@@ -516,7 +534,7 @@ export default function HomePage({
                   <button
                     type="submit"
                     disabled={isSubmittingSubscription}
-                    className="bg-black text-white hover:bg-gray-900 disabled:bg-gray-700 disabled:cursor-not-allowed px-8 py-4 rounded-2xl font-sans text-xs uppercase tracking-[0.3em] font-black w-full flex items-center justify-center gap-2 transition-transform h-14 cursor-pointer"
+                    className="flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-black px-8 py-4 font-sans text-xs font-black tracking-[0.3em] text-white uppercase transition-transform hover:bg-gray-900 disabled:cursor-not-allowed disabled:bg-gray-700"
                   >
                     {isSubmittingSubscription
                       ? "ĐANG GỬI ĐĂNG KÝ..."
@@ -540,7 +558,7 @@ export default function HomePage({
       />
 
       {/* Flying Particles for Cart Magnet */}
-      <div className="fixed inset-0 pointer-events-none z-[101]">
+      <div className="pointer-events-none fixed inset-0 z-[101]">
         {flyingParticles.map((particle) => (
           <motion.div
             key={particle.id}
@@ -567,13 +585,13 @@ export default function HomePage({
               duration: 0.9,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="w-12 h-12 rounded-full overflow-hidden bg-white shadow-2xl border border-gray-250 flex items-center justify-center p-1"
+            className="border-gray-250 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border bg-white p-1 shadow-2xl"
           >
             <img
               src={particle.image}
               alt="glowing-hardware"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-contain mix-blend-multiply"
+              className="h-full w-full object-contain mix-blend-multiply"
             />
           </motion.div>
         ))}
