@@ -64,6 +64,12 @@ const productSchema = new mongoose.Schema({
     min: 0,
     description: "Số lượng đánh giá sản phẩm",
   },
+  stock: {
+    type: Number,
+    default: 0,
+    min: 0,
+    description: "Số lượng hàng tồn kho",
+  },
 }, {
   timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   toJSON: { virtuals: true },

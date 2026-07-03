@@ -189,7 +189,9 @@ async function seedDefaultCategories() {
         { name: "Laptop" },
         { name: "Đồng hồ" },
         { name: "Âm thanh" },
-        { name: "Bàn phím" }
+        { name: "Bàn phím" },
+        { name: "Combo" },
+        { name: "Phụ kiện" }
       ];
       await Category.insertMany(defaultCategories);
       console.log(chalk.green.bold("✔ [SEED] Đã tự động chèn các danh mục mặc định vào database!"));
