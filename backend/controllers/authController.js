@@ -436,11 +436,24 @@ const authController = {
       `;
 
       // Gửi email
-      await sendEmail({
-        to: user.email,
-        subject: "[TechVie] Yêu cầu đặt lại mật khẩu",
-        html: emailHtml,
-      });
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "[TechVie] Yêu cầu đặt lại mật khẩu",
+          html: emailHtml,
+        });
+      } catch (emailErr) {
+        console.error("Lỗi gửi email đặt lại mật khẩu:", emailErr);
+        console.log("\n=======================================================");
+        console.log(`[DEV EMAIL FALLBACK] Reset password link for ${user.email}:`);
+        console.log(resetUrl);
+        console.log("=======================================================\n");
+        return res.status(200).json({
+          success: true,
+          message:
+            "Yêu cầu đặt lại mật khẩu đã được xử lý (Vui lòng kiểm tra Terminal/Console của server backend để lấy link đặt lại mật khẩu!)",
+        });
+      }
 
       return res.status(200).json({
         success: true,
@@ -712,16 +725,28 @@ const authController = {
         </div>
       `;
 
-      await sendEmail({
-        to: user.email,
-        subject: "[TechVie] Xác thực địa chỉ email của bạn",
-        html: emailHtml,
-      });
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "[TechVie] Xác thực địa chỉ email của bạn",
+          html: emailHtml,
+        });
+      } catch (emailErr) {
+        console.error("Lỗi gửi email xác thực:", emailErr);
+        console.log("\n=======================================================");
+        console.log(`[DEV EMAIL FALLBACK] Email verification link for ${user.email}:`);
+        console.log(verifyUrl);
+        console.log("=======================================================\n");
+        return res.status(200).json({
+          success: true,
+          message: "Email xác thực đã được gửi (Vui lòng kiểm tra Terminal/Console của server backend để lấy link xác thực!)"
+        });
+      }
 
       return res.status(200).json({ success: true, message: "Email xác thực đã được gửi, vui lòng kiểm tra hộp thư của bạn!" });
     } catch (error) {
       console.error("Lỗi gửi email xác thực:", error);
-      return res.status(500).json({ success: false, message: "Không thể kết nối đến máy chủ gửi mail." });
+      return res.status(500).json({ success: false, message: "Lỗi hệ thống khi gửi email xác thực." });
     }
   },
 

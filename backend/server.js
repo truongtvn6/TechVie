@@ -231,20 +231,55 @@ connectDB().then(async (conn) => {
       chalk.blue(`ℹ [DATABASE] Trạng thái kết nối Mongoose: ${mongoose.connection.readyState}`)
     );
 
-    // Báo cáo cấu hình Cloudinary
+    // Báo cáo cấu hình môi trường (.env)
+    console.log(chalk.cyan.bold("\n======================================================="));
+    console.log(chalk.cyan.bold("⚙ [ENV CONFIGURATION REPORT] Trạng thái cấu hình môi trường:"));
+    
+    // 1. MONGODB_URI
+    if (process.env.MONGODB_URI) {
+      // Trích xuất địa chỉ máy chủ (host) để hiển thị, ẩn hoàn toàn tên đăng nhập và mật khẩu
+      let hostInfo = "Đã cấu hình";
+      try {
+        const urlParts = process.env.MONGODB_URI.split("@");
+        if (urlParts.length > 1) {
+          hostInfo = urlParts[urlParts.length - 1].split("?")[0];
+        }
+      } catch (e) {}
+      console.log(chalk.green(`✔ [ENV] MONGODB_URI: `) + chalk.white(`${hostInfo} (Đã ẩn thông tin đăng nhập & mật khẩu)`));
+    } else {
+      console.log(chalk.red("✖ [ENV] MONGODB_URI: CHƯA ĐỊNH NGHĨA hoặc trống!"));
+    }
+
+    // 2. JWT_SECRET
+    if (process.env.JWT_SECRET) {
+      console.log(chalk.green(`✔ [ENV] JWT_SECRET: `) + chalk.white("Đã cấu hình (Được mã hóa bảo mật)"));
+    } else {
+      console.log(chalk.red("✖ [ENV] JWT_SECRET: CHƯA ĐỊNH NGHĨA hoặc trống!"));
+    }
+
+    // 3. CLOUDINARY
     const cloudinary = require("cloudinary").v2;
     const cloudConfig = cloudinary.config();
-    if (cloudConfig.cloud_name) {
-      console.log(
-        chalk.magenta.bold(`✔ [CLOUDINARY] Đã kết nối với Cloud Name: ${cloudConfig.cloud_name}`)
-      );
-      console.log(
-        chalk.magenta(`ℹ [CLOUDINARY] Trạng thái API Key: ${cloudConfig.api_key ? "Đã bật (Active)" : "N/A"}`)
-      );
+    if (cloudConfig.cloud_name && cloudConfig.api_key && cloudConfig.api_secret) {
+      console.log(chalk.green(`✔ [ENV] CLOUDINARY: `) + chalk.white(`Đã kết nối với Cloud: ${cloudConfig.cloud_name}`));
     } else {
-      console.log(
-        chalk.yellow.bold(`⚠ [CLOUDINARY] Chưa được cấu hình hoặc thiếu các biến môi trường!`)
-      );
+      console.log(chalk.red("✖ [ENV] CLOUDINARY: Thiếu CLOUDINARY_CLOUD_NAME, API_KEY hoặc API_SECRET!"));
     }
+
+    // 4. GOOGLE OAUTH2
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REDIRECT_URI) {
+      console.log(chalk.green(`✔ [ENV] GOOGLE OAUTH2: `) + chalk.white(`Đã cấu hình. Client ID: ${process.env.GOOGLE_CLIENT_ID.substring(0, 15)}...`));
+    } else {
+      console.log(chalk.yellow("⚠ [ENV] GOOGLE OAUTH2: Chưa cấu hình đầy đủ (Đăng nhập bằng Google sẽ không hoạt động)"));
+    }
+
+    // 5. EMAIL CONFIG
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      console.log(chalk.green(`✔ [ENV] SMTP EMAIL: `) + chalk.white(`Đã cấu hình với tài khoản ${process.env.EMAIL_USER}`));
+    } else {
+      console.log(chalk.yellow("⚠ [ENV] SMTP EMAIL: Chưa cấu hình EMAIL_USER & EMAIL_PASS (Sẽ tự động in mã xác thực/đổi mật khẩu ra Terminal)"));
+    }
+
+    console.log(chalk.cyan.bold("=======================================================\n"));
   });
 });

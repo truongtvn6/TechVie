@@ -138,19 +138,27 @@ export default function TabProfile({
                 {userProfile.authProvider === "google" ? "ĐÃ XÁC THỰC (GOOGLE)" : "ĐÃ XÁC THỰC"}
               </span>
             ) : (
-              <button
-                type="button"
-                onClick={handleVerifyEmail}
-                disabled={isVerifying}
-                className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100/80 border border-amber-250/20 px-2 py-0.5 rounded-md font-tech-label !tracking-normal transition-colors cursor-pointer mb-1.5"
-              >
-                {isVerifying ? (
-                  <Loader2 size={12} className="animate-spin text-amber-600" />
-                ) : (
-                  <ShieldAlert size={12} className="text-amber-600" />
-                )}
-                CHƯA XÁC THỰC (CLICK ĐỂ XÁC THỰC)
-              </button>
+              <div className="relative group/tooltip">
+                <button
+                  type="button"
+                  onClick={handleVerifyEmail}
+                  disabled={isVerifying}
+                  className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100/80 border border-amber-250/20 px-2 py-0.5 rounded-md font-tech-label !tracking-normal transition-colors cursor-pointer mb-1.5"
+                >
+                  {isVerifying ? (
+                    <Loader2 size={12} className="animate-spin text-amber-600" />
+                  ) : (
+                    <ShieldAlert size={12} className="text-amber-600" />
+                  )}
+                  CHƯA XÁC THỰC (CLICK ĐỂ XÁC THỰC)
+                </button>
+                {/* Tooltip gợi ý mã giảm giá */}
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 p-2.5 bg-neutral-900 text-white text-[10px] rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-opacity duration-300 z-[99] text-center font-semibold leading-relaxed border border-neutral-800">
+                  Xác thực email ngay để nhận ngay <span className="text-amber-400 font-bold">mã giảm giá 10%</span> gửi trực tiếp vào hòm thư của bạn!
+                  {/* Mũi tên chỉ xuống */}
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-900" />
+                </div>
+              </div>
             )}
           </div>
           <div className="relative mt-1.5 flex items-center">
