@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Eye, Plus, Check, Star } from 'lucide-react';
+import { Plus, Check, Star } from 'lucide-react';
 import { Product } from '../../types';
 
 interface ProductCardProps {
@@ -39,6 +39,7 @@ export default function ProductCard({
   };
 
   const handleAddToCartLocal = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     const buttonRect = e.currentTarget.getBoundingClientRect();
     const rippleX = e.clientX - buttonRect.left;
     const rippleY = e.clientY - buttonRect.top;
@@ -62,7 +63,8 @@ export default function ProductCard({
         y: isMagnetized ? -4 : 0
       }}
       transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-      className="group bg-white border border-gray-200 rounded-[2rem] p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-gray-300 h-full relative overflow-hidden text-left"
+      onClick={() => onSelect(product)}
+      className="group bg-white border border-gray-200 rounded-[2rem] p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-gray-300 h-full relative overflow-hidden text-left cursor-pointer"
     >
       <div>
         {/* Header section with category badge and premium tag */}
@@ -75,20 +77,11 @@ export default function ProductCard({
               {getBadgeText()}
             </span>
           </div>
-          
-          <button 
-            onClick={() => onSelect(product)}
-            className="w-8 h-8 rounded-full border border-gray-200 hover:border-black hover:bg-gray-50 flex items-center justify-center text-gray-400 hover:text-black transition-colors cursor-pointer"
-            title="Chi tiết kỹ thuật"
-          >
-            <Eye size={14} />
-          </button>
         </div>
 
         {/* Product image container with smooth scale */}
         <div 
-          className="w-full aspect-[4/5] flex items-center justify-center cursor-pointer relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50/50 to-gray-100/30 group-hover:from-gray-100/40 group-hover:to-gray-200/20 transition-all duration-300 border border-transparent group-hover:border-gray-100 select-none" 
-          onClick={() => onSelect(product)}
+          className="w-full aspect-[4/5] flex items-center justify-center relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50/50 to-gray-100/30 group-hover:from-gray-100/40 group-hover:to-gray-200/20 transition-all duration-300 border border-transparent group-hover:border-gray-100 select-none" 
         >
           <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
