@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { 
   BarChart3, 
   Package, 
@@ -72,7 +73,7 @@ export default function AdminSidebar({
   }, []);
 
   return (
-    <aside className="relative w-full h-full bg-transparent border-r border-gray-250/20 flex flex-col justify-between p-6 md:p-8 shrink-0 z-40 overflow-hidden">
+    <aside className="relative w-full h-full bg-transparent border-r border-gray-250/20 flex flex-col justify-between p-4 md:p-6 xl:p-8 shrink-0 z-40 overflow-hidden">
       {/* Liquid Glass Background Image Layer */}
       <div 
         className="absolute inset-0 -z-10 transition-all duration-500 scale-100"
@@ -117,14 +118,22 @@ export default function AdminSidebar({
             <button 
               type="button"
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className={`p-1.5 rounded-full transition-colors cursor-pointer flex items-center justify-center border ${
+              className={`p-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center border ${
                 isDarkMode 
                   ? 'bg-indigo-950/40 border-indigo-900/55 hover:bg-white/10 text-white' 
                   : 'bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-700'
               }`}
               title={isDarkMode ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
             >
-              {isDarkMode ? <Sun size={18} className="text-white" /> : <Moon size={18} className="text-black" />}
+              <motion.span
+                key={isDarkMode ? 'sun' : 'moon'}
+                initial={{ rotate: -90, opacity: 0, scale: 0.7 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className="flex items-center justify-center"
+              >
+                {isDarkMode ? <Sun size={18} className="text-white" /> : <Moon size={18} className="text-black" />}
+              </motion.span>
             </button>
           </div>
         </div>
@@ -170,19 +179,28 @@ export default function AdminSidebar({
               Báo cáo & Thống kê
             </span>
             <div className="space-y-1">
-              <button
+              <motion.button
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.02, duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                 onClick={() => setActiveSubTab('overview')}
-                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer relative overflow-hidden ${
                   activeSubTab === 'overview' 
                     ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
                     : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
                 }`}
               >
+                {activeSubTab === 'overview' && (
+                  <motion.span
+                    layoutId="sidebar-active-indicator"
+                    className={`absolute left-0 top-0 bottom-0 w-0.5 rounded-r-full ${isDarkMode ? 'bg-indigo-400' : 'bg-white'}`}
+                  />
+                )}
                 <div className="flex items-center gap-2">
                   <BarChart3 size={14} />
                   <span>Tổng quan</span>
                 </div>
-              </button>
+              </motion.button>
             </div>
           </div>
 
@@ -194,82 +212,45 @@ export default function AdminSidebar({
               Cửa hàng & Kho hàng
             </span>
             <div className="space-y-1">
-              <button
-                onClick={() => setActiveSubTab('categories')}
-                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  activeSubTab === 'categories' 
-                    ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
-                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <FolderTree size={14} />
-                  <span>Danh mục SP</span>
-                </div>
-                <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
-                  activeSubTab === 'categories' 
-                    ? (isDarkMode ? 'bg-white/10 text-white' : 'bg-white/20 text-white') 
-                    : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-200/50 text-gray-600')
-                }`}>
-                  {categoriesCount}
-                </span>
-              </button>
-
-              <button
-                onClick={() => setActiveSubTab('products')}
-                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  activeSubTab === 'products' 
-                    ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
-                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Package size={14} />
-                  <span>Sản phẩm</span>
-                </div>
-                <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
-                  activeSubTab === 'products' 
-                    ? (isDarkMode ? 'bg-white/10 text-white' : 'bg-white/20 text-white') 
-                    : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-200/50 text-gray-600')
-                }`}>
-                  {productsCount}
-                </span>
-              </button>
-
-              <button
-                onClick={() => setActiveSubTab('stock')}
-                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  activeSubTab === 'stock' 
-                    ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
-                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Boxes size={14} />
-                  <span>Kho hàng / Tồn</span>
-                </div>
-              </button>
-
-              <button
-                onClick={() => setActiveSubTab('orders')}
-                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  activeSubTab === 'orders' 
-                    ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
-                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <ShoppingBag size={14} />
-                  <span>Đơn hàng</span>
-                </div>
-                <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
-                  activeSubTab === 'orders' 
-                    ? (isDarkMode ? '!bg-white/10 text-white' : 'bg-white/20 text-white') 
-                    : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-200/50 text-gray-600')
-                }`}>
-                  {ordersCount}
-                </span>
-              </button>
+              {[
+                { tab: 'categories' as const, Icon: FolderTree, label: 'Danh mục SP', count: categoriesCount },
+                { tab: 'products' as const, Icon: Package, label: 'Sản phẩm', count: productsCount },
+                { tab: 'stock' as const, Icon: Boxes, label: 'Kho hàng / Tồn', count: null },
+                { tab: 'orders' as const, Icon: ShoppingBag, label: 'Đơn hàng', count: ordersCount },
+              ].map(({ tab, Icon, label, count }, i) => (
+                <motion.button
+                  key={tab}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.04 + i * 0.04, duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                  onClick={() => setActiveSubTab(tab)}
+                  className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer relative overflow-hidden ${
+                    activeSubTab === tab 
+                      ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
+                      : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
+                  }`}
+                >
+                  {activeSubTab === tab && (
+                    <motion.span
+                      layoutId="sidebar-active-indicator"
+                      className={`absolute left-0 top-0 bottom-0 w-0.5 rounded-r-full ${isDarkMode ? 'bg-indigo-400' : 'bg-white'}`}
+                    />
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Icon size={14} />
+                    <span>{label}</span>
+                  </div>
+                  {count !== null && (
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
+                      activeSubTab === tab 
+                        ? (isDarkMode ? 'bg-white/10 text-white' : 'bg-white/20 text-white') 
+                        : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-200/50 text-gray-600')
+                    }`}>
+                      {count}
+                    </span>
+                  )}
+                </motion.button>
+              ))}
             </div>
           </div>
 
@@ -281,68 +262,42 @@ export default function AdminSidebar({
               Chăm sóc & Chiến dịch
             </span>
             <div className="space-y-1">
-              <button
-                onClick={() => setActiveSubTab('messages')}
-                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  activeSubTab === 'messages' 
-                    ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
-                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <MessageSquare size={14} />
-                  <span>Phản hồi KH</span>
-                </div>
-                <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
-                  activeSubTab === 'messages' 
-                    ? (isDarkMode ? 'bg-white/10 text-white' : 'bg-white/20 text-white') 
-                    : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-200/50 text-gray-600')
-                }`}>
-                  {messagesCount}
-                </span>
-              </button>
-
-              <button
-                onClick={() => setActiveSubTab('promos')}
-                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  activeSubTab === 'promos' 
-                    ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
-                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Ticket size={14} />
-                  <span>Khuyến mãi</span>
-                </div>
-                <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
-                  activeSubTab === 'promos' 
-                    ? (isDarkMode ? 'bg-white/10 text-white' : 'bg-white/20 text-white') 
-                    : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-200/50 text-gray-600')
-                }`}>
-                  {promosCount}
-                </span>
-              </button>
-
-              <button
-                onClick={() => setActiveSubTab('reviews')}
-                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  activeSubTab === 'reviews' 
-                    ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
-                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Star size={14} className={activeSubTab === 'reviews' ? "text-yellow-500 fill-yellow-500" : "text-yellow-500"} />
-                  <span>Đánh giá SP</span>
-                </div>
-                <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
-                  activeSubTab === 'reviews' 
-                    ? (isDarkMode ? 'bg-white/10 text-white' : 'bg-white/20 text-white') 
-                    : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-200/50 text-gray-600')
-                }`}>
-                  {reviewsCount}
-                </span>
-              </button>
+              {[
+                { tab: 'messages' as const, Icon: MessageSquare, label: 'Phản hồi KH', count: messagesCount },
+                { tab: 'promos' as const, Icon: Ticket, label: 'Khuyến mãi', count: promosCount },
+                { tab: 'reviews' as const, Icon: Star, label: 'Đánh giá SP', count: reviewsCount },
+              ].map(({ tab, Icon, label, count }, i) => (
+                <motion.button
+                  key={tab}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.20 + i * 0.04, duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                  onClick={() => setActiveSubTab(tab)}
+                  className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer relative overflow-hidden ${
+                    activeSubTab === tab 
+                      ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
+                      : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
+                  }`}
+                >
+                  {activeSubTab === tab && (
+                    <motion.span
+                      layoutId="sidebar-active-indicator"
+                      className={`absolute left-0 top-0 bottom-0 w-0.5 rounded-r-full ${isDarkMode ? 'bg-indigo-400' : 'bg-white'}`}
+                    />
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Icon size={14} className={tab === 'reviews' ? (activeSubTab === tab ? 'text-yellow-400 fill-yellow-400' : 'text-yellow-500') : ''} />
+                    <span>{label}</span>
+                  </div>
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
+                    activeSubTab === tab 
+                      ? (isDarkMode ? 'bg-white/10 text-white' : 'bg-white/20 text-white') 
+                      : (isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-200/50 text-gray-600')
+                  }`}>
+                    {count}
+                  </span>
+                </motion.button>
+              ))}
             </div>
           </div>
 
@@ -354,14 +309,23 @@ export default function AdminSidebar({
               Hệ thống
             </span>
             <div className="space-y-1">
-              <button
+              <motion.button
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.36, duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                 onClick={() => setActiveSubTab('users')}
-                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer relative overflow-hidden ${
                   activeSubTab === 'users' 
                     ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
                     : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
                 }`}
               >
+                {activeSubTab === 'users' && (
+                  <motion.span
+                    layoutId="sidebar-active-indicator"
+                    className={`absolute left-0 top-0 bottom-0 w-0.5 rounded-r-full ${isDarkMode ? 'bg-indigo-400' : 'bg-white'}`}
+                  />
+                )}
                 <div className="flex items-center gap-2">
                   <Users size={14} />
                   <span>Thành viên</span>
@@ -373,7 +337,7 @@ export default function AdminSidebar({
                 }`}>
                   {usersCount}
                 </span>
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>

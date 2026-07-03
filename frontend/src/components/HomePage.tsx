@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Product, TabType } from "../types";
 import {
@@ -95,6 +95,24 @@ export default function HomePage({
   const [flyingParticles, setFlyingParticles] = useState<
     { id: number; startX: number; startY: number; image: string }[]
   >([]);
+
+  // Scroll reveal — IntersectionObserver
+  const revealRefs = useRef<(HTMLElement | null)[]>([]);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+    revealRefs.current.forEach((el) => { if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, []);
 
   const handleAddToCartWithSuccess = (
     product: Product,
@@ -329,35 +347,45 @@ export default function HomePage({
       </section>
 
       {/* Featured Electronics Collection */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-14">
+      <section
+        ref={(el) => { revealRefs.current[0] = el; }}
+        className="reveal py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto"
+      >
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 sm:mb-14">
           <div>
             <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
               SẢN PHẨM NỔI BẬT
             </span>
-            <h2 className="text-3xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-sans tracking-tighter text-gray-950 font-extrabold">
               Góc Setup Trendy & Tiện Ích
             </h2>
           </div>
           <button
             onClick={() => onNavigate("products")}
-            className="mt-4 md:mt-0 text-[13px] uppercase tracking-[0.3em] font-black border-b-2 border-primary pb-1.5 hover:opacity-75 transition-opacity cursor-pointer"
+            className="mt-4 sm:mt-0 text-[13px] uppercase tracking-[0.3em] font-black border-b-2 border-primary pb-1.5 hover:opacity-75 transition-opacity cursor-pointer"
           >
             Gian Trưng Bày
           </button>
         </div>
 
-        {/* 3 Core Products matching Vietnamese template cards layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {allProducts.slice(0, 3).map((product) => (
-            <ProductCard
+        {/* Products grid — 1 col xs, 2 col sm, 3 col md+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8">
+          {allProducts.slice(0, 3).map((product, idx) => (
+            <motion.div
               key={product.id}
-              product={product}
-              onSelect={setSelectedProduct}
-              onAddToCart={handleAddToCartWithSuccess}
-              isJustAdded={justAddedId === product.id}
-              isMagnetized={magneticRefId === product.id}
-            />
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.45, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <ProductCard
+                product={product}
+                onSelect={setSelectedProduct}
+                onAddToCart={handleAddToCartWithSuccess}
+                isJustAdded={justAddedId === product.id}
+                isMagnetized={magneticRefId === product.id}
+              />
+            </motion.div>
           ))}
         </div>
       </section>
@@ -365,7 +393,10 @@ export default function HomePage({
       <SloganQuote />
 
       {/* Exquisite Brand Promo Card Banner */}
-      <section className="px-6 max-w-7xl mx-auto mb-20 mt-40">
+      <section
+        ref={(el) => { revealRefs.current[1] = el; }}
+        className="reveal reveal-delay-1 px-4 sm:px-6 max-w-7xl mx-auto mb-16 sm:mb-20 mt-24 sm:mt-40"
+      >
         <div className="bg-linear-to-l from-black/5 to-white/90 rounded-[3rem] p-8 md:p-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="text-xs uppercase tracking-[0.3em] text-secondary font-bold mb-3 block">
@@ -432,7 +463,10 @@ export default function HomePage({
 
       {/* Luxurious Newsletter subscription matching modern grid template details */}
       {!isPremium && !showSubscriptionSuccess && (
-        <section className="py-24 px-6 max-w-7xl mx-auto">
+        <section
+          ref={(el) => { revealRefs.current[2] = el; }}
+          className="reveal reveal-delay-2 py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl md:text-5xl font-sans tracking-tighter text-gray-950 font-black leading-none mb-6">

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Product } from "../../types";
 import {
@@ -720,33 +721,44 @@ export default function AdminPage({
     >
       {/* Mobile Sticky Navbar */}
       <div
-        className={`flex w-full items-center justify-between border-b p-4 md:hidden ${isDarkMode ? "border-[#30363d] bg-[#0d1117] text-white" : "border-gray-200 bg-white text-gray-900"} bg-opacity-90 dark:bg-opacity-90 sticky top-0 z-30 backdrop-blur-md`}
+        className={`flex w-full items-center justify-between border-b px-4 py-3 md:hidden sticky top-0 z-30 backdrop-blur-xl ${
+          isDarkMode
+            ? "border-[#30363d] bg-[#0d1117]/90 text-white"
+            : "border-gray-200 bg-white/90 text-gray-900"
+        }`}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="cursor-pointer rounded-lg p-2 hover:bg-gray-200/20"
+            className={`cursor-pointer rounded-lg p-2 transition-colors ${
+              isDarkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+            }`}
             title="Mở menu quản trị"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <strong className="text-sm font-black tracking-tighter uppercase">
-            TechVie Admin
-          </strong>
+          <div>
+            <strong className="text-sm font-black tracking-tighter uppercase block leading-none">
+              TechVie Admin
+            </strong>
+            <span className={`text-[10px] font-mono uppercase tracking-wider ${
+              isDarkMode ? 'text-gray-500' : 'text-gray-400'
+            }`}>
+              {activeSubTab === "overview" ? "Dashboard" :
+               activeSubTab === "categories" ? "Danh mục" :
+               activeSubTab === "products" ? "Sản phẩm" :
+               activeSubTab === "stock" ? "Tồn kho" :
+               activeSubTab === "orders" ? "Đơn hàng" :
+               activeSubTab === "messages" ? "Phản hồi" :
+               activeSubTab === "promos" ? "Khuyến mãi" :
+               activeSubTab === "reviews" ? "Đánh giá" : "Thành viên"}
+            </span>
+          </div>
         </div>
-        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-extrabold text-emerald-500 uppercase">
+        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-extrabold text-emerald-500 uppercase flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           Live
         </span>
       </div>
@@ -755,23 +767,31 @@ export default function AdminPage({
       <div
         className={`fixed inset-0 z-50 flex md:relative md:inset-auto md:z-auto ${isSidebarOpen ? "pointer-events-auto" : "pointer-events-none md:pointer-events-auto"}`}
       >
-        {/* Backdrop for mobile */}
-        {isSidebarOpen && (
-          <div
-            onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity md:hidden"
-          />
-        )}
+        {/* Backdrop for mobile — animated */}
+        <AnimatePresence>
+          {isSidebarOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm md:hidden"
+            />
+          )}
+        </AnimatePresence>
 
         {/* Sidebar Drawer container */}
         <div
-          className={`fixed top-0 bottom-0 left-0 h-full w-64 transform md:sticky md:h-screen md:transform-none lg:w-72 xl:w-80 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} z-50 bg-transparent transition-transform duration-300 ease-in-out md:z-auto`}
+          className={`fixed top-0 bottom-0 left-0 h-full w-64 transform md:sticky md:h-screen md:transform-none lg:w-72 xl:w-80 ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          } z-50 bg-transparent transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:z-auto`}
         >
           <AdminSidebar
             activeSubTab={activeSubTab}
             setActiveSubTab={(tab) => {
               setActiveSubTab(tab);
-              setIsSidebarOpen(false); // Đóng menu mobile khi chọn tab
+              setIsSidebarOpen(false);
               if (tab === "overview" || tab === "orders") fetchOrders();
               if (tab === "overview" || tab === "messages") fetchMessages();
               if (tab === "overview" || tab === "categories") fetchCategories();
@@ -793,31 +813,22 @@ export default function AdminPage({
       </div>
 
       {/* Main Content Pane */}
-      <main className="min-w-0 flex-1 p-6 md:p-10 lg:p-12">
+      <main className="min-w-0 flex-1 p-4 sm:p-6 md:p-10 lg:p-12">
         <div className="mx-auto max-w-7xl">
-          {/* Header area in main text describing the active view */}
-          <div className="mb-10 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-center">
+          {/* Header area */}
+          <div className="mb-8 md:mb-10 flex flex-col items-start justify-between gap-3 border-b border-gray-200 pb-5 md:pb-6 md:flex-row md:items-center">
             <div>
               <span className="mb-1 block text-[10px] font-extrabold tracking-[0.25em] text-gray-400 uppercase">
-                {activeSubTab === "overview"
-                  ? "DASHBOARD OVERVIEW"
-                  : activeSubTab === "categories"
-                    ? "PRODUCT CATEGORIES"
-                    : activeSubTab === "products"
-                      ? "PRODUCT MANAGER"
-                      : activeSubTab === "stock"
-                        ? "STOCK WAREHOUSE MANAGER"
-                        : activeSubTab === "orders"
-                          ? "LIVE ORDERS REGISTRY"
-                          : activeSubTab === "messages"
-                            ? "CUSTOMER INQUIRIES"
-                            : activeSubTab === "promos"
-                              ? "PROMO CAMPAIGNS"
-                              : activeSubTab === "reviews"
-                                ? "PRODUCT REVIEWS"
-                                : "USER ROLES & ACCOUNTS"}
+                {activeSubTab === "overview" ? "DASHBOARD OVERVIEW" :
+                 activeSubTab === "categories" ? "PRODUCT CATEGORIES" :
+                 activeSubTab === "products" ? "PRODUCT MANAGER" :
+                 activeSubTab === "stock" ? "STOCK WAREHOUSE MANAGER" :
+                 activeSubTab === "orders" ? "LIVE ORDERS REGISTRY" :
+                 activeSubTab === "messages" ? "CUSTOMER INQUIRIES" :
+                 activeSubTab === "promos" ? "PROMO CAMPAIGNS" :
+                 activeSubTab === "reviews" ? "PRODUCT REVIEWS" : "USER ROLES & ACCOUNTS"}
               </span>
-              <h1 className="flex items-center gap-2.5 text-3xl font-black tracking-tighter text-gray-950 uppercase">
+              <h1 className="flex flex-wrap items-center gap-2.5 text-2xl md:text-3xl font-black tracking-tighter text-gray-950 uppercase">
                 {activeSubTab === "overview" && "Bảng Tổng Quan Hệ Thống"}
                 {activeSubTab === "categories" && "Quản Lý Danh Mục"}
                 {activeSubTab === "products" && "Quản Lý Quầy Sản Phẩm"}
@@ -829,148 +840,141 @@ export default function AdminPage({
                 {activeSubTab === "reviews" && "Quản Lý Đánh Giá Sản Phẩm"}
               </h1>
               <p className="mt-1 font-sans text-xs text-gray-400">
-                {activeSubTab === "overview" &&
-                  "Giao diện tổng quan trạng thái, cập nhật dữ liệu máy chủ thực tế tức thời."}
-                {activeSubTab === "categories" &&
-                  "Thêm mới danh mục sản phẩm, đổi tên, xóa mềm và khôi phục danh mục hàng hóa."}
-                {activeSubTab === "products" &&
-                  "Đăng bán sản phẩm mới, cập nhật giá cả, thương hiệu và thông số cấu hình cụ thể."}
-                {activeSubTab === "stock" &&
-                  "Giám sát số lượng tồn, lọc sản phẩm hết hàng hoặc sắp hết hàng và nhập hàng nhanh."}
-                {activeSubTab === "orders" &&
-                  "Xem thông tin giao nhận, cập nhật trạng thái đơn hàng (đang xử lý, hoàn thành, hủy đơn)."}
-                {activeSubTab === "messages" &&
-                  "Phản hồi ý kiến đóng góp, đề đạt yêu cầu làm đại lý hoặc câu hỏi hỗ trợ khách hàng."}
-                {activeSubTab === "promos" &&
-                  "Cấu hình mã giảm giá toàn sàn, lưu trực tiếp máy chủ và hiển thị cho người dùng tức thời khi checkout."}
-                {activeSubTab === "users" &&
-                  "Điều chỉnh phân quyền cán bộ nhân viên, xem thông tin số điện thoại email và trạng thái khoá tài khoản."}
-                {activeSubTab === "reviews" &&
-                  "Xem các đánh giá từ khách hàng, lọc theo số sao, ẩn/hiển thị đánh giá và xóa/khôi phục đánh giá."}
+                {activeSubTab === "overview" && "Giao diện tổng quan trạng thái, cập nhật dữ liệu máy chủ thực tế tức thời."}
+                {activeSubTab === "categories" && "Thêm mới danh mục sản phẩm, đổi tên, xóa mềm và khôi phục danh mục hàng hóa."}
+                {activeSubTab === "products" && "Đăng bán sản phẩm mới, cập nhật giá cả, thương hiệu và thông số cấu hình cụ thể."}
+                {activeSubTab === "stock" && "Giám sát số lượng tồn, lọc sản phẩm hết hàng hoặc sắp hết hàng và nhập hàng nhanh."}
+                {activeSubTab === "orders" && "Xem thông tin giao nhận, cập nhật trạng thái đơn hàng (đang xử lý, hoàn thành, hủy đơn)."}
+                {activeSubTab === "messages" && "Phản hồi ý kiến đóng góp, đề đạt yêu cầu làm đại lý hoặc câu hỏi hỗ trợ khách hàng."}
+                {activeSubTab === "promos" && "Cấu hình mã giảm giá toàn sàn, lưu trực tiếp máy chủ và hiển thị cho người dùng tức thời khi checkout."}
+                {activeSubTab === "users" && "Điều chỉnh phân quyền cán bộ nhân viên, xem thông tin số điện thoại email và trạng thái khoá tài khoản."}
+                {activeSubTab === "reviews" && "Xem các đánh giá từ khách hàng, lọc theo số sao, ẩn/hiển thị đánh giá và xóa/khôi phục đánh giá."}
               </p>
             </div>
           </div>
 
-          {/* DYNAMIC SUBTAB VIEWS */}
-          {activeSubTab === "overview" && (
-            <div className="animate-fade-in space-y-8">
-              <DashboardStats
-                totalRevenue={totalRevenue}
-                ordersCount={orders.length}
-                processingOrdersCount={
-                  orders.filter((o) => o.statusType === "processing").length
-                }
-                productsCount={products.length}
-                messagesCount={messages.length}
-                totalStock={products.reduce((sum, p) => sum + (p.stock ?? 0), 0)}
-                lowStockCount={products.filter((p) => (p.stock ?? 0) > 0 && (p.stock ?? 0) <= 5).length}
-                isDarkMode={isDarkMode}
-              />
+          {/* DYNAMIC SUBTAB VIEWS — animated on tab switch */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSubTab}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {activeSubTab === "overview" && (
+                <div className="space-y-6 sm:space-y-8">
+                  <DashboardStats
+                    totalRevenue={totalRevenue}
+                    ordersCount={orders.length}
+                    processingOrdersCount={orders.filter((o) => o.statusType === "processing").length}
+                    productsCount={products.length}
+                    messagesCount={messages.length}
+                    totalStock={products.reduce((sum, p) => sum + (p.stock ?? 0), 0)}
+                    lowStockCount={products.filter((p) => (p.stock ?? 0) > 0 && (p.stock ?? 0) <= 5).length}
+                    isDarkMode={isDarkMode}
+                  />
+                  <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+                    <SystemConsole
+                      logs={logs}
+                      onClearLogs={() => setLogs(["[LOG] Bàn phân tích khôi phục hoàn chỉnh."])}
+                    />
+                  </div>
+                </div>
+              )}
 
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-                {/* System Log terminal stream */}
-                <SystemConsole
-                  logs={logs}
-                  onClearLogs={() =>
-                    setLogs(["[LOG] Bàn phân tích khôi phục hoàn chỉnh."])
-                  }
+              {activeSubTab === "categories" && (
+                <CategoryManager
+                  categories={allCategories}
+                  onCreateCategory={handleCreateCategory}
+                  onUpdateCategory={handleUpdateCategory}
+                  onToggleCategory={handleToggleCategory}
+                  onHardDeleteCategory={handleHardDeleteCategory}
+                  isDarkMode={isDarkMode}
                 />
-              </div>
-            </div>
-          )}
+              )}
 
-          {activeSubTab === "categories" && (
-            <CategoryManager
-              categories={allCategories}
-              onCreateCategory={handleCreateCategory}
-              onUpdateCategory={handleUpdateCategory}
-              onToggleCategory={handleToggleCategory}
-              onHardDeleteCategory={handleHardDeleteCategory}
-              isDarkMode={isDarkMode}
-            />
-          )}
+              {activeSubTab === "products" && (
+                <ProductManager
+                  products={adminProducts}
+                  onOpenCreateForm={openCreateForm}
+                  onOpenEditForm={openEditForm}
+                  onDelete={handleDelete}
+                  onRestore={handleRestoreProductWrapper}
+                  onImportProducts={async (data) => {
+                    addLog(`Bắt đầu nhập ${data.length} sản phẩm từ file CSV...`);
+                    for (const item of data) { await onAddProduct(item, null); }
+                    addLog(`Đã nhập thành công ${data.length} sản phẩm mới.`);
+                    onRefreshProducts();
+                  }}
+                  isDarkMode={isDarkMode}
+                  onRefreshProducts={onRefreshProducts}
+                />
+              )}
 
-          {activeSubTab === "products" && (
-            <ProductManager
-              products={adminProducts}
-              onOpenCreateForm={openCreateForm}
-              onOpenEditForm={openEditForm}
-              onDelete={handleDelete}
-              onRestore={handleRestoreProductWrapper}
-              onImportProducts={async (data) => {
-                addLog(`Bắt đầu nhập ${data.length} sản phẩm từ file CSV...`);
-                for (const item of data) {
-                  await onAddProduct(item, null);
-                }
-                addLog(`Đã nhập thành công ${data.length} sản phẩm mới.`);
-                onRefreshProducts();
-              }}
-              isDarkMode={isDarkMode}
-              onRefreshProducts={onRefreshProducts}
-            />
-          )}
+              {activeSubTab === "stock" && (
+                <StockManager
+                  products={adminProducts}
+                  onOpenEditForm={openEditForm}
+                  onRefreshProducts={onRefreshProducts}
+                  isDarkMode={isDarkMode}
+                />
+              )}
 
-          {activeSubTab === "stock" && (
-            <StockManager
-              products={adminProducts}
-              onOpenEditForm={openEditForm}
-              onRefreshProducts={onRefreshProducts}
-              isDarkMode={isDarkMode}
-            />
-          )}
+              {activeSubTab === "orders" && (
+                <OrderManager
+                  orders={orders}
+                  isLoadingOrders={isLoadingOrders}
+                  onRefreshOrders={fetchOrders}
+                  onUpdateOrderStatus={handleUpdateOrderStatus}
+                  onUpdatePaymentStatus={handleUpdatePaymentStatus}
+                  isDarkMode={isDarkMode}
+                  products={products}
+                />
+              )}
 
-          {activeSubTab === "orders" && (
-            <OrderManager
-              orders={orders}
-              isLoadingOrders={isLoadingOrders}
-              onRefreshOrders={fetchOrders}
-              onUpdateOrderStatus={handleUpdateOrderStatus}
-              onUpdatePaymentStatus={handleUpdatePaymentStatus}
-              isDarkMode={isDarkMode}
-              products={products}
-            />
-          )}
+              {activeSubTab === "messages" && (
+                <ContactManager
+                  messages={messages}
+                  isLoadingMessages={isLoadingMessages}
+                  onRefreshMessages={fetchMessages}
+                  onDeleteMessage={handleDeleteContactMessage}
+                  onReplyMessage={handleReplyContactMessage}
+                  isDarkMode={isDarkMode}
+                />
+              )}
 
-          {activeSubTab === "messages" && (
-            <ContactManager
-              messages={messages}
-              isLoadingMessages={isLoadingMessages}
-              onRefreshMessages={fetchMessages}
-              onDeleteMessage={handleDeleteContactMessage}
-              onReplyMessage={handleReplyContactMessage}
-              isDarkMode={isDarkMode}
-            />
-          )}
+              {activeSubTab === "promos" && (
+                <PromoManager
+                  promos={promos}
+                  onAddPromo={handleAddPromo}
+                  onTogglePromoStatus={handleTogglePromoStatus}
+                  onDeletePromo={handleDeletePromo}
+                  isDarkMode={isDarkMode}
+                />
+              )}
 
-          {activeSubTab === "promos" && (
-            <PromoManager
-              promos={promos}
-              onAddPromo={handleAddPromo}
-              onTogglePromoStatus={handleTogglePromoStatus}
-              onDeletePromo={handleDeletePromo}
-              isDarkMode={isDarkMode}
-            />
-          )}
+              {activeSubTab === "users" && (
+                <UserManager
+                  systemUsers={adminUsers}
+                  onAddUser={handleAddUser}
+                  onToggleUserRole={handleToggleUserRole}
+                  onToggleUserVip={handleToggleUserVip}
+                  onToggleUserStatus={handleToggleUserStatus}
+                  onDeleteUser={handleDeleteUser}
+                  onRestoreUser={handleRestoreUserWrapper}
+                  isDarkMode={isDarkMode}
+                />
+              )}
 
-          {activeSubTab === "users" && (
-            <UserManager
-              systemUsers={adminUsers}
-              onAddUser={handleAddUser}
-              onToggleUserRole={handleToggleUserRole}
-              onToggleUserVip={handleToggleUserVip}
-              onToggleUserStatus={handleToggleUserStatus}
-              onDeleteUser={handleDeleteUser}
-              onRestoreUser={handleRestoreUserWrapper}
-              isDarkMode={isDarkMode}
-            />
-          )}
-
-          {activeSubTab === "reviews" && (
-            <ReviewManager
-              isDarkMode={isDarkMode}
-              onRefreshStats={fetchReviewsCount}
-            />
-          )}
+              {activeSubTab === "reviews" && (
+                <ReviewManager
+                  isDarkMode={isDarkMode}
+                  onRefreshStats={fetchReviewsCount}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
 
           <ProductFormModal
             isOpen={isFormOpen}
