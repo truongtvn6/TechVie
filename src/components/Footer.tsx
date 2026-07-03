@@ -52,15 +52,22 @@ export default function Footer({ navigationItems, setActiveTab }: FooterProps) {
           <ul className="space-y-3 text-sm text-gray-600 font-sans">
             <li className="flex items-start gap-2">
               <span className="font-semibold text-gray-800">Điện thoại:</span>
-              <a href="tel:19006868" className="hover:text-black hover:underline transition-colors">1900 6868</a>
+              <a href="tel:0909826249" className="hover:text-black hover:underline transition-colors">0909-826-249</a>
             </li>
             <li className="flex items-start gap-2">
               <span className="font-semibold text-gray-800">Email:</span>
-              <a href="mailto:hello@techvie.vn" className="hover:text-black hover:underline transition-colors">hello@techvie.vn</a>
+              <a href="mailto:contact@techvie-store.com" className="hover:text-black hover:underline transition-colors">contact@techvie-store.com</a>
             </li>
             <li className="flex flex-col gap-1 mt-2">
               <span className="font-semibold text-gray-800">Địa chỉ:</span>
-              <span className="leading-relaxed">Tầng 3, Tech Building, Quận 1, TP. HCM</span>
+              <a 
+                href="https://maps.app.goo.gl/BdJPvnyL8PYoqSPP9" 
+                target="_blank" 
+                rel="noreferrer"
+                className="leading-relaxed hover:text-black hover:underline transition-colors block"
+              >
+                02 Võ Oanh, Phường Thạnh Mỹ Tây, TP. HCM
+              </a>
               <span className="leading-relaxed italic">(Xem bản đồ tại trang Liên hệ)</span>
             </li>
           </ul>

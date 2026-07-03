@@ -142,7 +142,7 @@ export default function TabProfile({
                 type="button"
                 onClick={handleVerifyEmail}
                 disabled={isVerifying}
-                className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100/80 border border-amber-250/20 px-2 py-0.5 rounded-md font-tech-label tracking-normal transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100/80 border border-amber-250/20 px-2 py-0.5 rounded-md font-tech-label !tracking-normal transition-colors cursor-pointer mb-1.5"
               >
                 {isVerifying ? (
                   <Loader2 size={12} className="animate-spin text-amber-600" />
@@ -189,6 +189,13 @@ export default function TabProfile({
               setUserProfile({ ...userProfile, address: e.target.value })
             }
           />
+        </div>
+
+        {/* Disclaimer */}
+        <div className="md:col-span-2">
+          <p className="text-[12px] text-gray-500 italic">
+            * Khách hàng đảm bảo các thông tin cung cấp là đúng sự thật. TechVie không chịu trách nhiệm cho các sai sót phát sinh từ thông tin do khách hàng nhập.
+          </p>
         </div>
 
         {/* Submit Action */}

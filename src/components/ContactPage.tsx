@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 import { teamMembers } from '../data_mockdata';
 import { sendContactInquiry } from '../services/api';
 // @ts-ignore
-import heroImage from '../assets/images/markus-winkler-q3QPw37J6Xs-unsplash.jpg';
+import heroImage from '../assets/images/contact.png';
 
 export default function ContactPage() {
   const [formName, setFormName] = useState('');
@@ -17,26 +17,42 @@ export default function ContactPage() {
   
   // Accordion active index
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-
+  
   const faqs = [
     {
-      q: "TECHVIE có cung cấp giải pháp gia công thiết kế thiết bị tùy chỉnh cho doanh nghiệp không?",
-      a: "Có, chúng tôi chuyên thiết kế tinh chỉnh phần cứng tùy chọn, in khắc logo thương hiệu riêng và cấu hình bo mạch cá nhân hóa cho các đối tác doanh nghiệp quy mô toàn cầu. Quý khách hàng doanh nghiệp có thể liên hệ trực tiếp qua form đối tác để nhận báo giá chi tiết."
+      q: "Tôi có thể xem và mua các sản phẩm TechVie ở đâu?",
+      a: "TechVie hiện phân phối sản phẩm chủ yếu trên nền tảng trực tuyến nhằm tối ưu chi phí cho khách hàng. Bạn có thể dễ dàng xem hình ảnh thực tế, thông số chi tiết và đặt hàng ngay trên website này. Mọi sản phẩm đều được đóng gói chuẩn Gift Box chỉn chu trước khi giao đến tay bạn."
     },
     {
-      q: "Tôi có thể trải nghiệm trực tiếp các sản phẩm TechVie ở đâu?",
-      a: "Bạn có thể ghé thăm trực tiếp Phòng trưng bày và Trạm Trải Nghiệm Premium của chúng tôi tại trung tâm Hà Nội và TP. Hồ Chí Minh hoặc liên hệ tổng đài để đăng ký cuộc gọi tư vấn cấu hình trực quan cùng đội ngũ kỹ thuật viên."
+      q: "Các phụ kiện của TechVie có kén thiết bị sử dụng không?",
+      a: "Chắc chắn là không! Các sản phẩm cơ học như giá đỡ tản nhiệt được thiết kế công thái học, phù hợp với hầu hết laptop/tablet từ 11 - 17 inch. Các thiết bị điện tử như cáp sạc nhanh Type-C/Lightning và củ sạc PD đều tương thích hoàn hảo và an toàn cho đa dạng hệ sinh thái từ iOS, Android đến Windows."
     },
     {
-      q: "Chính sách bảo hành dòng sản phẩm TechVie như thế nào?",
-      a: "Tất cả các sản phẩm laptop, smartphone và phụ kiện hi-end của TechVie đều đi kèm bảo hành chính hãng một đổi một do lỗi nhà sản xuất trong vòng 12 tháng, bảo trì định kỳ và hỗ trợ phục hồi kỹ thuật trọn đời."
+      q: "Tôi muốn đặt ốp lưng in tên hoặc hình riêng thì làm thế nào?",
+      a: "Rất đơn giản! Tại trang chi tiết sản phẩm ốp lưng custom, bạn chỉ cần tải hình ảnh lên hoặc nhập nội dung muốn in. Đội ngũ thiết kế của TechVie sẽ lên bản xem trước (mockup) và gửi bạn duyệt qua Zalo/Email để chốt thiết kế trước khi tiến hành in ấn."
     },
     {
-      q: "Các dòng phụ kiện của TechVie có tương thích tốt với nền tảng khác không?",
-      a: "Các thiết bị ngoại vi của TechVie như tai nghe, bàn phím cơ và dock sạc thông minh được thiết kế theo chuẩn kết nối USB-C, Bluetooth 5.3 hiện đại nhất, bảo đảm tương thích hoàn toàn bứt phá trên iOS, Android, macOS và Windows."
-    }
+      q: "Tôi muốn mua sản phẩm làm quà tặng cho bạn bè thì sao?",
+      a: "Tuyệt vời! Tất cả các đơn hàng tại TechVie (đặc biệt là các gói Combo) đều được đóng gói theo tiêu chuẩn Gift Box cao cấp. Bạn chỉ cần ghi chú thông điệp ở bước thanh toán, chúng tôi sẽ chuẩn bị thiệp viết tay và gửi kèm vào hộp quà giúp bạn."
+    },
+    {
+      q: "TechVie hỗ trợ những hình thức thanh toán nào?",
+      a: "Nhằm mang lại sự tiện lợi tối đa, TechVie hỗ trợ thanh toán chuyển khoản nhanh qua mã VietQR tự động, thanh toán thẻ qua cổng an toàn, và hình thức nhận hàng thanh toán tiền mặt (COD) trên toàn quốc."
+    },
+    {
+      q: "Thời gian giao hàng mất bao lâu, đặc biệt là với ốp lưng custom?",
+      a: "Đối với các phụ kiện có sẵn, thời gian giao hàng từ 2-4 ngày làm việc. Riêng với dòng ốp lưng in custom độc bản, TechVie cần thêm 1-2 ngày để chế tác và kiểm tra chất lượng (QC) trước khi gửi đi, nhằm đảm bảo sản phẩm đến tay bạn hoàn hảo nhất."
+    },
+    {
+      q: "Chính sách bảo hành sản phẩm của TechVie như thế nào?",
+      a: "TechVie tự tin với chất lượng sản phẩm và áp dụng chính sách bảo hành 1-đổi-1 trong vòng 30 ngày đối với mọi lỗi từ nhà sản xuất (như lỗi in ấn ốp lưng, đèn LED không sáng, hoặc cáp sạc không nhận dòng). Các thiết bị điện tử sẽ đi kèm thời gian bảo hành cụ thể từ 6 đến 12 tháng tùy danh mục."
+    },
+    {
+      q: "TECHVIE có nhận thiết kế phụ kiện tùy chỉnh cho doanh nghiệp không?",
+      a: "Có. Chúng tôi chuyên nhận thiết kế, in ấn ốp lưng custom mang đậm dấu ấn thương hiệu và cung cấp các 'Combo Setup' làm quà tặng doanh nghiệp (Corporate Gifts) với mức chiết khấu hấp dẫn. Quý đối tác có thể liên hệ trực tiếp qua form Liên Hệ Hợp Tác để nhận báo giá chi tiết."
+    },
   ];
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formName.trim() === '' || formEmail.trim() === '' || isSubmitting) return;
@@ -116,7 +132,7 @@ export default function ContactPage() {
               </div>
               {/* context */}
               <p className="text-lg font-sans leading-relaxed max-w-xl text-gray-800 mt-auto">
-                Kết nối với chúng tôi để thiết lập cầu nối đổi mới sáng tạo, nhận tư vấn về thiết bị công nghệ hi-end hoặc đăng ký phân phối sản phẩm chính hãng.
+                Sẵn sàng kiến tạo giá trị chung. Kết nối với chúng tôi để thiết lập cầu nối đổi mới sáng tạo, nhận chính sách bán sỉ phụ kiện công nghệ, hoặc tư vấn gói combo setup không gian làm việc toàn diện cho doanh nghiệp của bạn.
               </p>
             </div>
             
@@ -155,18 +171,18 @@ export default function ContactPage() {
                 <div className="space-y-10">
                   <div className="group">
                     <h4 className="font-sans tracking-tight text-2xl md:text-3xl font-black mb-2 text-gray-950">
-                      TechVie Lab Switzerland
+                      TechVie Office
                     </h4>
                     <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold leading-relaxed">
-                      Lausanne Innovative Hub, 1015 Lausanne, Thụy Sĩ
+                      02 Võ Oanh, Phường Thạnh Mỹ Tây, TP. Hồ Chí Minh, Việt Nam
                     </p>
                     <p className="mt-3 font-bold text-sm text-gray-900 flex items-center gap-2">
                       <Phone size={14} className="text-secondary" />
-                      +41 (21) 500-TECH
+                      0909-826-249
                     </p>
                     <p className="mt-3 font-bold text-sm text-gray-900 flex items-center gap-2">
                       <Mail size={14} className="text-secondary" />
-                      contact@techvie-lab.com
+                      contact@techvie-store.com
                     </p>
                   </div>
                   
@@ -278,6 +294,10 @@ export default function ContactPage() {
                       />
                     </div>
 
+                    <p className="text-[12px] text-gray-500 italic mt-2">
+                      * Khách hàng đảm bảo các thông tin cung cấp là đúng sự thật. TechVie không chịu trách nhiệm cho các sai sót phát sinh từ thông tin do khách hàng nhập.
+                    </p>
+
                     <button 
                       type="submit"
                       disabled={isSubmitting}
@@ -333,15 +353,15 @@ export default function ContactPage() {
                 <div className="space-y-5 text-xs md:text-sm text-gray-800 font-sans font-bold">
                   <p className="flex gap-3 uppercase tracking-wider items-start">
                     <span className="w-6 border-t border-black mt-2.5 shrink-0"></span>
-                    Số 86 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, Việt Nam
+                    Số 02 Võ Oanh, Phường Thạnh Mỹ Tây, TP. Hồ Chí Minh, Việt Nam
                   </p>
                   <p className="flex gap-3 uppercase tracking-wider items-center">
                     <span className="w-6 border-t border-black mt-2 shrink-0"></span>
-                    0912 345 678
+                    0909-826-249
                   </p>
                   <p className="flex gap-3 uppercase tracking-wider items-center">
                     <span className="w-6 border-t border-black mt-2 shrink-0"></span>
-                    showroom@techvie.com
+                    contact@techvie-store.com
                   </p>
                 </div>
               </div>
@@ -353,7 +373,7 @@ export default function ContactPage() {
                 allowFullScreen={true}
                 height="100%" 
                 loading="lazy" 
-                src="https://maps.google.com/maps?q=H%E1%BB%93+Ch%C3%AD+Minh,+Vi%E1%BB%87t+Nam&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed" 
+                src="https://maps.google.com/maps?q=Ho+Chi+Minh+City+University+of+Transport&t=&z=16&ie=UTF8&iwloc=&output=embed" 
                 style={{ border: 0 }} 
                 width="100%"
               />
@@ -370,20 +390,21 @@ export default function ContactPage() {
                 </h2>
                 <div className="space-y-8">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest mb-3 text-gray-500 border-b border-black pb-1">
+                    {/* <p className="text-[10px] font-black uppercase tracking-widest mb-3 text-gray-500 border-b border-black pb-1">
                       Flagship Showroom
-                    </p>
-                    <p className="text-xs font-bold italic text-gray-900">T2 - T6: 08:00 - 21:30</p>
-                    <p className="text-xs font-bold italic text-gray-900 mt-1">T7 - CN: 09:00 - 22:00</p>
+                    </p> */}
+                    <p className="text-md font-bold italic text-gray-900">T2 - T6: 08:00 - 21:30</p>
+                    <p className="text-md font-bold italic text-gray-900 mt-1">T7 - CN: 09:00 - 22:00</p>
+                    <p className="text-md font-bold italic text-gray-900 mt-1">Ngày Lễ: Nghỉ</p>
                   </div>
-                  <div>
+                  {/* <div>
                     <p className="text-[10px] font-black uppercase tracking-widest mb-3 text-gray-500 border-b border-black pb-1">
-                      Trung Tâm Bảo Hành & Sửa Chữa
+                      Trung Tâm Bảo Hành
                     </p>
                     <p className="text-xs font-bold italic text-gray-900">T2 - T6: 09:00 - 18:00</p>
                     <p className="text-xs font-bold italic text-gray-900 mt-1">Thứ Bảy: 09:00 - 12:00</p>
                     <p className="text-xs font-bold italic text-gray-900 mt-1">Chủ Nhật & Ngày Lễ: Nghỉ</p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -392,7 +413,7 @@ export default function ContactPage() {
         </section>
 
         {/* TEAM SECTION: Editorial Profile Grid */}
-        <section className="p-8 lg:p-16 border-b-8 border-black">
+        {/* <section className="p-8 lg:p-16 border-b-8 border-black">
           <div className="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
             <div className="max-w-2xl">
               <span className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 block text-gray-500">
@@ -437,7 +458,7 @@ export default function ContactPage() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* FAQs Accordion Grid */}
         <section className="px-6 py-16 lg:py-24 bg-gray-50">

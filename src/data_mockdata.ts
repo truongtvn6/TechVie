@@ -1,5 +1,12 @@
 import { Product, NewsArticle, TimelineEvent, TeamMember } from './types';
 
+// @ts-ignore
+import blog1 from './assets/blog/blog_1.png';
+// @ts-ignore
+import blog2 from './assets/blog/blog_2.png';
+// @ts-ignore
+import blog3 from './assets/blog/blog_3.png';
+
 const laptopImg = 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=800&q=80';
 
 export const products: Product[] = [
@@ -81,7 +88,7 @@ export const newsArticles: NewsArticle[] = [
     title: "Tuyệt Chiêu Giấu Dây Cáp Gọn Gàng Cho Góc Làm Việc Minimalist",
     category: "Setup Tips",
     date: "20 Tháng 6, 2026",
-    image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&q=80&w=800",
+    image: blog1,
     summary: "Dây điện chằng chịt luôn là kẻ thù của một góc học tập aesthetic. Khám phá ngay 3 bước đơn giản để giấu hoàn toàn dây cáp, trả lại không gian tối giản cho bạn.",
     content: "Một góc làm việc lộn xộn sẽ làm giảm đáng kể cảm hứng học tập và sự tập trung. Việc đầu tiên để có một không gian chuẩn aesthetic chính là quy hoạch lại hệ thống dây điện. Bạn có thể sử dụng các khay đi dây kẹp dưới mặt bàn kết hợp cùng dây rút velcro để cố định các cáp sạc, dây nguồn. Đừng quên trang bị thêm các loại cáp sạc nhanh bọc dù từ TechVie để vừa tăng độ bền, vừa chống rối hiệu quả."
   },
@@ -90,7 +97,7 @@ export const newsArticles: NewsArticle[] = [
     title: "Hướng Dẫn Chọn Ốp Lưng Custom: Chất Liệu Nào Chống Ố Vàng Tốt Nhất?",
     category: "Product Guide",
     date: "15 Tháng 6, 2026",
-    image: "https://images.unsplash.com/photo-1601593346740-925612772716?auto=format&fit=crop&q=80&w=800",
+    image: blog2,
     summary: "Sở hữu một chiếc ốp lưng in hình cá nhân là cách tuyệt vời để thể hiện chất riêng. Nhưng làm sao để chọn được chất liệu ốp vừa bảo vệ máy, vừa bền màu?",
     content: "Ốp lưng trong suốt thường gặp phải tình trạng ố vàng sau một thời gian sử dụng do tác động của tia UV và mồ hôi tay. Tại TechVie, các sản phẩm ốp lưng custom được ưu tiên sử dụng mặt lưng PC (Polycarbonate) cứng kết hợp viền TPU dẻo cao cấp. Sự kết hợp này không chỉ giúp giảm chấn động khi va đập mà còn giữ được độ trong suốt bền lâu, làm nổi bật sắc nét từng chi tiết hình ảnh mà bạn đã thiết kế."
   },
@@ -98,9 +105,9 @@ export const newsArticles: NewsArticle[] = [
     id: "techvie-blog-03",
     title: "5 Phụ Kiện Không Thể Thiếu Cho Góc Học Tập Công Thái Học",
     category: "Lifestyle",
-    date: "05 Tháng 6, 2026",
-    image: "https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&q=80&w=800",
-    summary: "Đau mỏi vai gáy do ngồi sai tư thế? Tham khảo ngay danh sách 5 phụ kiện công nghệ thiết yếu giúp bạn bảo vệ sức khỏe và nâng cao năng suất mỗi ngày.",
+    date: "10 Tháng 6, 2026",
+    image: blog3,
+    summary: "Đầu tư vào không gian học tập khoa học là khoản đầu tư sinh lời nhất cho sức khỏe và hiệu suất. Điểm mặt 5 'trợ thủ' đắc lực giúp bạn nói không với đau mỏi vai gáy.",
     content: "Xu hướng học tập và làm việc cường độ cao đòi hỏi chúng ta phải quan tâm nhiều hơn đến sức khỏe thể chất. Hãy bắt đầu từ việc trang bị một chiếc giá đỡ laptop tản nhiệt để nâng tầm nhìn ngang mắt, hạn chế việc phải cúi gập cổ. Tiếp đó, một chiếc đèn LED kẹp màn hình hoặc đèn decor RGB sẽ giúp giảm tình trạng mỏi mắt khi làm việc ban đêm, đồng thời tăng gấp đôi cảm hứng sáng tạo cho góc làm việc của bạn."
   }
 ];

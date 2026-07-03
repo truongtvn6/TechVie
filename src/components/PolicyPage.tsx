@@ -31,6 +31,7 @@ const policies: PolicySection[] = [
       "Mọi đơn hàng đều được đóng gói chỉn chu dưới dạng hộp quà tặng (Gift box) kèm mút chống sốc bảo vệ an toàn tuyệt đối.",
       "Thời gian giao hàng dự kiến từ 1-3 ngày đối với khu vực TP.HCM và 3-5 ngày cho các tỉnh thành khác.",
       "Đối với các đơn hàng ốp lưng in hình custom, thời gian xưởng hoàn thiện và bàn giao cho bưu cục là từ 1-2 ngày.",
+      "Quy định xác nhận: Chúng tôi sẽ gọi điện xác nhận trước khi đóng hàng. Nếu sau 2 ngày quý khách không xác nhận đặt hàng qua điện thoại (tối đa 3 lần gọi), TechVie có quyền hủy đơn hàng của quý khách.",
       "Khách hàng có thể theo dõi mã vận đơn (Tracking) trực tiếp trên hệ thống để nắm bắt lộ trình."
     ]
   },

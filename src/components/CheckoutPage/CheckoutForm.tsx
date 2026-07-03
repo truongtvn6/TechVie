@@ -506,6 +506,9 @@ export default function CheckoutForm({
                 {apiError}
               </motion.div>
             )}
+            <p className="text-[12px] text-gray-500 italic pb-2">
+              * Khách hàng đảm bảo các thông tin cung cấp là đúng sự thật. TechVie không chịu trách nhiệm cho các sai sót phát sinh từ thông tin do khách hàng nhập.
+            </p>
             <button 
               type="submit"
               className="w-full bg-black hover:bg-gray-900 text-white py-5 rounded-xl text-xs uppercase tracking-widest font-black font-sans transition-all flex items-center justify-center gap-3 shadow-lg active:scale-[0.99]"

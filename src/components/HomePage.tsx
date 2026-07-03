@@ -15,6 +15,19 @@ import { subscribeNewsletter, API_BASE_URL } from "../services/api";
 import ProductCard from "./ProductPage/ProductCard";
 import ProductDetail from "./ProductPage/ProductDetail";
 import SloganQuote from "./SloganQuote";
+// @ts-ignore
+import slide1 from '../assets/slideshow/slide1.png';
+// @ts-ignore
+import slide2 from '../assets/slideshow/slide2.png';
+// @ts-ignore
+import slide3 from '../assets/slideshow/slide3.png';
+// @ts-ignore
+import slide4 from '../assets/slideshow/slide4.png';
+// @ts-ignore
+import slide5 from '../assets/slideshow/slide5.png';
+// @ts-ignore
+import img_card from '../assets/images/home_page_card.png';
+
 
 interface HomePageProps {
   products?: Product[];
@@ -127,11 +140,15 @@ export default function HomePage({
   };
 
   const [images, setImages] = useState<string[]>([
-    "https://images.unsplash.com/photo-1771218829829-3f7b00974fa5?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1593640404951-24f6ef605031?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    slide1,
+    slide2,
+    slide3,
+    slide4,
+    slide5
   ]);
 
   // Fetch slider images dynamically from backend express API (port 5000)
+  /*
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
@@ -169,6 +186,7 @@ export default function HomePage({
 
     return () => clearInterval(intervalId);
   }, [isLoadedFromApi]);
+  */
 
   // Rotating slider effect
   useEffect(() => {
@@ -217,7 +235,7 @@ export default function HomePage({
             />
           </AnimatePresence>
           {/* Lớp phủ màu đen mờ giúp tăng độ tương phản cho slideshow */}
-          <div className="absolute inset-0 bg-black/35" />
+          <div className="absolute inset-0 bg-black/5" />
         </div>
 
         {/* Ambient Overlay & Radial highlight, matching Vietnamese TechVie presentation card */}
@@ -302,10 +320,10 @@ export default function HomePage({
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+              className={`h-2.5 rounded-full transition-all duration-300 shadow-md border border-black/10 ${
                 currentSlide === idx
-                  ? "bg-black w-6 scale-110"
-                  : "bg-black/25 hover:bg-black/50"
+                  ? "bg-white w-8 scale-110"
+                  : "bg-white/50 hover:bg-white/80 w-2.5"
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
@@ -406,7 +424,7 @@ export default function HomePage({
           </div>
           <div className="aspect-video lg:aspect-square overflow-hidden rounded-[2rem] shadow relative hover:-translate-y-2 transition-all duration-300 shadow-2xl">
             <img
-              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80"
+              src={img_card}
               alt="TechVie Laboratory equipment"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover transition-all"
