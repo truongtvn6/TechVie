@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Cpu, Star, Send, ShieldCheck, Trash2 } from 'lucide-react';
+import { Cpu, Star, Send, ShieldCheck, Trash2, User, Pencil, MessageSquare } from 'lucide-react';
 import { Product, TabType, Review, ReviewSummary } from '../../types';
-import { getReviewsByProduct, createReview, deleteReview, getCurrentUser, checkCanReview } from '../../services/api';
+import { getReviewsByProduct, createReview, deleteReview, getCurrentUser, checkCanReview, updateReview } from '../../services/api';
 
 interface ProductDetailProps {
   product: Product | null;
@@ -32,6 +32,13 @@ export default function ProductDetail({
   const [newComment, setNewComment] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // States for editing a review
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [editRating, setEditRating] = useState<number>(5);
+  const [editTitle, setEditTitle] = useState<string>('');
+  const [editComment, setEditComment] = useState<string>('');
+  const [isEditingSubmitting, setIsEditingSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     if (!product) return;
@@ -127,6 +134,23 @@ export default function ProductDetail({
       setErrorMessage(res.message || 'Đăng đánh giá thất bại. Vui lòng thử lại.');
     }
     setIsSubmitting(false);
+  };
+
+  const handleUpdateReview = async (reviewId: string) => {
+    if (!editComment.trim()) return;
+    setIsEditingSubmitting(true);
+    const res = await updateReview(reviewId, editRating, editTitle.trim(), editComment.trim());
+    if (res.success) {
+      setEditingReviewId(null);
+      const reviewRes = await getReviewsByProduct(product!.id);
+      if (reviewRes.success) {
+        setReviews(reviewRes.reviews);
+        setSummary(reviewRes.summary);
+      }
+    } else {
+      alert(res.message || "Chỉnh sửa đánh giá thất bại. Vui lòng thử lại.");
+    }
+    setIsEditingSubmitting(false);
   };
 
   if (!product) return null;
@@ -277,18 +301,23 @@ export default function ProductDetail({
                   const userObj = typeof review.user_id === 'object' ? review.user_id : null;
                   const isOwner = currentUser && (currentUser.id === (userObj?._id || review.user_id));
                   const isAdmin = currentUser && currentUser.role === 'admin';
-                  const avatarUrl = userObj?.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${review.username}`;
                   const formattedDate = new Date(review.created_at).toLocaleDateString('vi-VN');
 
                   return (
-                    <div key={review.id || review._id} className="bg-gray-50 rounded-2xl p-5 border border-gray-100 hover:-translate-y-1 transition-all duration-300 ease-in-out relative group">
+                    <div key={review.id || review._id} className="bg-gray-55/80 rounded-2xl p-5 border border-gray-150 hover:-translate-y-1 transition-all duration-300 ease-in-out relative group">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-3">
-                          <img 
-                            src={avatarUrl} 
-                            alt={review.username} 
-                            className="w-10 h-10 rounded-full border border-gray-200 object-cover bg-white"
-                          />
+                          {userObj?.avatar ? (
+                            <img 
+                              src={userObj.avatar} 
+                              alt={review.username} 
+                              className="w-10 h-10 rounded-full border border-gray-200 object-cover bg-white"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-400 flex-shrink-0">
+                              <User size={18} />
+                            </div>
+                          )}
                           <div>
                             <span className="font-bold text-sm text-gray-900 flex items-center gap-1.5 flex-wrap">
                               {review.username}
@@ -297,33 +326,130 @@ export default function ProductDetail({
                                   <ShieldCheck size={10} /> ĐÃ MUA
                                 </span>
                               )}
+                              {review.isHidden && (
+                                <span className="inline-flex items-center gap-0.5 bg-amber-50 text-amber-700 text-[9px] font-black px-1.5 py-0.5 rounded-md border border-amber-200">
+                                  Đang Ẩn (Chỉ bạn thấy)
+                                </span>
+                              )}
                             </span>
                             <span className="text-[10px] text-gray-400 font-mono block">{formattedDate}</span>
                           </div>
                         </div>
 
-                        {/* Delete button */}
-                        {(isOwner || isAdmin) && (
-                          <button
-                            onClick={() => handleDeleteReview(review.id || review._id)}
-                            className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1 cursor-pointer"
-                            title="Xóa đánh giá này"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          {/* Edit button (Owner only) */}
+                          {isOwner && editingReviewId !== (review.id || review._id) && (
+                            <button
+                              onClick={() => {
+                                setEditingReviewId(review.id || review._id);
+                                setEditRating(review.rating);
+                                setEditTitle(review.title || '');
+                                setEditComment(review.comment);
+                              }}
+                              className="text-gray-400 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity p-1 cursor-pointer"
+                              title="Chỉnh sửa đánh giá"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                          )}
+
+                          {/* Delete button (Admin only) */}
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDeleteReview(review.id || review._id)}
+                              className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1 cursor-pointer"
+                              title="Xóa đánh giá này"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="flex gap-1 mb-2.5">
-                        {[1, 2, 3, 4, 5].map(star => (
-                          <Star key={star} size={11} className={star <= review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} />
-                        ))}
-                      </div>
+                      {editingReviewId === (review.id || review._id) ? (
+                        <div className="mt-3 space-y-3 bg-white p-4 rounded-xl border border-indigo-100 text-left">
+                          <div className="flex items-center gap-1.5 mb-2">
+                            <span className="text-[10px] uppercase font-bold text-gray-400">Số sao:</span>
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map(star => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setEditRating(star)}
+                                  className="text-yellow-400 hover:scale-110 transition-transform cursor-pointer"
+                                >
+                                  <Star size={16} className={star <= editRating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
 
-                      {review.title && (
-                        <h4 className="text-xs font-black text-gray-900 mb-1">{review.title}</h4>
+                          <input
+                            type="text"
+                            placeholder="Tiêu đề (Tùy chọn)"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:bg-white focus:border-black outline-none font-sans"
+                          />
+
+                          <textarea
+                            rows={3}
+                            placeholder="Nội dung bình luận..."
+                            value={editComment}
+                            onChange={(e) => setEditComment(e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:bg-white focus:border-black outline-none font-sans"
+                          />
+
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              type="button"
+                              onClick={() => setEditingReviewId(null)}
+                              className="px-3 py-1.5 rounded-lg border border-gray-200 text-[10px] font-bold text-gray-500 hover:bg-gray-50 cursor-pointer"
+                            >
+                              Hủy
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isEditingSubmitting}
+                              onClick={() => handleUpdateReview(review.id || review._id)}
+                              className="px-3 py-1.5 rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-50 text-[10px] font-bold cursor-pointer"
+                            >
+                              {isEditingSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex gap-1 mb-2.5">
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <Star key={star} size={11} className={star <= review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} />
+                            ))}
+                          </div>
+
+                          {review.title && (
+                            <h4 className="text-xs font-black text-gray-900 mb-1">{review.title}</h4>
+                          )}
+                          <p className="text-sm text-gray-700 font-sans leading-relaxed">{review.comment}</p>
+                        </>
                       )}
-                      <p className="text-sm text-gray-700 font-sans leading-relaxed">{review.comment}</p>
+
+                      {/* Admin reply container */}
+                      {review.reply && review.reply.comment && (
+                        <div className="mt-4 p-4 rounded-xl border border-indigo-100/50 bg-indigo-50/20 text-xs font-sans text-gray-700 flex gap-3 items-start ml-6">
+                          <MessageSquare size={16} className="text-indigo-600 mt-0.5 shrink-0" />
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-indigo-700">{review.reply.admin_username || "Admin TechVie"}</span>
+                              {review.reply.replied_at && (
+                                <span className="text-[10px] text-gray-400 font-mono">
+                                  {new Date(review.reply.replied_at).toLocaleDateString('vi-VN')}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-gray-650 leading-relaxed font-sans">{review.reply.comment}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })

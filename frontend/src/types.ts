@@ -35,6 +35,12 @@ export interface Review {
   comment: string;
   verified_purchase: boolean;
   created_at: string;
+  isHidden?: boolean;
+  reply?: {
+    comment: string;
+    replied_at: string;
+    admin_username: string;
+  };
 }
 
 export interface ReviewSummary {

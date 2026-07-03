@@ -38,6 +38,60 @@ const normalizeProduct = (p: any): Product => {
   };
 };
 
+
+// Hiệu ứng chờ đợi database
+const ProductSkeleton = () => (
+  <div className="bg-white border border-gray-200 rounded-[2rem] p-6 flex flex-col justify-between h-full relative overflow-hidden animate-pulse text-left">
+    <div>
+      {/* Header section with category badge and premium tag */}
+      <div className="flex justify-between items-start mb-4 select-none">
+        <div className="flex flex-wrap gap-1.5">
+          <div className="h-5 w-14 bg-gray-200 rounded-full" />
+          <div className="h-5 w-16 bg-gray-200 rounded-full" />
+        </div>
+        <div className="w-8 h-8 rounded-full bg-gray-150" />
+      </div>
+
+      {/* Product image container aspect-[4/5] */}
+      <div className="w-full aspect-[4/5] rounded-2xl bg-gray-100/70" />
+
+      {/* Text details */}
+      <div className="h-6 w-3/4 bg-gray-300 rounded-lg mt-6" />
+      
+      {/* Rating */}
+      <div className="h-3.5 w-1/3 bg-gray-200 rounded-md mt-2.5" />
+      
+      {/* Description */}
+      <div className="space-y-2 mt-3">
+        <div className="h-3 w-full bg-gray-200 rounded" />
+        <div className="h-3 w-5/6 bg-gray-200 rounded" />
+      </div>
+
+      {/* Colors display */}
+      <div className="mt-4 flex items-center gap-1.5">
+        <div className="h-3 w-8 bg-gray-150 rounded" />
+        <div className="h-4.5 w-10 bg-gray-200 rounded-full" />
+        <div className="h-4.5 w-12 bg-gray-200 rounded-full" />
+      </div>
+    </div>
+
+    {/* Basic specs indicator */}
+    <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+      <div className="h-3.5 w-20 bg-gray-150 rounded" />
+      <div className="h-3.5 w-24 bg-gray-150 rounded" />
+    </div>
+
+    {/* Pricing & Add to Cart button */}
+    <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between min-h-[48px] relative">
+      <div className="space-y-1 pr-12">
+        <div className="h-2.5 w-14 bg-gray-150 rounded" />
+        <div className="h-5 w-24 bg-gray-300 rounded-lg" />
+      </div>
+      <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-300 absolute right-0" />
+    </div>
+  </div>
+);
+
 interface ProductPageProps {
   products?: Product[];
   onAddToCart: (product: Product) => void;
@@ -45,6 +99,7 @@ interface ProductPageProps {
 }
 
 export default function ProductPage({ products, onAddToCart, onNavigate }: ProductPageProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const [dbProducts, setDbProducts] = useState<Product[]>([]);
   const allProducts = dbProducts.length > 0 ? dbProducts : (products || []).map(normalizeProduct);
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
@@ -86,6 +141,7 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
 
   useEffect(() => {
     let isMounted = true;
+    setIsLoading(true);
     
     getCategories().then(data => {
       if (isMounted && data.success && data.categories) {
@@ -96,6 +152,13 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
     getProducts().then(res => {
       if (isMounted && res.success && res.products && res.products.length > 0) {
         setDbProducts(res.products.map(normalizeProduct));
+      }
+      if (isMounted) {
+        setIsLoading(false);
+      }
+    }).catch(() => {
+      if (isMounted) {
+        setIsLoading(false);
       }
     });
 
@@ -444,20 +507,32 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
       </div>
 
       {/* Hardware Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-        <AnimatePresence mode="popLayout">
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onSelect={setSelectedProduct}
-              onAddToCart={handleAddToCartWithSuccess}
-              isJustAdded={justAddedId === product.id}
-              isMagnetized={magneticRefId === product.id}
-            />
+      {isLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductSkeleton key={i} />
           ))}
-        </AnimatePresence>
-      </div>
+        </div>
+      ) : filteredProducts.length === 0 ? (
+        <div className="text-center py-20 w-full col-span-full bg-white/40 backdrop-blur-md rounded-3xl border border-white/60">
+          <p className="text-gray-500 font-sans">Không tìm thấy sản phẩm nào phù hợp.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          <AnimatePresence mode="popLayout">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onSelect={setSelectedProduct}
+                onAddToCart={handleAddToCartWithSuccess}
+                isJustAdded={justAddedId === product.id}
+                isMagnetized={magneticRefId === product.id}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* Product Detail Specs Modal */}
       <ProductDetail

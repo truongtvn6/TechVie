@@ -3,16 +3,47 @@ const Product = require("../models/Product");
 const Order = require("../models/Order");
 const mongoose = require("mongoose");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 // 1. Lấy danh sách đánh giá của sản phẩm (Public)
 exports.getReviewsByProduct = async (req, res) => {
   try {
     const { productId } = req.params;
 
-    // Tìm tất cả các reviews chưa bị xóa của sản phẩm
-    const reviews = await Review.find({ product_id: productId, isDeleted: { $ne: true } })
-      .populate("user_id", "username avatar email")
+    // Giải mã token (nếu có) để lấy userId hiện tại cho việc ẩn/hiện bình luận
+    let currentUserId = null;
+    let currentUserRole = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "techvie_jwt_secret_key_2026");
+        currentUserId = decoded.id;
+        currentUserRole = decoded.role;
+      } catch (err) {
+        // Bỏ qua token lỗi cho request công cộng
+      }
+    }
+
+    // Tìm tất cả các reviews chưa bị xóa hoàn toàn của sản phẩm
+    const allReviews = await Review.find({ product_id: productId, isDeleted: { $ne: true } })
+      .populate("user_id", "username avatar email role")
       .sort({ created_at: -1 });
+
+    // Lọc các review theo điều kiện ẩn (isHidden)
+    // Nếu review có isHidden = true, chỉ hiển thị cho chính người viết hoặc Admin
+    const reviews = allReviews.filter(review => {
+      if (!review.isHidden) return true;
+
+      const reviewAuthorId = typeof review.user_id === 'object' && review.user_id 
+        ? review.user_id._id.toString() 
+        : review.user_id.toString();
+
+      const isAuthor = currentUserId && (currentUserId === reviewAuthorId);
+      const isAdmin = currentUserRole === 'admin';
+
+      return isAuthor || isAdmin;
+    });
 
     // Tính toán phân bổ số sao (Breakdown)
     const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -140,18 +171,36 @@ exports.createReview = async (req, res) => {
       });
     }
 
-    // Kiểm tra xem người dùng đã đánh giá sản phẩm này chưa (Tránh đánh giá nhiều lần)
+    // Kiểm tra xem người dùng đã đánh giá sản phẩm này chưa (Tránh đánh giá nhiều lần / tận dụng lại review đã soft delete)
     const existingReview = await Review.findOne({
       product_id: productId,
       user_id: req.user.id,
-      isDeleted: { $ne: true },
     });
 
     if (existingReview) {
-      return res.status(400).json({
-        success: false,
-        message: "Bạn đã đánh giá sản phẩm này rồi! Mỗi sản phẩm chỉ được đánh giá một lần.",
-      });
+      if (!existingReview.isDeleted) {
+        return res.status(400).json({
+          success: false,
+          message: "Bạn đã đánh giá sản phẩm này rồi! Mỗi sản phẩm chỉ được đánh giá một lần.",
+        });
+      } else {
+        // Hồi sinh đánh giá đã bị soft delete và cập nhật nội dung mới để tránh lỗi Unique Index MongoDB
+        existingReview.isDeleted = false;
+        existingReview.rating = numericRating;
+        existingReview.title = title || "";
+        existingReview.comment = comment;
+        existingReview.verified_purchase = true;
+        existingReview.created_at = new Date();
+        existingReview.reply = undefined; // Xóa phản hồi cũ của admin (nếu có)
+
+        await existingReview.save();
+
+        return res.status(201).json({
+          success: true,
+          message: "Đăng đánh giá thành công!",
+          review: existingReview,
+        });
+      }
     }
 
     // Tạo review mới
@@ -358,6 +407,148 @@ exports.restoreReview = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Lỗi khi khôi phục đánh giá!",
+      error: error.message,
+    });
+  }
+};
+
+// 5. Cập nhật đánh giá (User edit - Auth required)
+exports.updateReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const { rating, title, comment } = req.body;
+
+    if (!rating || !comment) {
+      return res.status(400).json({
+        success: false,
+        message: "Vui lòng cung cấp số sao (rating) và nội dung bình luận (comment)!",
+      });
+    }
+
+    const numericRating = Number(rating);
+    if (isNaN(numericRating) || numericRating < 1 || numericRating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Số sao đánh giá phải từ 1 đến 5!",
+      });
+    }
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy đánh giá!",
+      });
+    }
+
+    // Xác minh quyền sở hữu: chỉ chủ đánh giá mới được sửa
+    if (review.user_id.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Bạn không có quyền chỉnh sửa đánh giá này!",
+      });
+    }
+
+    review.rating = numericRating;
+    review.title = title || "";
+    review.comment = comment;
+
+    await review.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Chỉnh sửa đánh giá thành công!",
+      review,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi khi cập nhật đánh giá!",
+      error: error.message,
+    });
+  }
+};
+
+// 6. Admin phản hồi đánh giá (Admin only)
+exports.replyReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const { comment } = req.body;
+
+    if (!comment || !comment.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Nội dung phản hồi không được để trống!",
+      });
+    }
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy đánh giá để phản hồi!",
+      });
+    }
+
+    // Cập nhật trường reply
+    review.reply = {
+      comment: comment.trim(),
+      replied_at: new Date(),
+      admin_username: "Admin TechVie",
+    };
+
+    await review.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Gửi phản hồi thành công!",
+      review,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi khi phản hồi đánh giá!",
+      error: error.message,
+    });
+  }
+};
+
+// 7. Ẩn/Hiện đánh giá (Owner hoặc Admin)
+exports.toggleHideReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const { isHidden } = req.body;
+
+    const review = await Review.findById(reviewId);
+    if (!review || review.isDeleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy đánh giá!",
+      });
+    }
+
+    const isOwner = review.user_id.toString() === req.user.id;
+    const isAdmin = req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: "Bạn không có quyền thực hiện thao tác này!",
+      });
+    }
+
+    review.isHidden = typeof isHidden === 'boolean' ? isHidden : !review.isHidden;
+    await review.save();
+
+    return res.status(200).json({
+      success: true,
+      message: review.isHidden ? "Đã ẩn đánh giá thành công!" : "Đã hiển thị lại đánh giá thành công!",
+      review
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi khi cập nhật trạng thái ẩn/hiện đánh giá!",
       error: error.message,
     });
   }

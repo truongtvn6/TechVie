@@ -57,6 +57,16 @@ const reviewSchema = new mongoose.Schema({
     default: false,
     description: "Trạng thái xóa đánh giá (soft delete)",
   },
+  isHidden: {
+    type: Boolean,
+    default: false,
+    description: "Trạng thái ẩn đánh giá (chỉ người viết và admin thấy)",
+  },
+  reply: {
+    comment: { type: String, trim: true, maxLength: 1000 },
+    replied_at: { type: Date },
+    admin_username: { type: String, default: "Admin TechVie" }
+  },
 }, {
   timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   toJSON: { virtuals: true },

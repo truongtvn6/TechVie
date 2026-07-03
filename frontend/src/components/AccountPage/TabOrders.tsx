@@ -39,6 +39,36 @@ export default function TabOrders({ orders }: TabOrdersProps) {
                 <div>
                   <span className="text-[10px] uppercase font-bold text-[#4a5568] tracking-wider block sm:text-right">Tổng thanh toán</span>
                   <strong className="text-black font-black font-mono text-sm block sm:text-right">{ord.total}</strong>
+                  {(() => {
+                    switch (ord.paymentMethod) {
+                      case 'cod':
+                        return (
+                          <span className="text-[10px] text-indigo-600 font-extrabold italic block sm:text-right mt-1">
+                            (Sản phẩm này thanh toán với COD)
+                          </span>
+                        );
+                      case 'bank_transfer':
+                        return (
+                          <span className="text-[10px] text-blue-600 font-extrabold italic block sm:text-right mt-1">
+                            (Sản phẩm này thanh toán qua Chuyển khoản)
+                          </span>
+                        );
+                      case 'momo':
+                        return (
+                          <span className="text-[10px] text-pink-600 font-extrabold italic block sm:text-right mt-1">
+                            (Sản phẩm này thanh toán qua MoMo)
+                          </span>
+                        );
+                      case 'zalopay':
+                        return (
+                          <span className="text-[10px] text-emerald-600 font-extrabold italic block sm:text-right mt-1">
+                            (Sản phẩm này thanh toán qua ZaloPay)
+                          </span>
+                        );
+                      default:
+                        return null;
+                    }
+                  })()}
                 </div>
               </div>
 

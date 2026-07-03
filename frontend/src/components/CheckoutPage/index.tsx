@@ -39,6 +39,15 @@ export default function CheckoutPage({
   const [paymentStatusMessage, setPaymentStatusMessage] = useState<string>('');
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
   
+  // Snapshots for CheckoutSuccess view so global cart can be cleared immediately
+  const [completedCart, setCompletedCart] = useState<CartItem[]>([]);
+  const [completedTotals, setCompletedTotals] = useState({
+    subtotal: 0,
+    discountAmount: 0,
+    deliveryFee: 0,
+    finalTotal: 0
+  });
+  
   // Checkout Input States initialized from userProfile if available
   const [fullName, setFullName] = useState(userProfile?.name || '');
   const [phone, setPhone] = useState(userProfile?.phone || '');
@@ -115,6 +124,13 @@ export default function CheckoutPage({
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) return;
+
+    // Kiểm tra số điện thoại không chứa chữ cái
+    const containsLetters = /[a-zA-ZÀ-ỹ]/.test(phone);
+    if (containsLetters) {
+      setApiError('Số điện thoại liên hệ không hợp lệ. Vui lòng nhập đúng số điện thoại (không được chứa chữ cái).');
+      return;
+    }
     
     setStep('processing');
     setApiError('');
@@ -137,6 +153,19 @@ export default function CheckoutPage({
         if (data.success && data.orderId) {
           setServerOrderId(data.orderId);
           setPaymentDetails(data.payment || data.order || null);
+          
+          // Save snapshots of values
+          setCompletedCart([...cart]);
+          setCompletedTotals({
+            subtotal,
+            discountAmount,
+            deliveryFee,
+            finalTotal
+          });
+          
+          // Clear the global cart immediately
+          onClearCart();
+          
           setStep('success');
         } else {
           setApiError(data.message || 'Lỗi hệ thống khi khởi tạo bưu kiện đơn hàng.');
@@ -317,12 +346,12 @@ export default function CheckoutPage({
             phone={phone}
             address={address}
             deliveryMethod={deliveryMethod}
-            cart={cart}
-            subtotal={subtotal}
+            cart={completedCart}
+            subtotal={completedTotals.subtotal}
             appliedDiscount={appliedDiscount}
-            discountAmount={discountAmount}
-            deliveryFee={deliveryFee}
-            finalTotal={finalTotal}
+            discountAmount={completedTotals.discountAmount}
+            deliveryFee={completedTotals.deliveryFee}
+            finalTotal={completedTotals.finalTotal}
             onFinish={handleFinishSuccess}
             onRefreshPaymentStatus={handleRefreshPaymentStatus}
             isCheckingPayment={isCheckingPayment}

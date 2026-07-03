@@ -646,8 +646,11 @@ function AppContent() {
             : "min-h-screen flex items-center justify-center p-0 w-full"
         }
       >
-                <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
+        <AnimatePresence mode="wait">
+          <Routes 
+            location={location} 
+            key={location.pathname.startsWith('/admin') ? '/admin' : location.pathname}
+          >
             <Route path="/" element={
               <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.35 }} className="w-full">
                 <HomePage products={products} onNavigate={handleNavigate} onAddToCart={handleAddToCart} isLoggedIn={isLoggedIn} userEmail={userProfile.email} userProfile={userProfile} />

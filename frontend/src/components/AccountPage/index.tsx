@@ -74,11 +74,25 @@ export default function AccountPage({
 
   useEffect(() => {
     if (isLoggedIn && token) {
-      getUserOrders(token).then((res) => {
-        if (res.success && res.orders) {
-          setOrders(res.orders);
+      const fetchOrders = () => {
+        getUserOrders(token).then((res) => {
+          if (res.success && res.orders) {
+            setOrders(res.orders);
+          }
+        });
+      };
+
+      // Tải dữ liệu lần đầu
+      fetchOrders();
+
+      // Polling thông minh: tải lại dữ liệu đơn hàng mỗi 10 giây nếu tab trình duyệt đang hoạt động
+      const intervalId = setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          fetchOrders();
         }
-      });
+        // Thêm thời gian vào để quét liên tục
+      }, 10000);
+
       setIsLoadingDevices(true);
       getUserDevices().then((res) => {
         if (res.success && res.devices) {
@@ -88,6 +102,10 @@ export default function AccountPage({
       }).catch(() => {
         setIsLoadingDevices(false);
       });
+
+      return () => {
+        clearInterval(intervalId);
+      };
     }
   }, [isLoggedIn, token]);
 

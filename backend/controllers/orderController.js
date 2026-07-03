@@ -421,6 +421,7 @@ exports.getUserOrders = async (req, res) => {
         total: o.final_total,
         status: o.status,
         statusType: o.status_type,
+        paymentMethod: o.payment_method,
         items: mappedItems,
       };
     });

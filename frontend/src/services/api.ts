@@ -947,4 +947,55 @@ export async function restoreReview(reviewId: string): Promise<{ success: boolea
   }
 }
 
+// Chỉnh sửa đánh giá (User edit)
+export async function updateReview(reviewId: string, rating: number, title: string, comment: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ rating, title, comment })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể chỉnh sửa đánh giá.');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi chỉnh sửa đánh giá:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+// Phản hồi đánh giá (Admin reply)
+export async function replyReview(reviewId: string, comment: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/admin/${reviewId}/reply`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ comment })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể gửi phản hồi.');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi gửi phản hồi:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+// Ẩn/Hiện đánh giá (Owner hoặc Admin)
+export async function toggleHideReview(reviewId: string, isHidden?: boolean): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/toggle-hide`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ isHidden })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể thay đổi trạng thái ẩn/hiện đánh giá.');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi ẩn/hiện đánh giá:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
 
