@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Product } from "../../types";
 import { Plus, Edit3, Trash2, FileSpreadsheet, FileJson, RefreshCw } from "lucide-react";
-import CsvImportModal from "./CsvImportModal";
+import CsvImportExportModal from "./CsvImportExportModal";
 import JsonImportExportModal from "./JsonImportExportModal";
 import CustomAlert from "../CustomAlert";
 
@@ -88,27 +88,31 @@ export default function ProductManager({
           <button
             type="button"
             onClick={() => setIsJsonModalOpen(true)}
-            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border px-8 text-xs font-black tracking-widest uppercase shadow transition-all active:scale-95 ${
+            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border px-6 text-xs font-black tracking-widest uppercase shadow transition-all active:scale-95 ${
               d
-                ? "border-emerald-900/30 bg-emerald-950/20 text-emerald-400 hover:bg-emerald-900/35"
-                : "border-emerald-150 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                ? "border-[#30363d] bg-[#21262d] text-gray-300 hover:bg-white/10 hover:text-white"
+                : "border-gray-250 bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
             }`}
           >
-            <FileJson size={16} />
-            Nhập JSON/Ảnh
+            <FileJson size={16} className={d ? "text-emerald-400" : "text-emerald-600"} />
+            <span>
+              Nhập / Xuất <span className={`px-2.5 py-1 rounded-lg ml-1 ${d ? "bg-emerald-950/60 text-emerald-400 border border-emerald-900/30" : "bg-emerald-50 text-emerald-700 border border-emerald-100"}`}>JSON & Ảnh</span>
+            </span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsCsvModalOpen(true)}
-            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border px-8 text-xs font-black tracking-widest uppercase shadow transition-all active:scale-95 ${
+            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border px-6 text-xs font-black tracking-widest uppercase shadow transition-all active:scale-95 ${
               d
-                ? "border-indigo-900/30 bg-indigo-950/20 text-indigo-400 hover:bg-indigo-900/35"
-                : "border-indigo-150 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                ? "border-[#30363d] bg-[#21262d] text-gray-300 hover:bg-white/10 hover:text-white"
+                : "border-gray-250 bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
             }`}
           >
-            <FileSpreadsheet size={16} />
-            Nhập Excel / CSV
+            <FileSpreadsheet size={16} className={d ? "text-indigo-400" : "text-indigo-650"} />
+            <span>
+              Nhập / Xuất <span className={`px-2.5 py-1 rounded-lg ml-1 ${d ? "bg-indigo-950/60 text-indigo-400 border border-indigo-900/30" : "bg-indigo-50 text-indigo-700 border border-indigo-100"}`}>Excel / CSV</span>
+            </span>
           </button>
 
           <button
@@ -341,10 +345,11 @@ export default function ProductManager({
         </div>
       </div>
 
-      <CsvImportModal
+      <CsvImportExportModal
         isOpen={isCsvModalOpen}
         onClose={() => setIsCsvModalOpen(false)}
-        title="Nhập danh sách sản phẩm từ Excel / CSV"
+        title="Nhập / Xuất Sản Phẩm Excel & CSV"
+        products={products}
         templateHeaders={[
           "name",
           "price",

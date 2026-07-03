@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { X, Upload, CheckCircle, AlertCircle, FileJson, ArrowDownToLine, Check, AlertTriangle } from "lucide-react";
 import JSZip from "jszip";
 import { Product } from "../../types";
@@ -31,53 +31,120 @@ export default function JsonImportExportModal({
   const [importLogs, setImportLogs] = useState<string[]>([]);
   const [exporting, setExporting] = useState(false);
 
+  const [jsonDragActive, setJsonDragActive] = useState(false);
+  const [imagesDragActive, setImagesDragActive] = useState(false);
+
+  // Lock body scroll when modal is open to prevent background scrolling
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const processJsonFile = (file: File) => {
+    setJsonFile(file);
+    setErrors([]);
+    setParsedProducts([]);
+    setMatchedCount(0);
+    setUnmatchedProducts([]);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const parsed = JSON.parse(content);
+        if (!Array.isArray(parsed)) {
+          setErrors(["Tệp JSON phải chứa một mảng các sản phẩm."]);
+          return;
+        }
+        
+        // Verify fields
+        const validationErrors: string[] = [];
+        parsed.forEach((prod, index) => {
+          if (!prod.name) {
+            validationErrors.push(`Sản phẩm dòng ${index + 1}: Thiếu thuộc tính "name".`);
+          }
+          if (prod.price === undefined || isNaN(Number(prod.price))) {
+            validationErrors.push(`Sản phẩm dòng ${index + 1}: Giá trị "price" không hợp lệ.`);
+          }
+          if (!prod.category) {
+            validationErrors.push(`Sản phẩm dòng ${index + 1}: Thiếu thuộc tính "category".`);
+          }
+        });
+
+        if (validationErrors.length > 0) {
+          setErrors(validationErrors.slice(0, 5));
+        } else {
+          setParsedProducts(parsed);
+          // Auto match if images are already selected
+          matchImages(parsed, imageFiles);
+        }
+      } catch (err) {
+        setErrors(["Tệp JSON không hợp lệ hoặc bị lỗi cú pháp."]);
+      }
+    };
+    reader.readAsText(file);
+  };
 
   const handleJsonFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setJsonFile(file);
-      setErrors([]);
-      setParsedProducts([]);
-      setMatchedCount(0);
-      setUnmatchedProducts([]);
+      processJsonFile(e.target.files[0]);
+    }
+  };
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const content = event.target?.result as string;
-          const parsed = JSON.parse(content);
-          if (!Array.isArray(parsed)) {
-            setErrors(["Tệp JSON phải chứa một mảng các sản phẩm."]);
-            return;
-          }
-          
-          // Verify fields
-          const validationErrors: string[] = [];
-          parsed.forEach((prod, index) => {
-            if (!prod.name) {
-              validationErrors.push(`Sản phẩm dòng ${index + 1}: Thiếu thuộc tính "name".`);
-            }
-            if (prod.price === undefined || isNaN(Number(prod.price))) {
-              validationErrors.push(`Sản phẩm dòng ${index + 1}: Giá trị "price" không hợp lệ.`);
-            }
-            if (!prod.category) {
-              validationErrors.push(`Sản phẩm dòng ${index + 1}: Thiếu thuộc tính "category".`);
-            }
-          });
+  const handleJsonDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setJsonDragActive(true);
+    } else if (e.type === "dragleave") {
+      setJsonDragActive(false);
+    }
+  };
 
-          if (validationErrors.length > 0) {
-            setErrors(validationErrors.slice(0, 5));
-          } else {
-            setParsedProducts(parsed);
-            // Auto match if images are already selected
-            matchImages(parsed, imageFiles);
-          }
-        } catch (err) {
-          setErrors(["Tệp JSON không hợp lệ hoặc bị lỗi cú pháp."]);
-        }
-      };
-      reader.readAsText(file);
+  const handleJsonDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setJsonDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.name.toLowerCase().endsWith(".json")) {
+        processJsonFile(file);
+      } else {
+        setErrors(["Định dạng tệp không được hỗ trợ. Hãy kéo thả tệp products.json."]);
+      }
+    }
+  };
+
+  const handleImagesDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setImagesDragActive(true);
+    } else if (e.type === "dragleave") {
+      setImagesDragActive(false);
+    }
+  };
+
+  const handleImagesDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setImagesDragActive(false);
+
+    if (e.dataTransfer.files) {
+      const filesArray = Array.from(e.dataTransfer.files);
+      setImageFiles(filesArray);
+      if (parsedProducts.length > 0) {
+        matchImages(parsedProducts, filesArray);
+      }
     }
   };
 
@@ -292,7 +359,7 @@ export default function JsonImportExportModal({
             d ? "text-white" : "text-gray-955"
           }`}
         >
-          Nhập Sản Phẩm Qua JSON & Thư Mục Ảnh
+          Nhập / Xuất Sản Phẩm Qua JSON & Thư Mục Ảnh
         </h3>
 
         <div className="space-y-4">
@@ -395,68 +462,128 @@ export default function JsonImportExportModal({
                 Tải File Mẫu (.zip)
               </button>
             </div>
+
+            {/* Export ZIP Card */}
+            <div
+              className={`flex items-center justify-between rounded-2xl border p-4 ${
+                d ? "border-[#30363d] bg-[#0d1117]/60" : "border-gray-100 bg-slate-50"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <ArrowDownToLine className="h-5 w-5 text-indigo-400" />
+                <div className="text-left">
+                  <span className="block text-[11px] font-black tracking-wider uppercase">
+                    Xuất JSON + Ảnh sản phẩm
+                  </span>
+                  <span className={`mt-0.5 block text-[9px] ${d ? "text-gray-400" : "text-gray-500"}`}>
+                    Tải về file ZIP chứa dữ liệu JSON và toàn bộ hình ảnh của sản phẩm hiện tại
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleExport}
+                disabled={exporting}
+                className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[9px] font-bold tracking-wider uppercase transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${
+                  d
+                    ? "border-indigo-900/30 bg-indigo-950/20 text-indigo-400 hover:bg-indigo-900/35"
+                    : "border-indigo-150 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                }`}
+              >
+                {exporting ? "Đang xuất..." : "Xuất File ZIP"}
+              </button>
+            </div>
           </div>
 
           <h4 className="text-xs font-black tracking-widest text-indigo-500 uppercase pt-2">
             Nhập từ JSON + Ảnh
           </h4>
 
-          {/* JSON File Select */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">
-              1. Chọn products.json
-            </label>
-            <div
-              onClick={() => jsonFileInputRef.current?.click()}
-              className={`flex cursor-pointer items-center gap-3 rounded-xl border border-dashed p-3.5 transition-all ${
-                d
-                  ? "border-[#30363d] bg-[#0d1117]/30 hover:bg-[#161b22]"
-                  : "border-gray-250 bg-slate-50/50 hover:bg-slate-100/50"
-              }`}
-            >
-              <input
-                ref={jsonFileInputRef}
-                type="file"
-                accept=".json"
-                onChange={handleJsonFileChange}
-                className="hidden"
-              />
-              <FileJson className="h-5 w-5 text-indigo-400" />
-              <span className="truncate text-xs font-bold">
-                {jsonFile ? jsonFile.name : "Tải lên products.json"}
-              </span>
+          {/* JSON & Image Select Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* JSON File Drag & Drop Card */}
+            <div className="space-y-1.5 text-left">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider block">
+                Bước 1: Cấu trúc sản phẩm (.json)
+              </label>
+              <div
+                onClick={() => jsonFileInputRef.current?.click()}
+                onDragEnter={handleJsonDrag}
+                onDragOver={handleJsonDrag}
+                onDragLeave={handleJsonDrag}
+                onDrop={handleJsonDrop}
+                className={`flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed p-6 transition-all min-h-[160px] text-center cursor-pointer ${
+                  jsonDragActive
+                    ? "border-indigo-500 bg-indigo-500/5 scale-[1.01]"
+                    : d
+                      ? "border-[#30363d] bg-[#0d1117]/40 hover:bg-[#161b22] hover:border-gray-650"
+                      : "border-gray-250 bg-slate-50/50 hover:bg-slate-100/50 hover:border-gray-400"
+                }`}
+              >
+                <input
+                  ref={jsonFileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={handleJsonFileChange}
+                  className="hidden"
+                />
+                <div className={`p-3 rounded-full ${d ? "bg-[#21262d]" : "bg-white"} border shadow-sm`}>
+                  <FileJson className="h-5 w-5 text-indigo-400 animate-pulse" />
+                </div>
+                <div className="space-y-0.5">
+                  <span className="block text-[11px] font-bold tracking-wider uppercase">
+                    {jsonFile ? jsonFile.name : "Tải lên products.json"}
+                  </span>
+                  <span className={`block text-[9px] ${d ? "text-gray-500" : "text-gray-400"}`}>
+                    Kéo thả file hoặc bấm để chọn tệp tin cấu trúc
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Image Folder Select */}
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">
-              2. Chọn Thư mục ảnh (hoặc nhiều ảnh)
-            </label>
-            <div
-              onClick={() => imagesFileInputRef.current?.click()}
-              className={`flex cursor-pointer items-center gap-3 rounded-xl border border-dashed p-3.5 transition-all ${
-                d
-                  ? "border-[#30363d] bg-[#0d1117]/30 hover:bg-[#161b22]"
-                  : "border-gray-250 bg-slate-50/50 hover:bg-slate-100/50"
-              }`}
-            >
-              <input
-                ref={imagesFileInputRef}
-                type="file"
-                multiple
-                // @ts-ignore
-                webkitdirectory=""
-                directory=""
-                onChange={handleImagesChange}
-                className="hidden"
-              />
-              <Upload className="h-5 w-5 text-emerald-400" />
-              <span className="truncate text-xs font-bold">
-                {imageFiles.length > 0
-                  ? `Đã chọn ${imageFiles.length} hình ảnh`
-                  : "Chọn thư mục chứa ảnh"}
-              </span>
+            {/* Images Folder Drag & Drop Card */}
+            <div className="space-y-1.5 text-left">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider block">
+                Bước 2: Tài nguyên hình ảnh (Folder)
+              </label>
+              <div
+                onClick={() => imagesFileInputRef.current?.click()}
+                onDragEnter={handleImagesDrag}
+                onDragOver={handleImagesDrag}
+                onDragLeave={handleImagesDrag}
+                onDrop={handleImagesDrop}
+                className={`flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed p-6 transition-all min-h-[160px] text-center cursor-pointer ${
+                  imagesDragActive
+                    ? "border-emerald-500 bg-emerald-500/5 scale-[1.01]"
+                    : d
+                      ? "border-[#30363d] bg-[#0d1117]/40 hover:bg-[#161b22] hover:border-gray-650"
+                      : "border-gray-250 bg-slate-50/50 hover:bg-slate-100/50 hover:border-gray-400"
+                }`}
+              >
+                <input
+                  ref={imagesFileInputRef}
+                  type="file"
+                  multiple
+                  // @ts-ignore
+                  webkitdirectory=""
+                  directory=""
+                  onChange={handleImagesChange}
+                  className="hidden"
+                />
+                <div className={`p-3 rounded-full ${d ? "bg-[#21262d]" : "bg-white"} border shadow-sm`}>
+                  <Upload className="h-5 w-5 text-emerald-400 animate-pulse" />
+                </div>
+                <div className="space-y-0.5">
+                  <span className="block text-[11px] font-bold tracking-wider uppercase">
+                    {imageFiles.length > 0
+                      ? `Đã chọn ${imageFiles.length} hình ảnh`
+                      : "Chọn thư mục chứa ảnh"}
+                  </span>
+                  <span className={`block text-[9px] ${d ? "text-gray-500" : "text-gray-400"}`}>
+                    Kéo thả thư mục hoặc chọn hàng loạt ảnh mockup
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -519,30 +646,31 @@ export default function JsonImportExportModal({
             </div>
           )}
 
-          <button
-            type="button"
-            disabled={parsedProducts.length === 0 || isProcessing}
-            onClick={handleImport}
-            className={`w-full cursor-pointer rounded-xl py-3 text-center text-xs font-black tracking-widest uppercase shadow transition-all active:scale-95 disabled:pointer-events-none disabled:opacity-40 ${
-              d ? "bg-indigo-600 hover:bg-indigo-700 text-white" : "bg-indigo-600 text-white hover:bg-indigo-700"
-            }`}
-          >
-            {isProcessing ? "Đang tiến hành..." : "Bắt đầu Nhập"}
-          </button>
-        </div>
-
-        <div className="mt-8 flex justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className={`cursor-pointer rounded-xl border px-6 py-2.5 text-center text-xs font-black uppercase transition-all ${
-              d
-                ? "border-[#30363d] text-gray-300 hover:bg-[#21262d]"
-                : "text-gray-555 border-gray-200 hover:bg-gray-50"
-            }`}
-          >
-            Đóng
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className={`flex-1 cursor-pointer rounded-xl border py-3 text-center text-xs font-black uppercase transition-all ${
+                d
+                  ? "border-[#30363d] text-gray-300 hover:bg-[#21262d]"
+                  : "text-gray-555 border-gray-200 hover:bg-gray-50"
+              }`}
+            >
+              Hủy bỏ
+            </button>
+            <button
+              type="button"
+              disabled={parsedProducts.length === 0 || isProcessing}
+              onClick={handleImport}
+              className={`flex-1 cursor-pointer rounded-xl py-3 text-center text-xs font-black tracking-widest uppercase shadow transition-all active:scale-95 disabled:pointer-events-none disabled:opacity-40 ${
+                d
+                  ? "bg-white! text-black hover:bg-gray-100!"
+                  : "bg-black text-white hover:bg-gray-900"
+              }`}
+            >
+              {isProcessing ? "Đang tiến hành..." : "Bắt đầu Nhập"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

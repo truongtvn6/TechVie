@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   X,
   Upload,
@@ -6,10 +6,12 @@ import {
   CheckCircle,
   AlertCircle,
   RefreshCw,
+  ArrowDownToLine,
 } from "lucide-react";
 import * as XLSX from "xlsx";
+import { Product } from "../../types";
 
-interface CsvImportModalProps {
+interface CsvImportExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
@@ -17,9 +19,10 @@ interface CsvImportModalProps {
   templateRows: string[][]; // Sample rows to download/view
   onImport: (parsedData: any[]) => void;
   isDarkMode?: boolean;
+  products: Product[];
 }
 
-export default function CsvImportModal({
+export default function CsvImportExportModal({
   isOpen,
   onClose,
   title = "Nhập dữ liệu từ tệp CSV",
@@ -27,7 +30,8 @@ export default function CsvImportModal({
   templateRows,
   onImport,
   isDarkMode = false,
-}: CsvImportModalProps) {
+  products,
+}: CsvImportExportModalProps) {
   const d = isDarkMode;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,6 +40,18 @@ export default function CsvImportModal({
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Lock body scroll when modal is open to prevent background scrolling
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -304,6 +320,70 @@ export default function CsvImportModal({
     document.body.removeChild(link);
   };
 
+  const handleExportExcel = () => {
+    try {
+      const headers = ["name", "price", "category", "image", "description", "specs"];
+      const rows = products.map((p) => {
+        const specsStr = p.specs.map((s) => `${s.label}: ${s.value}`).join(" | ");
+        return [
+          p.name,
+          p.price.toString(),
+          p.category,
+          p.image,
+          p.description,
+          specsStr,
+        ];
+      });
+
+      const dataRows = [headers, ...rows];
+      const worksheet = XLSX.utils.aoa_to_sheet(dataRows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Products Export");
+      worksheet["!cols"] = headers.map(() => ({ wch: 25 }));
+      XLSX.writeFile(workbook, `techvie_products_export_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    } catch (err: any) {
+      alert("Lỗi xuất Excel: " + err.message);
+    }
+  };
+
+  const handleExportCsv = () => {
+    try {
+      const headers = ["name", "price", "category", "image", "description", "specs"];
+      const rows = products.map((p) => {
+        const specsStr = p.specs.map((s) => `${s.label}: ${s.value}`).join(" | ");
+        return [
+          p.name,
+          p.price.toString(),
+          p.category,
+          p.image,
+          p.description,
+          specsStr,
+        ];
+      });
+
+      const csvContent =
+        "\uFEFF" + // Add UTF-8 BOM to prevent Vietnamese font corruption in Excel
+        headers.join(",") +
+        "\n" +
+        rows
+          .map((row) =>
+            row.map((val) => `"${val.replace(/"/g, '""')}"`).join(","),
+          )
+          .join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `techvie_products_export_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err: any) {
+      alert("Lỗi xuất CSV: " + err.message);
+    }
+  };
+
   const handleImportClick = () => {
     if (parsedData.length > 0) {
       onImport(parsedData);
@@ -419,6 +499,84 @@ export default function CsvImportModal({
               </button>
             </div>
           </div>
+
+          <h4 className="text-xs font-black tracking-widest text-indigo-500 uppercase pt-2">
+            Xuất dữ liệu hiện tại
+          </h4>
+
+          <div className="space-y-3">
+            {/* Export Excel */}
+            <div
+              className={`flex items-center justify-between rounded-2xl border p-4 ${
+                d ? "border-[#30363d] bg-[#0d1117]/60" : "border-gray-100 bg-slate-50"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <FileText
+                  className={`h-5 w-5 ${d ? "text-emerald-400" : "text-emerald-600"}`}
+                />
+                <div className="text-left">
+                  <span className="block text-[11px] font-black tracking-wider uppercase">
+                    Xuất ra tệp Excel (.xlsx)
+                  </span>
+                  <span
+                    className={`mt-0.5 block text-[10px] ${d ? "text-gray-400" : "text-gray-500"}`}
+                  >
+                    Xuất danh sách sản phẩm hiện tại ra file Excel
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleExportExcel}
+                className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[9px] font-bold tracking-wider uppercase transition-all active:scale-95 ${
+                  d
+                    ? "border-emerald-900/30 bg-emerald-950/20 text-emerald-400 hover:bg-emerald-900/35"
+                    : "border-emerald-150 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                }`}
+              >
+                Xuất Excel
+              </button>
+            </div>
+
+            {/* Export CSV */}
+            <div
+              className={`flex items-center justify-between rounded-2xl border p-4 ${
+                d ? "border-[#30363d] bg-[#0d1117]/60" : "border-gray-100 bg-slate-50"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <FileText
+                  className={`h-5 w-5 ${d ? "text-indigo-400" : "text-indigo-600"}`}
+                />
+                <div className="text-left">
+                  <span className="block text-[11px] font-black tracking-wider uppercase">
+                    Xuất ra tệp CSV (.csv)
+                  </span>
+                  <span
+                    className={`mt-0.5 block text-[10px] ${d ? "text-gray-400" : "text-gray-500"}`}
+                  >
+                    Xuất danh sách sản phẩm hiện tại ra file CSV
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[9px] font-bold tracking-wider uppercase transition-all active:scale-95 ${
+                  d
+                    ? "border-indigo-900/30 bg-indigo-950/20 text-indigo-400 hover:bg-indigo-900/35"
+                    : "border-indigo-150 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                }`}
+              >
+                Xuất CSV
+              </button>
+            </div>
+          </div>
+
+          <h4 className="text-xs font-black tracking-widest text-indigo-500 uppercase pt-2">
+            Nhập dữ liệu mới
+          </h4>
 
           {/* Drag & Drop Area */}
           <div
