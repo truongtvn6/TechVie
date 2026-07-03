@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CheckCircle2, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { showSuccess, showError } from '../../utils/toast';
 import { changePassword } from '../../services/api';
 
 interface TabSecurityProps {
@@ -18,7 +18,7 @@ export default function TabSecurity({ userProfile }: TabSecurityProps) {
 
   const handleSavePassword = async () => {
     if (!currentPassword || !newPassword) {
-      toast.error('Vui lòng điền đầy đủ mật khẩu hiện tại và mật khẩu mới.');
+      showError('Vui lòng điền đầy đủ mật khẩu hiện tại và mật khẩu mới.');
       return;
     }
 
@@ -28,15 +28,15 @@ export default function TabSecurity({ userProfile }: TabSecurityProps) {
     try {
       const res = await changePassword({ currentPassword, newPassword });
       if (res.success) {
-        toast.success('Cập nhật mật khẩu thành công.');
+        showSuccess('Cập nhật mật khẩu thành công.');
         setCurrentPassword('');
         setNewPassword('');
         console.log('Mật khẩu của bạn đã được cập nhật an toàn!');
       } else {
-        toast.error(res.message || 'Cập nhật mật khẩu thất bại.');
+        showError(res.message || 'Cập nhật mật khẩu thất bại.');
       }
     } catch (err) {
-      toast.error('Lỗi kết nối đến máy chủ.');
+      showError('Lỗi kết nối đến máy chủ.');
     } finally {
       setIsSubmitting(false);
     }

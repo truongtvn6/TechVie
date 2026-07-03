@@ -107,20 +107,106 @@ export default function AdminDemoPanel({
   const handleCreateMockProduct = async () => {
     setIsCreatingProduct(true);
     try {
+      const MOCK_PRODUCTS_POOL = [
+        {
+          name: "iPhone 16 Pro Max Titanium",
+          price: "34990000",
+          category: "Điện thoại",
+          description: "Điện thoại cao cấp nhất từ Apple với khung titan siêu bền, chip A18 Pro mạnh mẽ và cụm camera zoom quang học 5x sắc nét.",
+          image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80",
+          specs: [
+            { label: "Màn hình", value: "6.9 inch Super Retina XDR OLED, 120Hz" },
+            { label: "Vi xử lý", value: "Apple A18 Pro (3nm)" },
+            { label: "Bộ nhớ trong", value: "256GB / 512GB / 1TB" }
+          ]
+        },
+        {
+          name: "Samsung Galaxy S25 Ultra",
+          price: "31990000",
+          category: "Điện thoại",
+          description: "Siêu phẩm cao cấp của Samsung tích hợp bút S Pen, màn hình độ sáng cao chống chói mắt và cụm camera AI 200MP.",
+          image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=800&q=80",
+          specs: [
+            { label: "Màn hình", value: "6.8 inch Dynamic AMOLED 2X, QHD+" },
+            { label: "Vi xử lý", value: "Snapdragon 8 Gen 4 for Galaxy" },
+            { label: "Camera chính", value: "200MP + 50MP + 12MP + 10MP" }
+          ]
+        },
+        {
+          name: "MacBook Pro M4 Max Space Black",
+          price: "79990000",
+          category: "Laptop",
+          description: "Laptop chuyên nghiệp cho thiết kế đồ họa và lập trình với sức mạnh đỉnh cao từ vi xử lý M4 Max thế hệ mới nhất.",
+          image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
+          specs: [
+            { label: "CPU / GPU", value: "Apple M4 Max (16-core CPU, 40-core GPU)" },
+            { label: "Bộ nhớ RAM", value: "36GB Unified Memory" },
+            { label: "Màn hình", value: "16.2 inch Liquid Retina XDR, ProMotion 120Hz" }
+          ]
+        },
+        {
+          name: "ASUS ROG Zephyrus G16 OLED",
+          price: "64990000",
+          category: "Laptop",
+          description: "Laptop gaming kiêm đồ họa mỏng nhẹ đẳng cấp, trang bị màn hình OLED tuyệt sắc cùng card đồ họa NVIDIA RTX 4080 cực mạnh.",
+          image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80",
+          specs: [
+            { label: "Bộ xử lý", value: "Intel Core Ultra 9 185H" },
+            { label: "Card đồ họa", value: "NVIDIA GeForce RTX 4080 12GB" },
+            { label: "Màn hình", value: "16 inch ROG Nebula OLED 2.5K, 240Hz" }
+          ]
+        },
+        {
+          name: "Apple Watch Ultra 2 Titanium",
+          price: "21990000",
+          category: "Đồng hồ",
+          description: "Đồng hồ thể thao chuyên nghiệp với thiết kế hầm hố từ chất liệu titan hàng không, thời lượng pin tối ưu và GPS tần số kép siêu chính xác.",
+          image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=800&q=80",
+          specs: [
+            { label: "Chất liệu vỏ", value: "Titanium hàng không cấp độ 5" },
+            { label: "Độ sáng màn hình", value: "Tối đa 3000 nits" },
+            { label: "Chống nước", value: "WR100 (độ sâu lên đến 100m)" }
+          ]
+        },
+        {
+          name: "Sony WH-1000XM5 Wireless",
+          price: "8490000",
+          category: "Âm thanh",
+          description: "Tai nghe chụp tai chống ồn chủ động đỉnh cao số 1 thế giới với chất âm Hi-Res Audio chân thực và thời lượng pin sử dụng lên đến 30 giờ liên tục.",
+          image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
+          specs: [
+            { label: "Driver", value: "30mm đặc chế" },
+            { label: "Chống ồn", value: "Dual Processor V1 & HD Noise Cancelling QN1" },
+            { label: "Kết nối", value: "Bluetooth 5.2, hỗ trợ LDAC" }
+          ]
+        },
+        {
+          name: "Bàn phím cơ Keychron Q1 Pro",
+          price: "4650000",
+          category: "Bàn phím",
+          description: "Bàn phím cơ Custom cao cấp vỏ nhôm CNC nguyên khối, thiết kế double-gasket giảm chấn và hỗ trợ kết nối Bluetooth / Type-C đa thiết bị.",
+          image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80",
+          specs: [
+            { label: "Layout", value: "75% compact" },
+            { label: "Switch", value: "Keychron K Pro Red / Brown (Pre-lubed)" },
+            { label: "Chất liệu vỏ", value: "Nhôm CNC toàn phần" }
+          ]
+        }
+      ];
+
+      const randomProduct = MOCK_PRODUCTS_POOL[Math.floor(Math.random() * MOCK_PRODUCTS_POOL.length)];
+      
       const formData = new FormData();
-      formData.append('name', `Bàn phím cơ TechVie Pro ${Math.floor(Math.random() * 1000)}`);
-      formData.append('price', '2450000');
-      formData.append('category', 'Keyboard');
-      formData.append('description', 'Bàn phím cơ chuyên nghiệp thiết kế công thái học và đèn LED RGB rực rỡ.');
-      formData.append('image', 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80');
-      formData.append('specs', JSON.stringify([
-        { label: "Switch", value: "Blue Clicky Switch" },
-        { label: "Keycaps", value: "Double-shot PBT" }
-      ]));
+      formData.append('name', `${randomProduct.name} #${Math.floor(Math.random() * 1000)}`);
+      formData.append('price', randomProduct.price);
+      formData.append('category', randomProduct.category);
+      formData.append('description', randomProduct.description);
+      formData.append('image', randomProduct.image);
+      formData.append('specs', JSON.stringify(randomProduct.specs));
 
       const res = await createProduct(formData, token);
       if (res.success) {
-        console.log("Sản phẩm mẫu đã được tạo thành công!");
+        console.log(`Sản phẩm mẫu (${randomProduct.name}) đã được tạo thành công!`);
         onRefreshProducts();
       } else {
         console.log("Tạo sản phẩm thất bại: " + res.message);

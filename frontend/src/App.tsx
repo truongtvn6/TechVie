@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronUp } from "lucide-react";
-import { Toaster, toast } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
+import { showSuccess, showError } from './utils/toast';
 import { TabType, CartItem, Product } from "./types";
 import {
   createProduct,
@@ -94,7 +95,7 @@ function AppContent() {
     const verified = params.get("verified");
 
     if (verified === "true") {
-      toast.success("Xác thực địa chỉ email thành công!", { icon: "✉️" });
+      showSuccess("Xác thực địa chỉ email thành công!", { icon: "✉️" });
       localStorage.setItem("active_tab", "account");
       handleNavigate("account");
       navigate(location.pathname, { replace: true });
@@ -131,7 +132,7 @@ function AppContent() {
         } else {
           // Token không hợp lệ hoặc tài khoản đã bị xóa (ví dụ sau khi seed lại database)
           handleSetIsLoggedIn(false);
-          toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+          showError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
         }
       });
     }
@@ -268,17 +269,17 @@ function AppContent() {
           added,
         );
         setProducts((prev) => [added, ...prev]);
-        toast.success("Đăng bán sản phẩm thành công!");
+        showSuccess("Đăng bán sản phẩm thành công!");
       } else {
         console.error(
           "Lỗi phản hồi từ backend khi thêm sản phẩm:",
           res.message,
         );
-        toast.error(`Lỗi khi thêm sản phẩm: ${res.message}`);
+        showError(`Lỗi khi thêm sản phẩm: ${res.message}`);
       }
     } catch (error: any) {
       console.error("Lỗi thêm sản phẩm:", error);
-      toast.error("Không thể thêm sản phẩm, vui lòng kiểm tra kết nối.");
+      showError("Không thể thêm sản phẩm, vui lòng kiểm tra kết nối.");
     }
   };
 
@@ -327,14 +328,14 @@ function AppContent() {
         setProducts((prev) =>
           prev.map((p) => (p.id === updated.id ? updated : p)),
         );
-        toast.success("Cập nhật thông tin sản phẩm thành công!");
+        showSuccess("Cập nhật thông tin sản phẩm thành công!");
       } else {
         console.error("Cập nhật thất bại:", res.message);
-        toast.error(`Lỗi cập nhật sản phẩm: ${res.message}`);
+        showError(`Lỗi cập nhật sản phẩm: ${res.message}`);
       }
     } catch (error: any) {
       console.error("Lỗi cập nhật sản phẩm:", error);
-      toast.error("Không thể cập nhật sản phẩm, vui lòng kiểm tra mạng.");
+      showError("Không thể cập nhật sản phẩm, vui lòng kiểm tra mạng.");
     }
   };
 
@@ -345,14 +346,14 @@ function AppContent() {
       if (res.success) {
         console.log(`Xóa sản phẩm #${productId} thành công khỏi state React.`);
         setProducts((prev) => prev.filter((p) => p.id !== productId));
-        toast.success("Xóa sản phẩm thành công!");
+        showSuccess("Xóa sản phẩm thành công!");
       } else {
         console.error("Lỗi phản hồi từ backend khi xóa sản phẩm:", res.message);
-        toast.error(`Lỗi khi xóa sản phẩm: ${res.message}`);
+        showError(`Lỗi khi xóa sản phẩm: ${res.message}`);
       }
     } catch (error: any) {
       console.error("Lỗi xóa sản phẩm:", error);
-      toast.error("Không thể xóa sản phẩm, vui lòng kiểm tra kết nối.");
+      showError("Không thể xóa sản phẩm, vui lòng kiểm tra kết nối.");
     }
   };
 
@@ -364,13 +365,13 @@ function AppContent() {
         getProducts().then((data) => {
           if (data.success) setProducts(data.products);
         });
-        toast.success("Khôi phục sản phẩm thành công!");
+        showSuccess("Khôi phục sản phẩm thành công!");
         return { success: true, message: res.message };
       }
-      toast.error(`Lỗi khôi phục: ${res.message}`);
+      showError(`Lỗi khôi phục: ${res.message}`);
       return { success: false, message: res.message };
     } catch (error: any) {
-      toast.error("Lỗi kết nối khi khôi phục sản phẩm.");
+      showError("Lỗi kết nối khi khôi phục sản phẩm.");
       return { success: false, message: "Lỗi kết nối khi khôi phục sản phẩm." };
     }
   };
@@ -545,7 +546,7 @@ function AppContent() {
       }
       return [...prevCart, { product, quantity: 1 }];
     });
-    toast.success(`Đã thêm ${product.name} vào giỏ hàng`, { position: "bottom-right", duration: 3000 });
+    showSuccess(`Đã thêm ${product.name} vào giỏ hàng`, { position: "top-center", duration: 3000 });
     // Open cart drawer so customer enjoys the feedback
     setIsCartOpen(true);
   };
@@ -699,10 +700,10 @@ function AppContent() {
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
                     handleNavigate("admin");
-                    toast.success("Đăng nhập Admin thành công", { icon: "👑" });
+                    showSuccess("Đăng nhập Admin thành công", { icon: "👑" });
                   } else {
                     handleNavigate("account");
-                    toast.success(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
+                    showSuccess(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
                   }
                 }} onRegisterSuccess={(email, name, userToken) => {
                   if (userToken) {
@@ -717,7 +718,7 @@ function AppContent() {
                   }));
                   setIsLoggedIn(true);
                   handleNavigate("account");
-                  toast.success(`Đăng ký thành công! Chào mừng ${name}.`);
+                  showSuccess(`Đăng ký thành công! Chào mừng ${name}.`);
                 }} />
               </motion.div>
             } />
@@ -738,10 +739,10 @@ function AppContent() {
                   setIsLoggedIn(true);
                   if (isSystemAdmin) {
                     handleNavigate("admin");
-                    toast.success("Đăng nhập Admin thành công", { icon: "👑" });
+                    showSuccess("Đăng nhập Admin thành công", { icon: "👑" });
                   } else {
                     handleNavigate("account");
-                    toast.success(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
+                    showSuccess(`Chào mừng ${email.split("@")[0].toUpperCase()} quay trở lại!`);
                   }
                 }} onRegisterSuccess={(email, name, userToken) => {
                   if (userToken) {
@@ -756,7 +757,7 @@ function AppContent() {
                   }));
                   setIsLoggedIn(true);
                   handleNavigate("account");
-                  toast.success(`Đăng ký thành công! Chào mừng ${name}.`);
+                  showSuccess(`Đăng ký thành công! Chào mừng ${name}.`);
                 }} />
               </motion.div>
             } />

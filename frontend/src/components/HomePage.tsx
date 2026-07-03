@@ -15,17 +15,11 @@ import { subscribeNewsletter, API_BASE_URL } from "../services/api";
 import ProductCard from "./ProductPage/ProductCard";
 import ProductDetail from "./ProductPage/ProductDetail";
 import SloganQuote from "./SloganQuote";
-// @ts-ignore
 import slide1 from '../assets/slideshow/slide1.png';
-// @ts-ignore
 import slide2 from '../assets/slideshow/slide2.png';
-// @ts-ignore
 import slide3 from '../assets/slideshow/slide3.png';
-// @ts-ignore
 import slide4 from '../assets/slideshow/slide4.png';
-// @ts-ignore
 import slide5 from '../assets/slideshow/slide5.png';
-// @ts-ignore
 import img_card from '../assets/images/home_page_card.png';
 
 
@@ -222,9 +216,9 @@ export default function HomePage({
   return (
     <div className="w-full">
       {/* Hero Slideshow Section */}
-      <section className="relative h-[85vh] md:h-[90vh] w-full overflow-hidden bg-gray-150">
+      <section className="relative h-screen w-full overflow-hidden bg-gray-150 -mt-18">
         <div className="absolute inset-0 w-full h-full">
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence>
             <motion.img
               key={images[currentSlide] || currentSlide}
               src={images[currentSlide]}
@@ -234,7 +228,7 @@ export default function HomePage({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1 }}
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </AnimatePresence>
           {/* Lớp phủ màu đen mờ giúp tăng độ tương phản cho slideshow */}
@@ -242,13 +236,13 @@ export default function HomePage({
         </div>
 
         {/* Ambient Overlay & Radial highlight, matching Vietnamese TechVie presentation card */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/35 via-transparent to-black/10 backdrop-brightness-95 flex items-center justify-start px-6 md:px-margin-desktop z-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-white/35 via-transparent to-black/10 backdrop-brightness-95 flex items-center justify-start px-6 md:px-margin-desktop z-10 pt-18">
           <div className="max-w-7xl mx-auto w-full flex">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="max-w-2xl bg-white/45 backdrop-blur-[35px] p-8 md:p-14 rounded-3xl border border-white/60 shadow-[0_30px_70px_rgba(0,0,0,0.1)] relative"
+              className="max-w-2xl bg-white/45 backdrop-blur-[35px] p-6 sm:p-8 md:p-10 lg:p-14 rounded-2xl sm:rounded-3xl border border-white/60 shadow-[0_30px_70px_rgba(0,0,0,0.1)] relative"
             >
               {/* <div className="absolute top-0 right-0 p-6 flex flex-col items-end opacity-35 text-[9px] font-mono tracking-widest text-gray-800">
                 <span>MÃ LƯỚI: 48.85 / 2.35</span>
@@ -257,37 +251,37 @@ export default function HomePage({
 
               <div className="absolute -left-px top-1/4 h-24 w-1 bg-gradient-to-b from-transparent via-secondary/40 to-transparent"></div>
 
-              <span className="text-sm uppercase tracking-[0.25em] text-secondary font-bold mb-6 block">
+              <span className="text-xs sm:text-sm uppercase tracking-[0.25em] text-secondary font-bold mb-4 lg:mb-6 block">
                 <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
                 PHỤ KIỆN & ĐỒ SETUP AESTHETIC
               </span>
 
-              <h1 className="text-5xl md:text-6xl font-sans font-black tracking-tighter text-gray-900 mb-6 leading-[1.05]">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans font-black tracking-tighter text-gray-900 mb-4 lg:mb-6 leading-[1.05]">
                 Góc Làm Việc <br />
                 Đậm Chất Riêng
               </h1>
 
-              <p className="font-sans text-gray-650 text-md leading-relaxed mb-8 max-w-md text-justify">
+              <p className="font-sans text-gray-650 text-sm sm:text-md leading-relaxed mb-4 lg:mb-8 max-w-md text-justify">
                 Khơi nguồn cảm hứng với các combo phụ kiện tiện ích và ốp lưng
                 custom độc quyền. TechVie đồng hành cùng bạn kiến tạo góc làm
                 việc tối giản, bảo vệ sức khỏe và thể hiện cá tính.
               </p>
 
               {/* Specification stats box in vietnamese template */}
-              <div className="grid grid-cols-2 gap-8 mb-8 py-2">
+              <div className="grid grid-cols-2 gap-4 sm:gap-8 mb-4 lg:mb-8 py-1 lg:py-2">
                 <div>
-                  <div className="text-[15px] font-extrabold uppercase tracking-widest text-gray-900 mb-1">
+                  <div className="text-[12px] sm:text-[15px] font-extrabold uppercase tracking-widest text-gray-900 mb-1">
                     BẢO HÀNH 1-ĐỔI-1
                   </div>
-                  <div className="text-[13px] text-gray-500 flex items-baseline gap-1">
+                  <div className="text-[11px] sm:text-[13px] text-gray-500 flex items-baseline gap-1">
                     Lỗi từ nhà sản xuất
                   </div>
                 </div>
                 <div>
-                  <div className="text-[15px] font-extrabold uppercase tracking-widest text-gray-900 mb-1">
+                  <div className="text-[12px] sm:text-[15px] font-extrabold uppercase tracking-widest text-gray-900 mb-1">
                     ĐÓNG GÓI GIFT BOX
                   </div>
-                  <div className="text-[13px] text-gray-500 flex items-baseline gap-1">
+                  <div className="text-[11px] sm:text-[13px] text-gray-500 flex items-baseline gap-1">
                     Trải nghiệm unbox khác biệt
                   </div>
                 </div>

@@ -230,7 +230,7 @@ export default function AccountPage({
           
           {/* CASE 1: USER NOT SIGNED IN */}
           {!isLoggedIn ? (
-            <AccountAuth onNavigate={onNavigate} setIsLoggedIn={setIsLoggedIn} />
+            <AccountAuth onNavigate={onNavigate} />
           ) : (
             <motion.div 
               key="dashboard-view"

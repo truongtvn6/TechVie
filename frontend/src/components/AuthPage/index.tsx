@@ -505,7 +505,7 @@ export default function AuthPage({
         <motion.div 
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, cubicBezier: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="liquid-glass-slab glass-edge glass-sheen-container w-full h-full max-h-[850px] lg:max-h-full rounded-[28px] sm:rounded-[36px] lg:border-none px-6 py-8 sm:px-12 md:px-14 lg:px-10 xl:px-14 flex flex-col justify-center z-10 overflow-y-auto"
         >
           {/* Header Section */}

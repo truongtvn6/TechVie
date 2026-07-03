@@ -3,10 +3,9 @@ import { Cpu } from 'lucide-react';
 
 interface AccountAuthProps {
   onNavigate: (tab: any) => void;
-  setIsLoggedIn: (val: boolean) => void;
 }
 
-export default function AccountAuth({ onNavigate, setIsLoggedIn }: AccountAuthProps) {
+export default function AccountAuth({ onNavigate }: AccountAuthProps) {
   return (
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }}
@@ -52,20 +51,6 @@ export default function AccountAuth({ onNavigate, setIsLoggedIn }: AccountAuthPr
           >
             ĐĂNG KÝ TÀI KHOẢN MỚI
           </a>
-        </div>
-
-        {/* Fast automatic mock login for standard testing */}
-        <div className="pt-4 border-t border-white/60 flex flex-col items-center">
-          <span className="text-[10px] uppercase font-bold tracking-wider text-[#4a5568]/70">Đăng nhập tài khoản mẫu nhanh:</span>
-          <button 
-            type="button"
-            onClick={() => {
-              setIsLoggedIn(true);
-            }}
-            className="mt-2 bg-black text-white hover:bg-gray-800 border border-transparent px-4 py-2 rounded-lg text-[9px] font-tech-label text-tech-label tracking-wider transition-all"
-          >
-            Bỏ qua & Đăng nhập nhanh
-          </button>
         </div>
       </div>
     </motion.div>

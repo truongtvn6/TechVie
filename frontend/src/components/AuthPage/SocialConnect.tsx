@@ -1,5 +1,5 @@
 import React from 'react';
-import { toast } from 'react-hot-toast';
+import { showError } from '../../utils/toast';
 
 interface SocialConnectProps {
   mode: 'login' | 'register';
@@ -19,11 +19,11 @@ export default function SocialConnect({
       if (data.success && data.url) {
         window.location.href = data.url;
       } else {
-        toast.error("Không thể khởi tạo phiên kết nối OAuth2 với Google.");
+        showError("Không thể khởi tạo phiên kết nối OAuth2 với Google.");
       }
     } catch (error) {
       console.error("Lỗi chuyển hướng Google OAuth:", error);
-      toast.error("Lỗi kết nối máy chủ Google OAuth.");
+      showError("Lỗi kết nối máy chủ Google OAuth.");
     }
   };
 

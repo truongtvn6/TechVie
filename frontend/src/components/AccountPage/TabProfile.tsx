@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MapPin, ArrowRight, Copy, Check, Loader2, ShieldCheck, ShieldAlert, MailCheck } from "lucide-react";
 import { updateUserProfile, sendEmailVerification } from "../../services/api";
-import { toast } from "react-hot-toast";
+import { showSuccess, showError } from "../../utils/toast";
 
 interface TabProfileProps {
   userProfile: any;
@@ -58,14 +58,14 @@ export default function TabProfile({
     try {
       const res = await sendEmailVerification();
       if (res.success) {
-        toast.success(res.message, {
+        showSuccess(res.message, {
           icon: "✉️",
         });
       } else {
-        toast.error(res.message || "Không thể gửi email xác thực.");
+        showError(res.message || "Không thể gửi email xác thực.");
       }
     } catch (error) {
-      toast.error("Đã xảy ra lỗi khi gửi yêu cầu xác thực email.");
+      showError("Đã xảy ra lỗi khi gửi yêu cầu xác thực email.");
     } finally {
       setIsVerifying(false);
     }
