@@ -1,4 +1,4 @@
-import { DollarSign, ShoppingBag, Package, MessageSquare } from 'lucide-react';
+import { DollarSign, ShoppingBag, Package, MessageSquare, Boxes } from 'lucide-react';
 
 interface DashboardStatsProps {
   totalRevenue: number;
@@ -6,6 +6,8 @@ interface DashboardStatsProps {
   processingOrdersCount: number;
   productsCount: number;
   messagesCount: number;
+  totalStock: number;
+  lowStockCount: number;
   isDarkMode?: boolean;
 }
 
@@ -15,6 +17,8 @@ export default function DashboardStats({
   processingOrdersCount,
   productsCount,
   messagesCount,
+  totalStock,
+  lowStockCount,
   isDarkMode = false,
 }: DashboardStatsProps) {
   const d = isDarkMode;
@@ -30,7 +34,7 @@ export default function DashboardStats({
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
       {/* Stat 1: Revenue */}
       <div className={`border rounded-3xl p-6 shadow-sm flex items-center justify-between transition-all duration-300 min-w-0 ${
         d ? 'bg-[#161b22] border-[#30363d] text-white' : 'bg-white border-gray-200 text-gray-900'
@@ -100,6 +104,28 @@ export default function DashboardStats({
         </div>
         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform ${d ? 'bg-amber-950/40 text-amber-500' : 'bg-amber-50 text-amber-500'}`}>
           <MessageSquare size={20} />
+        </div>
+      </div>
+
+      {/* Stat 5: Warehouse Stock */}
+      <div className={`border rounded-3xl p-6 shadow-sm flex items-center justify-between transition-all duration-300 ${
+        d ? 'bg-[#161b22] border-[#30363d] text-white' : 'bg-white border-gray-200 text-gray-900'
+      }`}>
+        <div className="space-y-1">
+          <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider font-sans block">TỔNG TỒN KHO</span>
+          <strong className={`text-2xl font-black font-mono tracking-tight block ${d ? 'text-white' : 'text-gray-900'}`}>
+            {totalStock.toLocaleString('vi-VN')} chiếc
+          </strong>
+          <span className={`text-[9px] block font-mono ${
+            lowStockCount > 0 ? 'text-amber-500' : 'text-violet-600'
+          }`}>
+            {lowStockCount > 0
+              ? `${lowStockCount} sản phẩm sắp hết hàng`
+              : 'Kho hàng ổn định'}
+          </span>
+        </div>
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform ${d ? 'bg-violet-950/40 text-violet-400' : 'bg-violet-50 text-violet-600'}`}>
+          <Boxes size={20} />
         </div>
       </div>
     </div>

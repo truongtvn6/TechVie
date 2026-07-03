@@ -32,6 +32,7 @@ import PromoManager from "./PromoManager";
 import UserManager from "./UserManager";
 import CategoryManager from "./CategoryManager";
 import ReviewManager from "./ReviewManager";
+import StockManager from "./StockManager";
 import AdminDemoPanel from "../../demo/AdminDemoPanel";
 import { IS_DEMO_ENABLED } from "../../demo/demoConfig";
 
@@ -202,6 +203,7 @@ export default function AdminPage({
     "overview",
     "categories",
     "products",
+    "stock",
     "orders",
     "messages",
     "promos",
@@ -632,6 +634,7 @@ export default function AdminPage({
         id: editingProduct.id,
         name: productData.name,
         price: productData.price,
+        stock: productData.stock,
         category: productData.category,
         image: productData.image || editingProduct.image,
         description: productData.description,
@@ -644,6 +647,7 @@ export default function AdminPage({
       const created = {
         name: productData.name,
         price: productData.price,
+        stock: productData.stock,
         category: productData.category,
         image: productData.image,
         description: productData.description,
@@ -659,14 +663,8 @@ export default function AdminPage({
 
   // Delete product
   const handleDelete = (id: string, name: string) => {
-    if (
-      confirm(
-        `Bạn chắn chắn muốn gỡ bỏ thiết bị "${name}" khỏi quầy trưng bày?`,
-      )
-    ) {
-      onDeleteProduct(id);
-      addLog(`Đã xóa thiết bị: ${name}`);
-    }
+    onDeleteProduct(id);
+    addLog(`Đã xóa thiết bị: ${name}`);
   };
 
   // Update order status on Express
@@ -807,20 +805,23 @@ export default function AdminPage({
                     ? "PRODUCT CATEGORIES"
                     : activeSubTab === "products"
                       ? "PRODUCT MANAGER"
-                      : activeSubTab === "orders"
-                        ? "LIVE ORDERS REGISTRY"
-                        : activeSubTab === "messages"
-                          ? "CUSTOMER INQUIRIES"
-                          : activeSubTab === "promos"
-                            ? "PROMO CAMPAIGNS"
-                            : activeSubTab === "reviews"
-                              ? "PRODUCT REVIEWS"
-                              : "USER ROLES & ACCOUNTS"}
+                      : activeSubTab === "stock"
+                        ? "STOCK WAREHOUSE MANAGER"
+                        : activeSubTab === "orders"
+                          ? "LIVE ORDERS REGISTRY"
+                          : activeSubTab === "messages"
+                            ? "CUSTOMER INQUIRIES"
+                            : activeSubTab === "promos"
+                              ? "PROMO CAMPAIGNS"
+                              : activeSubTab === "reviews"
+                                ? "PRODUCT REVIEWS"
+                                : "USER ROLES & ACCOUNTS"}
               </span>
               <h1 className="flex items-center gap-2.5 text-3xl font-black tracking-tighter text-gray-950 uppercase">
                 {activeSubTab === "overview" && "Bảng Tổng Quan Hệ Thống"}
                 {activeSubTab === "categories" && "Quản Lý Danh Mục"}
                 {activeSubTab === "products" && "Quản Lý Quầy Sản Phẩm"}
+                {activeSubTab === "stock" && "Báo cáo Tồn kho & Quản lý Kho"}
                 {activeSubTab === "orders" && "Sổ Ghi Đơn Hàng Thực"}
                 {activeSubTab === "messages" && "Thư Phản Hồi Khách Hàng"}
                 {activeSubTab === "promos" && "Hệ Thống Voucher & Khuyến Mãi"}
@@ -834,6 +835,8 @@ export default function AdminPage({
                   "Thêm mới danh mục sản phẩm, đổi tên, xóa mềm và khôi phục danh mục hàng hóa."}
                 {activeSubTab === "products" &&
                   "Đăng bán sản phẩm mới, cập nhật giá cả, thương hiệu và thông số cấu hình cụ thể."}
+                {activeSubTab === "stock" &&
+                  "Giám sát số lượng tồn, lọc sản phẩm hết hàng hoặc sắp hết hàng và nhập hàng nhanh."}
                 {activeSubTab === "orders" &&
                   "Xem thông tin giao nhận, cập nhật trạng thái đơn hàng (đang xử lý, hoàn thành, hủy đơn)."}
                 {activeSubTab === "messages" &&
@@ -859,6 +862,8 @@ export default function AdminPage({
                 }
                 productsCount={products.length}
                 messagesCount={messages.length}
+                totalStock={products.reduce((sum, p) => sum + (p.stock ?? 0), 0)}
+                lowStockCount={products.filter((p) => (p.stock ?? 0) > 0 && (p.stock ?? 0) <= 5).length}
                 isDarkMode={isDarkMode}
               />
 
@@ -902,6 +907,15 @@ export default function AdminPage({
               }}
               isDarkMode={isDarkMode}
               onRefreshProducts={onRefreshProducts}
+            />
+          )}
+
+          {activeSubTab === "stock" && (
+            <StockManager
+              products={adminProducts}
+              onOpenEditForm={openEditForm}
+              onRefreshProducts={onRefreshProducts}
+              isDarkMode={isDarkMode}
             />
           )}
 

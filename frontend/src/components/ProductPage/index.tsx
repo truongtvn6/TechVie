@@ -5,6 +5,7 @@ import { Plus, Check, SlidersHorizontal, Eye, Cpu, Search, ArrowUpDown, X, Lapto
 import { getCategories, getProducts } from '../../services/api';
 import ProductDetail from './ProductDetail';
 import ProductCard from './ProductCard';
+import Pagination from '../Pagination';
 
 const normalizeProduct = (p: any): Product => {
   let safeSpecs: { label: string; value: string }[] = [];
@@ -109,6 +110,10 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem("techvie_token");
+  
+  // Pagination State (4 x 3 = 12 items per page)
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 12;
 
   // Advanced Filter state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -288,6 +293,7 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
                   key={cat}
                   onClick={() => {
                     setSelectedCategory(cat);
+                    setCurrentPage(1);
                   }}
                   className={`px-5 py-3 rounded-2xl font-sans text-xs uppercase tracking-wider font-extrabold transition-all duration-300 flex items-center gap-2 relative cursor-pointer group ${
                     isActive
@@ -351,7 +357,7 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
               initial={{ height: 0, opacity: 0, marginTop: 0 }}
               animate={{ height: 'auto', opacity: 1, marginTop: 24 }}
               exit={{ height: 0, opacity: 0, marginTop: 0 }}
-              className="overflow-hidden"
+              className="overflow-visible"
             >
               <div className="bg-gray-50 border border-gray-200 rounded-3xl p-5 grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Price Range */}
@@ -425,18 +431,52 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
                   <div>
                     <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-3">Sắp xếp</h3>
                     <div className="relative">
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as any)}
-                        className="w-full text-xs font-sans px-3 py-2.5 bg-white rounded-lg focus:outline-none focus:ring-1 focus:ring-black text-gray-700 font-bold border border-gray-300 appearance-none cursor-pointer"
+                      {/* Custom Glassmorphism Dropdown Trigger */}
+                      <button
+                        type="button"
+                        onClick={() => setIsSortOpen(!isSortOpen)}
+                        className="w-full flex items-center justify-between text-xs font-sans px-4 py-2.5 bg-white/70 backdrop-blur-md rounded-xl text-gray-700 font-bold border border-gray-200 hover:border-gray-400 transition-all cursor-pointer shadow-sm active:scale-98"
+                        style={{ WebkitBackdropFilter: "blur(12px)" }}
                       >
-                        {sortOptions.map((option) => (
-                          <option key={option.value} value={option.value}>{option.label}</option>
-                        ))}
-                      </select>
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                        <ArrowUpDown size={12} />
-                      </div>
+                        <span>{currentSortOption.label}</span>
+                        <ArrowUpDown size={12} className="text-gray-400 ml-2" />
+                      </button>
+
+                      {/* Glass Dropdown Options Menu */}
+                      {isSortOpen && (
+                        <>
+                          {/* Close overlay on click outside */}
+                          <div 
+                            className="fixed inset-0 z-[9998]" 
+                            onClick={() => setIsSortOpen(false)}
+                          />
+                          <div 
+                            className="absolute z-[9999] left-0 right-0 mt-1.5 rounded-xl border border-white/40 bg-white/75 shadow-lg backdrop-blur-xl p-1 flex flex-col gap-0.5 transition-all overflow-hidden"
+                            style={{ 
+                              WebkitBackdropFilter: "blur(20px)",
+                              boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.4)"
+                            }}
+                          >
+                            {sortOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => {
+                                  setSortBy(option.value as any);
+                                  setIsSortOpen(false);
+                                }}
+                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                  sortBy === option.value
+                                    ? "bg-black text-white"
+                                    : "text-gray-700 hover:bg-black/5"
+                                }`}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -518,20 +558,37 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
           <p className="text-gray-500 font-sans">Không tìm thấy sản phẩm nào phù hợp.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-          <AnimatePresence mode="popLayout">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onSelect={setSelectedProduct}
-                onAddToCart={handleAddToCartWithSuccess}
-                isJustAdded={justAddedId === product.id}
-                isMagnetized={magneticRefId === product.id}
-              />
-            ))}
-          </AnimatePresence>
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+            <AnimatePresence mode="popLayout">
+              {(() => {
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const paginatedItems = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+                return paginatedItems.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onSelect={setSelectedProduct}
+                    onAddToCart={handleAddToCartWithSuccess}
+                    isJustAdded={justAddedId === product.id}
+                    isMagnetized={magneticRefId === product.id}
+                  />
+                ));
+              })()}
+            </AnimatePresence>
+          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(filteredProducts.length / itemsPerPage)}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              // Cuộn nhẹ lên trên danh sách sản phẩm khi đổi trang
+              window.scrollTo({ top: 400, behavior: 'smooth' });
+            }}
+            isDarkMode={false}
+          />
+        </>
       )}
 
       {/* Product Detail Specs Modal */}

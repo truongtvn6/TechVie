@@ -11,7 +11,8 @@ import {
   Moon,
   FolderTree,
   Search,
-  Star
+  Star,
+  Boxes
 } from 'lucide-react';
 
 // @ts-ignore
@@ -20,8 +21,8 @@ import localLightBg from '/image/aleksandra-dementeva-aWBPQHfPwVM-unsplash.jpg';
 import localDarkBg from '/image/long-chung-uaVvEOCrq8s-unsplash.jpg';
 
 interface AdminSidebarProps {
-  activeSubTab: 'overview' | 'categories' | 'products' | 'orders' | 'messages' | 'promos' | 'users' | 'reviews';
-  setActiveSubTab: (tab: 'overview' | 'categories' | 'products' | 'orders' | 'messages' | 'promos' | 'users' | 'reviews') => void;
+  activeSubTab: 'overview' | 'categories' | 'products' | 'stock' | 'orders' | 'messages' | 'promos' | 'users' | 'reviews';
+  setActiveSubTab: (tab: 'overview' | 'categories' | 'products' | 'stock' | 'orders' | 'messages' | 'promos' | 'users' | 'reviews') => void;
   isDarkMode: boolean;
   setIsDarkMode: (val: boolean) => void;
   categoriesCount: number;
@@ -233,6 +234,20 @@ export default function AdminSidebar({
                 }`}>
                   {productsCount}
                 </span>
+              </button>
+
+              <button
+                onClick={() => setActiveSubTab('stock')}
+                className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                  activeSubTab === 'stock' 
+                    ? (isDarkMode ? 'bg-white text-black shadow-md shadow-white/5' : 'bg-black text-white shadow-md shadow-black/10') 
+                    : (isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-black/5 hover:text-black')
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Boxes size={14} />
+                  <span>Kho hàng / Tồn</span>
+                </div>
               </button>
 
               <button

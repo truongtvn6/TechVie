@@ -244,6 +244,7 @@ function AppContent() {
       const formData = new FormData();
       formData.append("name", newProduct.name);
       formData.append("price", String(newProduct.price));
+      formData.append("stock", String(newProduct.stock ?? 0));
       formData.append("category", newProduct.category);
       formData.append("description", newProduct.description || "");
       formData.append("specs", JSON.stringify(newProduct.specs || []));
@@ -259,6 +260,7 @@ function AppContent() {
           id: res.product.id || (res.product as any)._id,
           name: res.product.name,
           price: res.product.price,
+          stock: res.product.stock ?? newProduct.stock,
           category: res.product.category,
           image: res.product.image || newProduct.image,
           description: res.product.description,
@@ -301,6 +303,7 @@ function AppContent() {
       const formData = new FormData();
       formData.append("name", editedProduct.name);
       formData.append("price", String(editedProduct.price));
+      formData.append("stock", String(editedProduct.stock ?? 0));
       formData.append("category", editedProduct.category);
       formData.append("description", editedProduct.description || "");
       formData.append("specs", JSON.stringify(editedProduct.specs || []));
@@ -316,6 +319,7 @@ function AppContent() {
           id: res.product.id || (res.product as any)._id,
           name: res.product.name,
           price: res.product.price,
+          stock: res.product.stock ?? editedProduct.stock,
           category: res.product.category,
           image: res.product.image || editedProduct.image,
           description: res.product.description,

@@ -11,6 +11,7 @@ import {
   Volume2,
   Keyboard,
   Package,
+  Layers,
 } from "lucide-react";
 
 const categoryIconMap: Record<string, React.ReactNode> = {
@@ -39,6 +40,7 @@ export default function ProductFormModal({
   // Input fields local states
   const [prodName, setProdName] = useState("");
   const [prodPrice, setProdPrice] = useState<number>(0);
+  const [prodStock, setProdStock] = useState<number>(0);
   const [prodCategory, setProdCategory] = useState("");
   const [prodImage, setProdImage] = useState("");
   const [prodDesc, setProdDesc] = useState("");
@@ -163,6 +165,7 @@ export default function ProductFormModal({
       if (editingProduct) {
         setProdName(editingProduct.name);
         setProdPrice(editingProduct.price);
+        setProdStock(editingProduct.stock ?? 0);
         setProdCategory(editingProduct.category);
         setProdImage(editingProduct.image);
         setProdDesc(editingProduct.description || "");
@@ -171,6 +174,7 @@ export default function ProductFormModal({
       } else {
         setProdName("");
         setProdPrice(0);
+        setProdStock(0);
         setProdCategory("");
         setProdImage("");
         setProdDesc("");
@@ -188,6 +192,7 @@ export default function ProductFormModal({
       id: editingProduct?.id,
       name: prodName,
       price: prodPrice,
+      stock: prodStock,
       category: prodCategory,
       image: prodImage,
       description: prodDesc,
@@ -214,7 +219,7 @@ export default function ProductFormModal({
         }
       `}</style>
       <div
-        className={`rounded-[2.5rem] p-6 md:p-10 max-w-7xl w-full max-h-[92vh] overflow-y-auto relative font-sans text-xs my-auto scrollbar-none transition-all duration-300 ${
+        className={`rounded-[2.5rem] p-6 md:p-10 max-w-7xl w-full relative font-sans text-xs my-auto transition-all duration-300 ${
           d
             ? "bg-[#161b22] border border-[#30363d] text-white shadow-[0_24px_70px_rgba(0,0,0,0.4)]"
             : "bg-white border border-gray-200 text-gray-955 shadow-[0_24px_70px_rgba(0,0,0,0.12)]"
@@ -286,7 +291,7 @@ export default function ProductFormModal({
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Name field */}
-              <div className="lg:col-span-6 space-y-2">
+              <div className="lg:col-span-12 space-y-2">
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                   Tên thiết bị *
                 </label>
@@ -305,7 +310,7 @@ export default function ProductFormModal({
               </div>
 
               {/* Pricing field */}
-              <div className="lg:col-span-3 space-y-2">
+              <div className="lg:col-span-4 space-y-2">
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                   Giá bán niêm yết (VND) *
                 </label>
@@ -323,8 +328,51 @@ export default function ProductFormModal({
                 />
               </div>
 
+              {/* Stock field with big increase/decrease buttons */}
+              <div className="lg:col-span-4 space-y-2">
+                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                  Tồn kho
+                </label>
+                <div className="flex items-center w-full gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setProdStock(prev => Math.max(0, prev - 1))}
+                    className={`w-11 h-11 rounded-xl border flex items-center justify-center font-bold text-lg transition-all active:scale-90 cursor-pointer flex-shrink-0 ${
+                      d
+                        ? "border-[#30363d] bg-[#21262d] text-white hover:bg-white/10"
+                        : "border-gray-250 bg-gray-50 text-gray-700 hover:bg-gray-150"
+                    }`}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={prodStock}
+                    onChange={(e) => setProdStock(Math.max(0, parseInt(e.target.value) || 0))}
+                    placeholder="0"
+                    className={`flex-1 text-center focus:outline-none focus:ring-1 rounded-xl py-3 text-xs transition-all font-mono font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none min-w-0 ${
+                      d
+                        ? "bg-[#161b22] border border-[#30363d] focus:!border-white focus:!ring-white !text-white placeholder-gray-500"
+                        : "bg-white border border-gray-200 focus:border-black focus:ring-black text-gray-905 placeholder-gray-400"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setProdStock(prev => prev + 1)}
+                    className={`w-11 h-11 rounded-xl border flex items-center justify-center font-bold text-lg transition-all active:scale-90 cursor-pointer flex-shrink-0 ${
+                      d
+                        ? "border-[#30363d] bg-[#21262d] text-white hover:bg-white/10"
+                        : "border-gray-250 bg-gray-50 text-gray-700 hover:bg-gray-150"
+                    }`}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
               {/* Category selector */}
-              <div className="lg:col-span-3 relative" ref={dropdownRef}>
+              <div className="lg:col-span-4 relative" ref={dropdownRef}>
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
                   Phân loại thiết bị
                 </label>
@@ -477,155 +525,145 @@ export default function ProductFormModal({
             </div>
           </section>
 
-          {/* Grid Bottom: Description, Image and Technical specs */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-            {/* Column 1: Description */}
-            <section
-              className={`border rounded-3xl p-6 flex flex-col text-left transition-all duration-300 ${
-                d
-                  ? "bg-[#0d1117]/60 border-[#30363d]"
-                  : "bg-slate-50 border-gray-100"
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  02 / Mô tả sản phẩm
-                </span>
-                <div
-                  className={`h-px flex-1 ${d ? "bg-[#30363d]/60" : "bg-gray-200/60"}`}
-                ></div>
-              </div>
-              <div className="flex-1 flex flex-col">
-                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
-                  Mô tả đặc tính cốt lõi
-                </label>
-                <textarea
-                  value={prodDesc}
-                  onChange={(e) => setProdDesc(e.target.value)}
-                  placeholder="Nhập những đặc điểm nổi bật đặc biệt nhất của thiết bị..."
-                  className={`w-full flex-1 min-h-[220px] focus:outline-none focus:ring-1 rounded-xl px-4 py-3 text-xs transition-all resize-none leading-relaxed ${
-                    d
-                      ? "bg-[#161b22] border border-[#30363d] focus:!border-white focus:!ring-white !text-white placeholder-gray-500"
-                      : "bg-white border border-gray-200 focus:border-black focus:ring-black text-gray-900 placeholder-gray-400"
-                  }`}
-                />
-              </div>
-            </section>
+          {/* Grid Bottom: Description & Image on one row, Specs on full width below */}
+          <div className="space-y-6 mt-6">
+            {/* Row 1: 02 / Description and 03 / Image & Render */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+              {/* Column 1: Description */}
+              <section
+                className={`border rounded-3xl p-6 flex flex-col text-left transition-all duration-300 ${
+                  d
+                    ? "bg-[#0d1117]/60 border-[#30363d]"
+                    : "bg-slate-50 border-gray-100"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    02 / Mô tả sản phẩm
+                  </span>
+                  <div
+                    className={`h-px flex-1 ${d ? "bg-[#30363d]/60" : "bg-gray-200/60"}`}
+                  ></div>
+                </div>
+                <div className="flex-1 flex flex-col">
+                  <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
+                    Mô tả đặc tính cốt lõi
+                  </label>
+                  <textarea
+                    value={prodDesc}
+                    onChange={(e) => setProdDesc(e.target.value)}
+                    placeholder="Nhập những đặc điểm nổi bật đặc biệt nhất của thiết bị..."
+                    className={`w-full flex-1 min-h-[220px] focus:outline-none focus:ring-1 rounded-xl px-4 py-3 text-xs transition-all resize-none leading-relaxed ${
+                      d
+                        ? "bg-[#161b22] border border-[#30363d] focus:!border-white focus:!ring-white !text-white placeholder-gray-500"
+                        : "bg-white border border-gray-200 focus:border-black focus:ring-black text-gray-900 placeholder-gray-400"
+                    }`}
+                  />
+                </div>
+              </section>
 
-            {/* Column 2: Media/Image upload preview */}
-            <section
-              className={`border rounded-3xl p-6 flex flex-col text-left transition-all duration-300 ${
-                d
-                  ? "bg-[#0d1117]/60 border-[#30363d]"
-                  : "bg-slate-50 border-gray-100"
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  03 / Hình ảnh & Render
-                </span>
-                <div
-                  className={`h-px flex-1 ${d ? "bg-[#30363d]/60" : "bg-gray-200/60"}`}
-                ></div>
-              </div>
-              <div className="flex-1 flex flex-col space-y-4">
-                <div
-                  className={`relative group border border-dashed rounded-2xl p-6 flex-1 flex flex-col items-center justify-center gap-3 transition-all min-h-[160px] ${
-                    d
-                      ? "border-[#30363d] bg-[#161b22] hover:bg-[#21262d]/45"
-                      : "border-gray-200 bg-white hover:bg-slate-50"
-                  }`}
-                >
-                  {imageFile || prodImage ? (
-                    <div className="relative w-full h-full flex items-center justify-center overflow-hidden min-h-[120px]">
-                      <img
-                        referrerPolicy="no-referrer"
-                        src={
-                          imageFile ? URL.createObjectURL(imageFile) : prodImage
-                        }
-                        alt="Mockup preview"
-                        className={`max-h-[120px] object-contain p-2 group-hover:scale-105 transition-transform duration-300 ${d ? "" : "mix-blend-multiply"}`}
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = "none";
-                        }}
-                      />
-                      <div
-                        className={`absolute top-1 left-1 px-1.5 py-0.5 rounded border text-[8px] font-mono tracking-widest font-bold uppercase flex items-center gap-0.5 ${
-                          d
-                            ? "bg-emerald-950/40 border-emerald-900/40 text-emerald-400"
-                            : "bg-emerald-50 border-emerald-100 text-emerald-700"
-                        }`}
-                      >
-                        <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping inline-block" />
-                        Preview OK
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div
-                        className={`w-12 h-12 rounded-full border flex items-center justify-center group-hover:scale-105 transition-transform shadow-sm ${
-                          d
-                            ? "bg-[#21262d] border-[#30363d]"
-                            : "bg-slate-100 border-gray-200"
-                        }`}
-                      >
-                        <UploadCloud
-                          className={`${d ? "text-gray-400" : "text-gray-500"} w-5 h-5 stroke-[1.5]`}
+              {/* Column 2: Media/Image upload preview */}
+              <section
+                className={`border rounded-3xl p-6 flex flex-col text-left transition-all duration-300 ${
+                  d
+                    ? "bg-[#0d1117]/60 border-[#30363d]"
+                    : "bg-slate-50 border-gray-100"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    03 / Hình ảnh & Render
+                  </span>
+                  <div
+                    className={`h-px flex-1 ${d ? "bg-[#30363d]/60" : "bg-gray-200/60"}`}
+                  ></div>
+                </div>
+                <div className="flex-1 flex flex-col space-y-4">
+                  <div
+                    className={`relative group border border-dashed rounded-2xl p-6 flex-1 flex flex-col items-center justify-center gap-3 transition-all min-h-[160px] ${
+                      d
+                        ? "border-[#30363d] bg-[#161b22] hover:bg-[#21262d]/45"
+                        : "border-gray-200 bg-white hover:bg-slate-50"
+                    }`}
+                  >
+                    {imageFile || prodImage ? (
+                      <div className="relative w-full h-full flex items-center justify-center overflow-hidden min-h-[120px]">
+                        <img
+                          referrerPolicy="no-referrer"
+                          src={
+                            imageFile ? URL.createObjectURL(imageFile) : prodImage
+                          }
+                          alt="Mockup preview"
+                          className={`max-h-[120px] object-contain p-2 group-hover:scale-105 transition-transform duration-300 ${d ? "" : "mix-blend-multiply"}`}
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = "none";
+                          }}
                         />
-                      </div>
-                      <div className="text-center font-medium">
-                        <p
-                          className={`text-xs ${d ? "text-white" : "text-gray-955"}`}
+                        <div
+                          className={`absolute top-1 left-1 px-1.5 py-0.5 rounded border text-[8px] font-mono tracking-widest font-bold uppercase flex items-center gap-0.5 ${
+                            d
+                              ? "bg-[#0d1117] border-[#30363d] text-gray-400"
+                              : "bg-gray-50 border-gray-200 text-gray-500"
+                          }`}
                         >
-                          Chưa có ảnh
-                        </p>
+                          preview
+                        </div>
                       </div>
-                    </>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">
-                      Tải ảnh mới từ máy tính
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          setImageFile(e.target.files[0]);
-                        }
-                      }}
-                      className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none focus:ring-1 cursor-pointer ${
-                        d
-                          ? "bg-[#161b22] border-[#30363d] focus:!border-white focus:!ring-white text-gray-300"
-                          : "bg-white border-gray-200 focus:border-black focus:ring-black text-gray-900"
-                      }`}
-                    />
+                    ) : (
+                      <>
+                        <div className={`p-4 rounded-2xl ${d ? "bg-[#21262d]" : "bg-slate-100"}`}>
+                          <Layers className="text-gray-400 animate-pulse" size={24} />
+                        </div>
+                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                          Không có file mockup
+                        </span>
+                      </>
+                    )}
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">
-                      URL Đường dẫn ảnh
-                    </label>
-                    <input
-                      type="text"
-                      value={prodImage}
-                      onChange={(e) => setProdImage(e.target.value)}
-                      placeholder="Dán liên kết hình ảnh độc bản..."
-                      className={`w-full focus:outline-none focus:ring-1 rounded-xl px-3 py-2 text-xs transition-all font-mono ${
-                        d
-                          ? "bg-[#161b22] border border-[#30363d] focus:!border-white focus:!ring-white !text-white placeholder-gray-500"
-                          : "bg-white border border-gray-200 focus:border-black focus:ring-black text-gray-900 placeholder-gray-400"
-                      }`}
-                    />
+                  <div className="space-y-2">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">
+                        Tải ảnh mới từ máy tính
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setImageFile(e.target.files[0]);
+                          }
+                        }}
+                        className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none focus:ring-1 cursor-pointer ${
+                          d
+                            ? "bg-[#161b22] border-[#30363d] focus:!border-white focus:!ring-white text-gray-300"
+                            : "bg-white border-gray-200 focus:border-black focus:ring-black text-gray-900"
+                        }`}
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">
+                        URL Đường dẫn ảnh
+                      </label>
+                      <input
+                        type="text"
+                        value={prodImage}
+                        onChange={(e) => setProdImage(e.target.value)}
+                        placeholder="Dán liên kết hình ảnh độc bản..."
+                        className={`w-full focus:outline-none focus:ring-1 rounded-xl px-3 py-2 text-xs transition-all font-mono ${
+                          d
+                            ? "bg-[#161b22] border border-[#30363d] focus:!border-white focus:!ring-white !text-white placeholder-gray-500"
+                            : "bg-white border border-gray-200 focus:border-black focus:ring-black text-gray-900 placeholder-gray-400"
+                        }`}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
+              </section>
+            </div>
 
-            {/* Column 3: Technical specifications */}
+            {/* Row 2: 04 / Technical specifications (Full Width) */}
             <section
               className={`border rounded-3xl p-6 flex flex-col text-left transition-all duration-300 ${
                 d
@@ -641,10 +679,7 @@ export default function ProductFormModal({
                   className={`h-px flex-1 ${d ? "bg-[#30363d]/60" : "bg-gray-200/60"}`}
                 ></div>
               </div>
-              <div
-                className="space-y-3 flex-1 overflow-y-auto max-h-[300px] pr-1 scrollbar-none"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-              >
+              <div className="space-y-3 flex-1 pr-1">
                 {formSpecs.map((spec, index) => (
                   <div
                     key={index}
@@ -654,7 +689,7 @@ export default function ProductFormModal({
                         : "bg-white border-gray-200 hover:border-black/15"
                     }`}
                   >
-                    <div className="flex-1 min-w-0 grid grid-cols-2 gap-2">
+                    <div className="flex-1 min-w-0 grid grid-cols-2 gap-4">
                       <div className="space-y-0.5">
                         <span className="text-[8px] uppercase font-black text-slate-400 tracking-wider block">
                           Tên thông số

@@ -14,6 +14,7 @@ export interface Product {
   colors?: string[];
   averageRating?: number;
   reviewCount?: number;
+  stock?: number;
 }
 
 export interface ReviewUser {

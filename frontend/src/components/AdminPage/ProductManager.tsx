@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Product } from "../../types";
-import { Plus, Edit3, Trash2, FileSpreadsheet, FileJson } from "lucide-react";
+import { Plus, Edit3, Trash2, FileSpreadsheet, FileJson, RefreshCw } from "lucide-react";
 import CsvImportModal from "./CsvImportModal";
 import JsonImportExportModal from "./JsonImportExportModal";
+import CustomAlert from "../CustomAlert";
 
 interface ProductManagerProps {
   products: Product[];
@@ -28,6 +29,39 @@ export default function ProductManager({
   const d = isDarkMode;
   const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
   const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Custom alert state
+  const [alertConfig, setAlertConfig] = useState<{
+    isOpen: boolean;
+    productId: string;
+    productName: string;
+  }>({
+    isOpen: false,
+    productId: "",
+    productName: "",
+  });
+
+  const handleRefresh = async () => {
+    if (!onRefreshProducts || isRefreshing) return;
+    setIsRefreshing(true);
+    await onRefreshProducts();
+    // Giữ animation ít nhất 600ms để người dùng thấy phản hồi
+    setTimeout(() => setIsRefreshing(false), 600);
+  };
+
+  const triggerDeleteConfirm = (id: string, name: string) => {
+    setAlertConfig({
+      isOpen: true,
+      productId: id,
+      productName: name,
+    });
+  };
+
+  const confirmDelete = () => {
+    onDelete(alertConfig.productId, alertConfig.productName);
+    setAlertConfig({ isOpen: false, productId: "", productName: "" });
+  };
 
   return (
     <div className="animate-fade-in space-y-6 font-sans">
@@ -88,6 +122,22 @@ export default function ProductManager({
             <Plus size={16} />
             Thêm sản phẩm mới
           </button>
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={isRefreshing || !onRefreshProducts}
+            title="Đồng bộ dữ liệu sản phẩm mới nhất"
+            className={`flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border shadow transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+              d
+                ? "border-[#30363d] bg-[#21262d] text-gray-300 hover:bg-white/10 hover:text-white"
+                : "border-gray-200 bg-white text-gray-500 hover:bg-gray-100 hover:text-black"
+            }`}
+          >
+            <RefreshCw
+              size={16}
+              className={isRefreshing ? "animate-spin" : "transition-transform"}
+            />
+          </button>
         </div>
       </div>
 
@@ -110,6 +160,7 @@ export default function ProductManager({
                 <th className="px-6 py-4.5">Định danh Ảnh / Tên</th>
                 <th className="px-6 py-4.5">Phân loại</th>
                 <th className="px-6 py-4.5">Giá bán</th>
+                <th className="px-6 py-4.5">Tồn kho</th>
                 <th className="col-span-2 px-6 py-4.5">
                   Đặc tả / Thông số tiêu biểu
                 </th>
@@ -187,6 +238,36 @@ export default function ProductManager({
                       {p.price.toLocaleString("vi-VN")}₫
                     </strong>
                   </td>
+                  {/* Stock column */}
+                  <td className="px-6 py-4">
+                    {(() => {
+                      const stock = p.stock ?? 0;
+                      const isLow = stock > 0 && stock <= 5;
+                      const isOut = stock === 0;
+                      return (
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-wider font-mono ${
+                            isOut
+                              ? d
+                                ? 'bg-rose-950/40 border border-rose-900/40 text-rose-400'
+                                : 'bg-rose-50 border border-rose-200 text-rose-600'
+                              : isLow
+                              ? d
+                                ? 'bg-amber-950/40 border border-amber-900/40 text-amber-400'
+                                : 'bg-amber-50 border border-amber-200 text-amber-600'
+                              : d
+                                ? 'bg-emerald-950/40 border border-emerald-900/40 text-emerald-400'
+                                : 'bg-emerald-50 border border-emerald-200 text-emerald-600'
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            isOut ? 'bg-rose-500' : isLow ? 'bg-amber-400' : 'bg-emerald-500'
+                          }`} />
+                          {isOut ? 'Hết hàng' : `${stock} chiếc`}
+                        </span>
+                      );
+                    })()}
+                  </td>
                   <td className="max-w-sm px-6 py-4">
                     <span
                       className={`mb-1 line-clamp-2 block text-[11px] leading-relaxed ${
@@ -239,7 +320,7 @@ export default function ProductManager({
                             <Edit3 size={13} />
                           </button>
                           <button
-                            onClick={() => onDelete(p.id, p.name)}
+                            onClick={() => triggerDeleteConfirm(p.id, p.name)}
                             className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
                               d
                                 ? "text-rose-400 text-rose-500 hover:bg-rose-950/30"
@@ -317,6 +398,18 @@ export default function ProductManager({
         onImportCompleted={() => {
           if (onRefreshProducts) onRefreshProducts();
         }}
+        isDarkMode={d}
+      />
+
+      <CustomAlert
+        isOpen={alertConfig.isOpen}
+        type="warning"
+        title="Xác nhận gỡ bỏ thiết bị"
+        message={`Bạn có chắc chắn muốn xóa sản phẩm "${alertConfig.productName}" khỏi hệ thống quầy hàng hay không?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setAlertConfig({ isOpen: false, productId: "", productName: "" })}
+        confirmText="Xác nhận xóa"
+        cancelText="Để tôi xem lại"
         isDarkMode={d}
       />
     </div>

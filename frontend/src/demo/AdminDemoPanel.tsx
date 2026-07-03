@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Key, ChevronRight, RefreshCw, Layers, ShoppingBag, Trash2 } from 'lucide-react';
-import { createProduct, clearAllOrdersFromServer, API_BASE_URL } from '../services/api';
+import { createProduct, clearAllOrdersFromServer, deleteProduct, getProducts, API_BASE_URL } from '../services/api';
+import CustomAlert from '../components/CustomAlert';
 
 interface AdminDemoPanelProps {
   token: string;
@@ -28,14 +29,30 @@ export default function AdminDemoPanel({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
+
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [isCreatingProduct, setIsCreatingProduct] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const [isClearingOrders, setIsClearingOrders] = useState(false);
+  const [isClearingProducts, setIsClearingProducts] = useState(false);
+  const [mockProductCount, setMockProductCount] = useState<number>(100);
 
-  const handleClearOrders = async () => {
-    if (!confirm("Bạn có chắc chắn muốn xóa sạch toàn bộ lịch sử đơn hàng trên hệ thống?")) return;
+  // Custom alert configuration
+  const [alertConfig, setAlertConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+  });
+
+  const handleClearOrdersAction = async () => {
     setIsClearingOrders(true);
+    setAlertConfig(prev => ({ ...prev, isOpen: false }));
     try {
       const res = await clearAllOrdersFromServer();
       if (res.success) {
@@ -50,6 +67,15 @@ export default function AdminDemoPanel({
     } finally {
       setIsClearingOrders(false);
     }
+  };
+
+  const handleClearOrders = () => {
+    setAlertConfig({
+      isOpen: true,
+      title: "Dọn sạch đơn hàng",
+      message: "Bạn có chắc chắn muốn xóa sạch toàn bộ lịch sử đơn hàng trên hệ thống?",
+      onConfirm: handleClearOrdersAction,
+    });
   };
 
   const handleCreateMockOrder = async () => {
@@ -71,6 +97,7 @@ export default function AdminDemoPanel({
               price: 3500000,
               image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80",
               category: "Keyboard",
+              stock: 15,
               description: "Bàn phím custom chất lượng hi-end gõ cực kỳ êm ái.",
               specs: [
                 { label: "Switches", value: "Linear Gateron Oil King" },
@@ -107,116 +134,204 @@ export default function AdminDemoPanel({
   const handleCreateMockProduct = async () => {
     setIsCreatingProduct(true);
     try {
-      const MOCK_PRODUCTS_POOL = [
+      // 1. Định nghĩa các tập từ khóa để lắp ghép sản phẩm ngẫu nhiên mà không cần hardcode
+      const brands = ["TechVie", "Alpha", "Zenith", "Quantum", "Nexus", "Aero", "Apex", "Edge"];
+      const modifiers = ["Pro", "Ultra", "Max", "Prime", "Lite", "Studio", "Carbon", "Elite", "X", "One"];
+      
+      const productTypes = [
         {
-          name: "iPhone 16 Pro Max Titanium",
-          price: "34990000",
           category: "Điện thoại",
-          description: "Điện thoại cao cấp nhất từ Apple với khung titan siêu bền, chip A18 Pro mạnh mẽ và cụm camera zoom quang học 5x sắc nét.",
-          image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80",
-          specs: [
-            { label: "Màn hình", value: "6.9 inch Super Retina XDR OLED, 120Hz" },
-            { label: "Vi xử lý", value: "Apple A18 Pro (3nm)" },
-            { label: "Bộ nhớ trong", value: "256GB / 512GB / 1TB" }
-          ]
+          nouns: ["Phone", "Mobile", "Pocket", "Cell"],
+          basePrice: 12000000,
+          priceRange: 20000000,
+          specKeys: [
+            { label: "Màn hình", values: ["6.1 inch OLED, 120Hz", "6.7 inch Super Retina", "6.9 inch Dynamic AMOLED"] },
+            { label: "Vi xử lý", values: ["A18 Bionic", "Snapdragon 8 Gen 3", "Dimensity 9300"] },
+            { label: "Bộ nhớ RAM", values: ["8GB LPDDR5X", "12GB RAM", "16GB RAM"] }
+          ],
+          imageKeywords: ["smartphone", "mobile-phone", "iphone"]
         },
         {
-          name: "Samsung Galaxy S25 Ultra",
-          price: "31990000",
-          category: "Điện thoại",
-          description: "Siêu phẩm cao cấp của Samsung tích hợp bút S Pen, màn hình độ sáng cao chống chói mắt và cụm camera AI 200MP.",
-          image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=800&q=80",
-          specs: [
-            { label: "Màn hình", value: "6.8 inch Dynamic AMOLED 2X, QHD+" },
-            { label: "Vi xử lý", value: "Snapdragon 8 Gen 4 for Galaxy" },
-            { label: "Camera chính", value: "200MP + 50MP + 12MP + 10MP" }
-          ]
-        },
-        {
-          name: "MacBook Pro M4 Max Space Black",
-          price: "79990000",
           category: "Laptop",
-          description: "Laptop chuyên nghiệp cho thiết kế đồ họa và lập trình với sức mạnh đỉnh cao từ vi xử lý M4 Max thế hệ mới nhất.",
-          image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
-          specs: [
-            { label: "CPU / GPU", value: "Apple M4 Max (16-core CPU, 40-core GPU)" },
-            { label: "Bộ nhớ RAM", value: "36GB Unified Memory" },
-            { label: "Màn hình", value: "16.2 inch Liquid Retina XDR, ProMotion 120Hz" }
-          ]
+          nouns: ["Book", "Blade", "ZenBook", "Air", "Workstation"],
+          basePrice: 18000000,
+          priceRange: 45000000,
+          specKeys: [
+            { label: "CPU", values: ["Apple M3 Pro", "Intel Core i7 Ultra 7", "AMD Ryzen 7 8840HS"] },
+            { label: "Độ phân giải", values: ["3K Liquid Retina", "2.8K OLED 120Hz", "FHD IPS 144Hz"] },
+            { label: "Dung lượng SSD", values: ["512GB NVMe PCIE", "1TB SSD Ultra-Fast"] }
+          ],
+          imageKeywords: ["laptop", "macbook", "notebook"]
         },
         {
-          name: "ASUS ROG Zephyrus G16 OLED",
-          price: "64990000",
-          category: "Laptop",
-          description: "Laptop gaming kiêm đồ họa mỏng nhẹ đẳng cấp, trang bị màn hình OLED tuyệt sắc cùng card đồ họa NVIDIA RTX 4080 cực mạnh.",
-          image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80",
-          specs: [
-            { label: "Bộ xử lý", value: "Intel Core Ultra 9 185H" },
-            { label: "Card đồ họa", value: "NVIDIA GeForce RTX 4080 12GB" },
-            { label: "Màn hình", value: "16 inch ROG Nebula OLED 2.5K, 240Hz" }
-          ]
-        },
-        {
-          name: "Apple Watch Ultra 2 Titanium",
-          price: "21990000",
           category: "Đồng hồ",
-          description: "Đồng hồ thể thao chuyên nghiệp với thiết kế hầm hố từ chất liệu titan hàng không, thời lượng pin tối ưu và GPS tần số kép siêu chính xác.",
-          image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=800&q=80",
-          specs: [
-            { label: "Chất liệu vỏ", value: "Titanium hàng không cấp độ 5" },
-            { label: "Độ sáng màn hình", value: "Tối đa 3000 nits" },
-            { label: "Chống nước", value: "WR100 (độ sâu lên đến 100m)" }
-          ]
+          nouns: ["Watch", "Chronos", "Band", "Wrist", "Fit"],
+          basePrice: 3500000,
+          priceRange: 15000000,
+          specKeys: [
+            { label: "Thời lượng pin", values: ["Lên đến 18 giờ", "Khoảng 3 ngày sử dụng", "Tối đa 14 ngày ở chế độ tiết kiệm"] },
+            { label: "Cảm biến", values: ["Đo nhịp tim sinh học & SpO2", "Cảm biến ECG chuyên sâu", "Đo độ cao khí áp"] }
+          ],
+          imageKeywords: ["smartwatch", "apple-watch", "watch"]
         },
         {
-          name: "Sony WH-1000XM5 Wireless",
-          price: "8490000",
           category: "Âm thanh",
-          description: "Tai nghe chụp tai chống ồn chủ động đỉnh cao số 1 thế giới với chất âm Hi-Res Audio chân thực và thời lượng pin sử dụng lên đến 30 giờ liên tục.",
-          image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
-          specs: [
-            { label: "Driver", value: "30mm đặc chế" },
-            { label: "Chống ồn", value: "Dual Processor V1 & HD Noise Cancelling QN1" },
-            { label: "Kết nối", value: "Bluetooth 5.2, hỗ trợ LDAC" }
-          ]
+          nouns: ["Pods", "Buds", "Headset", "Boombox", "Soundbar"],
+          basePrice: 1500000,
+          priceRange: 8000000,
+          specKeys: [
+            { label: "Kết nối không dây", values: ["Bluetooth 5.3 aptX", "Bluetooth 5.2 LDAC"] },
+            { label: "Chống ồn", values: ["Chống ồn chủ động ANC 40dB", "Chống ồn Hybird thông minh"] }
+          ],
+          imageKeywords: ["headphones", "earbuds", "speaker"]
         },
         {
-          name: "Bàn phím cơ Keychron Q1 Pro",
-          price: "4650000",
           category: "Bàn phím",
-          description: "Bàn phím cơ Custom cao cấp vỏ nhôm CNC nguyên khối, thiết kế double-gasket giảm chấn và hỗ trợ kết nối Bluetooth / Type-C đa thiết bị.",
-          image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80",
-          specs: [
-            { label: "Layout", value: "75% compact" },
-            { label: "Switch", value: "Keychron K Pro Red / Brown (Pre-lubed)" },
-            { label: "Chất liệu vỏ", value: "Nhôm CNC toàn phần" }
-          ]
+          nouns: ["Board", "Key", "Keyboard", "Deck"],
+          basePrice: 1200000,
+          priceRange: 4000000,
+          specKeys: [
+            { label: "Layout", values: ["75% Compact layout", "TKL Tenkeyless", "Full-size 108 keys"] },
+            { label: "Switch", values: ["Gateron G Pro Brown", "Cherry MX Red Linear", "Kailh Box White Clicky"] }
+          ],
+          imageKeywords: ["mechanical-keyboard", "keyboard-keycaps"]
+        },
+        {
+          category: "Combo",
+          nouns: ["Workspace Elite Combo", "Studio Setup Combo", "Gaming Extreme Combo", "Creator Premium Combo"],
+          basePrice: 2000000,
+          priceRange: 6000000,
+          specKeys: [
+            { label: "Bao gồm", values: ["Bàn phím cơ, Chuột không dây, Lót chuột cỡ lớn", "Đèn LED thanh, Loa bluetooth, Bảng tiêu âm", "Bàn phím, Chuột công thái học, Thớt da trải bàn"] },
+            { label: "Kết nối", values: ["Bluetooth 5.1 / 2.4GHz", "Không dây & Có dây"] }
+          ],
+          imageKeywords: ["workspace", "desk-setup", "office-setup"]
+        },
+        {
+          category: "Phụ kiện",
+          nouns: ["Cáp Sạc Nhanh", "Bộ Sạc GaN", "Giá Đỡ Laptop", "Tấm Lót Chuột Da", "Túi Chống Sốc"],
+          basePrice: 200000,
+          priceRange: 1000000,
+          specKeys: [
+            { label: "Chất liệu", values: ["Liquid Silicon siêu bền", "Hợp kim nhôm cao cấp", "Da PU nguyên tấm"] },
+            { label: "Tính năng", values: ["Sạc nhanh 100W", "Chống nước, Dễ lau chùi", "Gập gọn tiện lợi"] }
+          ],
+          imageKeywords: ["charger", "cable", "mousepad", "laptop-stand"]
         }
       ];
 
-      const randomProduct = MOCK_PRODUCTS_POOL[Math.floor(Math.random() * MOCK_PRODUCTS_POOL.length)];
-      
-      const formData = new FormData();
-      formData.append('name', `${randomProduct.name} #${Math.floor(Math.random() * 1000)}`);
-      formData.append('price', randomProduct.price);
-      formData.append('category', randomProduct.category);
-      formData.append('description', randomProduct.description);
-      formData.append('image', randomProduct.image);
-      formData.append('specs', JSON.stringify(randomProduct.specs));
+      const descriptions = [
+        "Sản phẩm đột phá tích hợp công nghệ tương lai, mang lại trải nghiệm tối ưu vượt trội cho người dùng.",
+        "Thiết kế công thái học đỉnh cao từ chất liệu cao cấp siêu bền bỉ, tôn vinh phong cách sống tinh tế.",
+        "Hiệu năng mạnh mẽ đứng đầu phân khúc, sẵn sàng giải quyết mọi tác vụ công việc và giải trí nặng nề nhất.",
+        "Thiết bị chính hãng, bảo hành toàn quốc 24 tháng kèm chính sách 1 đổi 1 cực kỳ ưu đãi."
+      ];
 
-      const res = await createProduct(formData, token);
-      if (res.success) {
-        console.log(`Sản phẩm mẫu (${randomProduct.name}) đã được tạo thành công!`);
-        onRefreshProducts();
-      } else {
-        console.log("Tạo sản phẩm thất bại: " + res.message);
+      const colorsPool = ["Titan Tự Nhiên", "Xám Không Gian", "Bạc Silver", "Xanh Midnight", "Đen Jet Black", "Trắng Ceramic"];
+
+      console.log(`Bắt đầu sinh ngẫu nhiên ${mockProductCount} sản phẩm mẫu gửi lên backend...`);
+      let successCount = 0;
+      
+      // Tạo mảng tác vụ gửi song song (chia thành các batch nhỏ 10 sản phẩm để tránh quá tải server/Cloudinary)
+      const batchSize = 10;
+      for (let i = 0; i < mockProductCount; i += batchSize) {
+        const batchPromises = [];
+        
+        for (let j = 0; j < batchSize && (i + j) < mockProductCount; j++) {
+          const type = productTypes[Math.floor(Math.random() * productTypes.length)];
+          const brand = brands[Math.floor(Math.random() * brands.length)];
+          const noun = type.nouns[Math.floor(Math.random() * type.nouns.length)];
+          const modifier = modifiers[Math.floor(Math.random() * modifiers.length)];
+          const name = `${brand} ${noun} ${modifier} #${Math.floor(Math.random() * 9000) + 1000}`;
+          
+          const price = Math.floor(type.basePrice + Math.random() * type.priceRange);
+          const stock = Math.floor(Math.random() * 80) + 5; // Tồn kho ngẫu nhiên từ 5 đến 85 chiếc
+          const desc = descriptions[Math.floor(Math.random() * descriptions.length)];
+          
+          // Tạo specs ngẫu nhiên
+          const specs = type.specKeys.map(spec => {
+            const specVal = spec.values ? spec.values[Math.floor(Math.random() * spec.values.length)] : (spec as any).value;
+            return { label: spec.label, value: Array.isArray(specVal) ? specVal[0] : specVal };
+          });
+
+          // Chọn ngẫu nhiên 2 màu sắc
+          const colors = [
+            colorsPool[Math.floor(Math.random() * colorsPool.length)],
+            colorsPool[(Math.floor(Math.random() * colorsPool.length) + 1) % colorsPool.length]
+          ];
+
+          // Lấy ảnh ngẫu nhiên từ Unsplash theo từ khóa category thông qua Source Unsplash
+          const keyword = type.imageKeywords[Math.floor(Math.random() * type.imageKeywords.length)];
+          const randomPhotoId = Math.floor(Math.random() * 1000);
+          const imageUrl = `https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&sig=${randomPhotoId}&search=${keyword}`;
+
+          const formData = new FormData();
+          formData.append('name', name);
+          formData.append('price', String(price));
+          formData.append('stock', String(stock));
+          formData.append('category', type.category);
+          formData.append('description', desc);
+          formData.append('image', imageUrl);
+          formData.append('specs', JSON.stringify(specs));
+          formData.append('colors', JSON.stringify(colors));
+
+          batchPromises.push(
+            createProduct(formData, token).then(res => {
+              if (res.success) {
+                successCount++;
+              }
+            }).catch(e => console.error("Lỗi khi tạo sản phẩm hàng loạt:", e))
+          );
+        }
+
+        // Chờ batch hiện tại hoàn thành trước khi chạy batch tiếp theo
+        await Promise.all(batchPromises);
+        console.log(`Đang chạy... Đã tạo thành công ${successCount}/${Math.min(mockProductCount, i + batchPromises.length)} sản phẩm mẫu.`);
       }
+
+      console.log(`✔ Hoàn thành! Đã tạo thành công tổng cộng ${successCount}/${mockProductCount} sản phẩm mẫu.`);
+      onRefreshProducts();
     } catch (err) {
       console.error(err);
-      console.log("Lỗi kết nối khi tạo sản phẩm mẫu!");
+      console.log("Lỗi kết nối khi tạo sản phẩm mẫu hàng loạt!");
     } finally {
       setIsCreatingProduct(false);
     }
+  };
+
+  const handleClearProductsAction = async () => {
+    setIsClearingProducts(true);
+    setAlertConfig(prev => ({ ...prev, isOpen: false }));
+    try {
+      const res = await getProducts();
+      if (res.success && res.products) {
+        let deletedCount = 0;
+        for (const p of res.products) {
+          const delRes = await deleteProduct(p.id, token);
+          if (delRes.success) {
+            deletedCount++;
+          }
+        }
+        console.log(`Đã xóa sạch ${deletedCount}/${res.products.length} sản phẩm thành công!`);
+        onRefreshProducts();
+      } else {
+        console.log("Không lấy được danh sách sản phẩm để xóa.");
+      }
+    } catch (err) {
+      console.error(err);
+      console.log("Lỗi kết nối khi dọn sạch sản phẩm!");
+    } finally {
+      setIsClearingProducts(false);
+    }
+  };
+
+  const handleClearProducts = () => {
+    setAlertConfig({
+      isOpen: true,
+      title: "Xóa sạch sản phẩm",
+      message: "Bạn có chắc chắn muốn xóa sạch TOÀN BỘ sản phẩm trên hệ thống?",
+      onConfirm: handleClearProductsAction,
+    });
   };
 
   const handleSwitchToClient = async () => {
@@ -230,37 +345,28 @@ export default function AdminDemoPanel({
       className={`fixed right-0 top-[25%] z-[9999] flex items-center transition-transform duration-500 ease-out select-none ${
         isOpen
           ? "translate-x-0"
-          : "translate-x-[calc(100%-24px)] md:translate-x-[calc(100%-28px)]"
+          : "translate-x-[220px]"
       }`}
     >
-      {/* Tab Toggle Button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-7.5 h-14 bg-black/70 hover:bg-black/90 text-white/80 hover:text-white border-y border-l border-white/10 rounded-l-xl flex items-center justify-center shadow-lg cursor-pointer transition-colors backdrop-blur-md"
-        title={isOpen ? "Thu gọn bảng demo" : "Mở rộng bảng demo"}
+        className="bg-black/90 hover:bg-black text-white p-3 rounded-l-2xl border-y border-l border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex items-center justify-center transition-all cursor-pointer hover:pl-4 group"
       >
-        {isOpen ? (
-          <ChevronRight size={16} />
-        ) : (
-          <Key size={14} className="animate-pulse text-indigo-400" />
-        )}
+        <ChevronRight
+          size={16}
+          className={`transition-transform duration-300 ${isOpen ? "rotate-0" : "rotate-180"}`}
+        />
       </button>
 
-      {/* Main Glass Panel */}
-      <div className="w-[240px] p-4 bg-black/70 backdrop-blur-2xl border border-white/10 rounded-l-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] flex flex-col gap-4 text-white relative">
-        <div className="absolute inset-0 rounded-l-2xl border border-white/5 pointer-events-none" />
-
-        <div className="text-center pb-2 border-b border-white/10">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 block mb-0.5 font-jakarta">
-            BẢNG THỬ NGHIỆM ĐỒNG BỘ
-          </span>
-          <span className="text-[11px] text-indigo-300 font-bold block font-jakarta">
-            ADMIN DEMO CONTROL
+      <div className="w-[220px] bg-black/95 border-l border-y border-white/10 rounded-l-2xl p-4 flex flex-col gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-md">
+        <div className="flex items-center gap-2 pb-1 border-b border-white/10">
+          <Layers size={14} className="text-white" />
+          <span className="text-[11px] font-black uppercase tracking-wider text-white font-jakarta">
+            Demo Control Panel
           </span>
         </div>
 
-        {/* Action 1: Create Mock Order */}
         <div className="space-y-1">
           <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-white/50 block font-jakarta">
             Dữ liệu Đơn hàng
@@ -269,16 +375,16 @@ export default function AdminDemoPanel({
             type="button"
             onClick={handleCreateMockOrder}
             disabled={isCreatingOrder}
-            className="w-full flex items-center justify-center gap-2 bg-indigo-600/35 hover:bg-indigo-600/50 disabled:bg-gray-700/50 text-indigo-100 border border-indigo-500/20 py-2.5 rounded-xl text-[10.5px] font-bold tracking-wider transition-all active:scale-95 cursor-pointer font-jakarta"
+            className="w-full flex items-center justify-center gap-2 bg-indigo-600/30 hover:bg-indigo-600/45 disabled:bg-gray-700/50 text-indigo-200 border border-indigo-500/20 py-2.5 rounded-xl text-[10.5px] font-bold tracking-wider transition-all active:scale-95 cursor-pointer font-jakarta"
           >
             {isCreatingOrder ? (
               <RefreshCw size={12} className="animate-spin" />
             ) : (
               <ShoppingBag size={12} />
             )}
-            TẠO ĐƠN HÀNG MẪU (KHÁCH)
+            TẠO ĐƠN HÀNG MẪU
           </button>
-          
+
           <button
             type="button"
             onClick={handleClearOrders}
@@ -294,11 +400,22 @@ export default function AdminDemoPanel({
           </button>
         </div>
 
-        {/* Action 2: Create Mock Product */}
         <div className="space-y-1">
           <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-white/50 block font-jakarta">
             Dữ liệu Kho hàng
           </span>
+          {/* Custom Input for mock product count */}
+          <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 mb-1">
+            <span className="text-[9.5px] font-bold text-white/55 font-jakarta">SL:</span>
+            <input
+              type="number"
+              min={1}
+              max={500}
+              value={mockProductCount}
+              onChange={(e) => setMockProductCount(Math.max(1, parseInt(e.target.value) || 1))}
+              className="flex-1 bg-transparent border-0 p-0 text-[11px] font-bold text-white font-mono focus:outline-none focus:ring-0 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
           <button
             type="button"
             onClick={handleCreateMockProduct}
@@ -312,9 +429,22 @@ export default function AdminDemoPanel({
             )}
             TẠO SẢN PHẨM MẪU
           </button>
+
+          <button
+            type="button"
+            onClick={handleClearProducts}
+            disabled={isClearingProducts}
+            className="w-full flex items-center justify-center gap-2 bg-rose-600/30 hover:bg-rose-600/45 disabled:bg-gray-700/50 text-rose-200 border border-rose-500/20 py-2.5 rounded-xl text-[10.5px] font-bold tracking-wider transition-all active:scale-95 cursor-pointer font-jakarta mt-1.5"
+          >
+            {isClearingProducts ? (
+              <RefreshCw size={12} className="animate-spin" />
+            ) : (
+              <Trash2 size={12} />
+            )}
+            XÓA SẠCH SẢN PHẨM
+          </button>
         </div>
 
-        {/* Action 3: Switch Account */}
         <div className="space-y-1 pt-1 border-t border-white/10">
           <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-white/50 block font-jakarta">
             Thay Đổi Phân Quyền
@@ -335,6 +465,17 @@ export default function AdminDemoPanel({
         </div>
       </div>
 
+      <CustomAlert
+        isOpen={alertConfig.isOpen}
+        type="warning"
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onConfirm={alertConfig.onConfirm}
+        onCancel={() => setAlertConfig(prev => ({ ...prev, isOpen: false }))}
+        confirmText="Xác nhận"
+        cancelText="Hủy bỏ"
+        isDarkMode={true}
+      />
     </div>
   );
 }

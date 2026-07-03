@@ -56,7 +56,6 @@ export default function ProductCard({
 
   return (
     <motion.div 
-      layout
       whileHover={{ y: -6, scale: 1.01 }}
       animate={{ 
         scale: isMagnetized ? 0.96 : 1,
