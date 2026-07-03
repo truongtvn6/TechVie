@@ -14,10 +14,12 @@ import {
   Headphones,
   Keyboard,
   FileSpreadsheet,
-  FileText
+  FileText,
+  FileJson,
 } from "lucide-react";
 import { Product } from "../../types";
 import * as XLSX from "xlsx";
+import OrderExportModal from "./OrderExportModal";
 
 interface OrderManagerProps {
   orders: any[];
@@ -103,10 +105,10 @@ function OrderProductImage({
   if (!imageUrl || imgError) {
     return (
       <div
-        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 ${
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all duration-300 ${
           d
-            ? "bg-gradient-to-br from-[#21262d]/80 to-[#161b22]/80 border-[#30363d] text-gray-400"
-            : "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 text-gray-450"
+            ? "border-[#30363d] bg-gradient-to-br from-[#21262d]/80 to-[#161b22]/80 text-gray-400"
+            : "text-gray-450 border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100"
         }`}
         title={productName}
       >
@@ -117,15 +119,15 @@ function OrderProductImage({
 
   return (
     <div
-      className={`w-11 h-11 rounded-xl border shrink-0 flex items-center justify-center overflow-hidden transition-all duration-300 ${
-        d ? "bg-[#21262d] border-[#30363d]" : "bg-white border-gray-150"
+      className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border transition-all duration-300 ${
+        d ? "border-[#30363d] bg-[#21262d]" : "border-gray-150 bg-white"
       }`}
     >
       <img
         src={imageUrl}
         alt={productName}
         onError={() => setImgError(true)}
-        className={`w-full h-full object-cover ${d ? "" : "mix-blend-multiply"}`}
+        className={`h-full w-full object-cover ${d ? "" : "mix-blend-multiply"}`}
       />
     </div>
   );
@@ -141,31 +143,35 @@ export default function OrderManager({
   products = [],
 }: OrderManagerProps) {
   const d = isDarkMode;
-  const [confirmAction, setConfirmAction] = useState<{ [orderId: number]: 'success' | 'cancelled' | null }>({});
+  const [confirmAction, setConfirmAction] = useState<{
+    [orderId: number]: "success" | "cancelled" | null;
+  }>({});
+  const [isExportJsonOpen, setIsExportJsonOpen] = useState(false);
 
   const handleExportExcel = () => {
     if (!orders || orders.length === 0) {
-      console.log('Không có dữ liệu đơn hàng để xuất Excel.');
+      console.log("Không có dữ liệu đơn hàng để xuất Excel.");
       return;
     }
 
     // Map dữ liệu đơn hàng sang format bảng biểu đẹp mắt
     const excelRows = orders.map((ord: any) => {
       // Nối danh sách sản phẩm thành một chuỗi text duy nhất
-      const productsText = ord.items
-        ?.map((item: any) => {
-          const name = item.product?.name || "Sản phẩm không rõ";
-          return `${name} (SL: ${item.quantity})`;
-        })
-        .join("\n") || "";
+      const productsText =
+        ord.items
+          ?.map((item: any) => {
+            const name = item.product?.name || "Sản phẩm không rõ";
+            return `${name} (SL: ${item.quantity})`;
+          })
+          .join("\n") || "";
 
       // Định dạng trạng thái tiếng Việt
       let statusVi = ord.status;
-      if (ord.statusType === 'pending') statusVi = 'Chờ xử lý';
-      else if (ord.statusType === 'processing') statusVi = 'Đang chuẩn bị gửi';
-      else if (ord.statusType === 'shipping') statusVi = 'Đang giao bưu tá';
-      else if (ord.statusType === 'success') statusVi = 'Hoàn tất bàn giao';
-      else if (ord.statusType === 'cancelled') statusVi = 'Đã hủy đơn';
+      if (ord.statusType === "pending") statusVi = "Chờ xử lý";
+      else if (ord.statusType === "processing") statusVi = "Đang chuẩn bị gửi";
+      else if (ord.statusType === "shipping") statusVi = "Đang giao bưu tá";
+      else if (ord.statusType === "success") statusVi = "Hoàn tất bàn giao";
+      else if (ord.statusType === "cancelled") statusVi = "Đã hủy đơn";
 
       return {
         "Mã Đơn Hàng": `#${ord.orderId}`,
@@ -173,10 +179,19 @@ export default function OrderManager({
         "Số Điện Thoại": ord.phone,
         "Địa Chỉ Giao Hàng": ord.address,
         "Chi Tiết Sản Phẩm": productsText,
-        "Tổng Tiền (VNĐ)": ord.totalPrice || ord.items?.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0) || 0,
+        "Tổng Tiền (VNĐ)":
+          ord.totalPrice ||
+          ord.items?.reduce(
+            (acc: number, item: any) => acc + item.price * item.quantity,
+            0,
+          ) ||
+          0,
         "Trạng Thái Đơn Hàng": statusVi,
-        "Phương Thức Thanh Toán": ord.paymentMethod === 'cod' ? 'Thanh toán COD' : 'Chuyển khoản Banking',
-        "Thời Gian Đặt Hàng": new Date(ord.createdAt).toLocaleString("vi-VN")
+        "Phương Thức Thanh Toán":
+          ord.paymentMethod === "cod"
+            ? "Thanh toán COD"
+            : "Chuyển khoản Banking",
+        "Thời Gian Đặt Hàng": new Date(ord.createdAt).toLocaleString("vi-VN"),
       };
     });
 
@@ -195,19 +210,19 @@ export default function OrderManager({
       { wch: 18 }, // Tổng Tiền (VNĐ)
       { wch: 20 }, // Trạng Thái Đơn Hàng
       { wch: 25 }, // Phương Thức Thanh Toán
-      { wch: 22 }  // Thời Gian Đặt Hàng
+      { wch: 22 }, // Thời Gian Đặt Hàng
     ];
     worksheet["!cols"] = maxColsWidth;
 
     // Kích hoạt trình tải xuống file Excel
-    const fileName = `Bao_cao_don_hang_${new Date().toISOString().slice(0,10)}.xlsx`;
+    const fileName = `Bao_cao_don_hang_${new Date().toISOString().slice(0, 10)}.xlsx`;
     XLSX.writeFile(workbook, fileName);
     console.log(`Xuất thành công file Excel báo cáo đơn hàng: ${fileName}`);
   };
 
   const handleExportCsv = () => {
     if (!orders || orders.length === 0) {
-      console.log('Không có dữ liệu đơn hàng để xuất CSV.');
+      console.log("Không có dữ liệu đơn hàng để xuất CSV.");
       return;
     }
 
@@ -220,25 +235,32 @@ export default function OrderManager({
       "Tổng Tiền (VNĐ)",
       "Trạng Thái Đơn Hàng",
       "Phương Thức Thanh Toán",
-      "Thời Gian Đặt Hàng"
+      "Thời Gian Đặt Hàng",
     ];
 
     const csvRows = orders.map((ord: any) => {
-      const productsText = ord.items
-        ?.map((item: any) => {
-          const name = item.product?.name || "Sản phẩm không rõ";
-          return `${name} (SL: ${item.quantity})`;
-        })
-        .join("; ") || "";
+      const productsText =
+        ord.items
+          ?.map((item: any) => {
+            const name = item.product?.name || "Sản phẩm không rõ";
+            return `${name} (SL: ${item.quantity})`;
+          })
+          .join("; ") || "";
 
       let statusVi = ord.status;
-      if (ord.statusType === 'pending') statusVi = 'Chờ xử lý';
-      else if (ord.statusType === 'processing') statusVi = 'Đang chuẩn bị gửi';
-      else if (ord.statusType === 'shipping') statusVi = 'Đang giao bưu tá';
-      else if (ord.statusType === 'success') statusVi = 'Hoàn tất bàn giao';
-      else if (ord.statusType === 'cancelled') statusVi = 'Đã hủy đơn';
+      if (ord.statusType === "pending") statusVi = "Chờ xử lý";
+      else if (ord.statusType === "processing") statusVi = "Đang chuẩn bị gửi";
+      else if (ord.statusType === "shipping") statusVi = "Đang giao bưu tá";
+      else if (ord.statusType === "success") statusVi = "Hoàn tất bàn giao";
+      else if (ord.statusType === "cancelled") statusVi = "Đã hủy đơn";
 
-      const totalPrice = ord.totalPrice || ord.items?.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0) || 0;
+      const totalPrice =
+        ord.totalPrice ||
+        ord.items?.reduce(
+          (acc: number, item: any) => acc + item.price * item.quantity,
+          0,
+        ) ||
+        0;
 
       // Escape quotes and wrap with double quotes to support CSV structure
       return [
@@ -249,18 +271,18 @@ export default function OrderManager({
         `"${productsText.replace(/"/g, '""')}"`,
         totalPrice,
         `"${statusVi}"`,
-        `"${ord.paymentMethod === 'cod' ? 'Thanh toán COD' : 'Chuyển khoản Banking'}"`,
-        `"${new Date(ord.createdAt).toLocaleString("vi-VN")}"`
+        `"${ord.paymentMethod === "cod" ? "Thanh toán COD" : "Chuyển khoản Banking"}"`,
+        `"${new Date(ord.createdAt).toLocaleString("vi-VN")}"`,
       ].join(",");
     });
 
     // Merge headers and rows with UTF-8 BOM to prevent Vietnamese font corruption in Excel
     const csvContent = "\uFEFF" + headers.join(",") + "\n" + csvRows.join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    const fileName = `Bao_cao_don_hang_${new Date().toISOString().slice(0,10)}.csv`;
-    
+    const fileName = `Bao_cao_don_hang_${new Date().toISOString().slice(0, 10)}.csv`;
+
     link.setAttribute("href", url);
     link.setAttribute("download", fileName);
     document.body.appendChild(link);
@@ -270,33 +292,33 @@ export default function OrderManager({
   };
 
   return (
-    <div className="space-y-6 animate-fade-in font-sans">
+    <div className="animate-fade-in space-y-6 font-sans">
       <div
-        className={`flex flex-col sm:flex-row justify-between sm:items-center gap-4 border p-6 sm:p-8 rounded-3xl shadow-sm transition-all duration-300 ${
-          d ? "bg-[#161b22] border-[#30363d]" : "bg-white border-gray-200"
+        className={`flex flex-col justify-between gap-4 rounded-3xl border p-6 shadow-sm transition-all duration-300 sm:flex-row sm:items-center sm:p-8 ${
+          d ? "border-[#30363d] bg-[#161b22]" : "border-gray-200 bg-white"
         }`}
       >
         <div>
           <h3
-            className={`font-extrabold text-base uppercase tracking-wider ${d ? "text-white" : "text-gray-955"}`}
+            className={`text-base font-extrabold tracking-wider uppercase ${d ? "text-white" : "text-gray-955"}`}
           >
             Theo dõi Sổ bưu kiện đặt hàng
           </h3>
           <p
-            className={`text-xs md:text-[13px] font-sans mt-1.5 leading-relaxed ${d ? "text-gray-400" : "text-gray-405"}`}
+            className={`mt-1.5 font-sans text-xs leading-relaxed md:text-[13px] ${d ? "text-gray-400" : "text-gray-405"}`}
           >
             Thực hiện phê duyệt lộ trình đơn hàng thực tế lưu trữ tại máy phản
             hồi của Express server.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={handleExportExcel}
-            className={`h-12 px-5 border flex items-center justify-center gap-2 rounded-xl transition-all cursor-pointer text-xs font-bold uppercase tracking-wider ${
+            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border px-8 text-xs font-bold tracking-wider uppercase transition-all ${
               d
-                ? "bg-[#21262d] border-[#30363d] hover:bg-[#30363d] text-emerald-400"
-                : "bg-white border-gray-200 hover:bg-gray-50 text-emerald-600 shadow-xs"
+                ? "border-[#30363d] bg-[#21262d] text-emerald-400 hover:bg-[#30363d]"
+                : "border-gray-200 bg-white text-emerald-600 shadow-xs hover:bg-gray-50"
             }`}
             title="Xuất báo cáo định dạng Excel (.xlsx)"
           >
@@ -306,10 +328,10 @@ export default function OrderManager({
 
           <button
             onClick={handleExportCsv}
-            className={`h-12 px-5 border flex items-center justify-center gap-2 rounded-xl transition-all cursor-pointer text-xs font-bold uppercase tracking-wider ${
+            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border px-8 text-xs font-bold tracking-wider uppercase transition-all ${
               d
-                ? "bg-[#21262d] border-[#30363d] hover:bg-[#30363d] text-indigo-400"
-                : "bg-white border-gray-200 hover:bg-gray-50 text-indigo-600 shadow-xs"
+                ? "border-[#30363d] bg-[#21262d] text-indigo-400 hover:bg-[#30363d]"
+                : "border-gray-200 bg-white text-indigo-600 shadow-xs hover:bg-gray-50"
             }`}
             title="Xuất báo cáo định dạng CSV (.csv)"
           >
@@ -318,11 +340,24 @@ export default function OrderManager({
           </button>
 
           <button
-            onClick={onRefreshOrders}
-            className={`w-12 h-12 border flex items-center justify-center rounded-xl transition-all cursor-pointer ${
+            onClick={() => setIsExportJsonOpen(true)}
+            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border px-8 text-xs font-bold tracking-wider uppercase transition-all ${
               d
-                ? "bg-[#21262d] border-[#30363d] hover:bg-[#30363d] text-white"
-                : "bg-white border-gray-200 hover:bg-gray-50"
+                ? "border-[#30363d] bg-[#21262d] text-amber-400 hover:bg-[#30363d]"
+                : "border-gray-200 bg-white text-amber-600 shadow-xs hover:bg-gray-50"
+            }`}
+            title="Xuất dữ liệu định dạng JSON (.json)"
+          >
+            <FileJson size={16} />
+            <span>Xuất JSON</span>
+          </button>
+
+          <button
+            onClick={onRefreshOrders}
+            className={`flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border transition-all ${
+              d
+                ? "border-[#30363d] bg-[#21262d] text-white hover:bg-[#30363d]"
+                : "border-gray-200 bg-white hover:bg-gray-50"
             }`}
             title="Tải lại sổ"
           >
@@ -334,12 +369,12 @@ export default function OrderManager({
       {/* Sổ đặt hàng Table list */}
       {isLoadingOrders ? (
         <div
-          className={`text-center py-20 border rounded-3xl ${
-            d ? "bg-[#161b22] border-[#30363d]" : "bg-white border-gray-200"
+          className={`rounded-3xl border py-20 text-center ${
+            d ? "border-[#30363d] bg-[#161b22]" : "border-gray-200 bg-white"
           }`}
         >
           <div
-            className={`w-8 h-8 border-3 rounded-full animate-spin mx-auto mb-3 ${
+            className={`mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-3 ${
               d
                 ? "border-white/15 border-t-white"
                 : "border-black/15 border-t-black"
@@ -351,13 +386,13 @@ export default function OrderManager({
         </div>
       ) : orders.length === 0 ? (
         <div
-          className={`text-center py-16 border rounded-3xl p-6 ${
-            d ? "bg-[#161b22] border-[#30363d]" : "bg-white border-gray-200"
+          className={`rounded-3xl border p-6 py-16 text-center ${
+            d ? "border-[#30363d] bg-[#161b22]" : "border-gray-200 bg-white"
           }`}
         >
           <AlertCircle
             size={36}
-            className="text-gray-400 mx-auto mb-3 animate-bounce"
+            className="mx-auto mb-3 animate-bounce text-gray-400"
           />
           <p
             className={`text-sm font-extrabold ${d ? "text-white" : "text-gray-805"}`}
@@ -365,7 +400,7 @@ export default function OrderManager({
             Sổ Đơn Hàng Đang Trống
           </p>
           <p
-            className={`text-xs max-w-[320px] mx-auto mt-1 leading-relaxed ${d ? "text-gray-400" : "text-gray-405"}`}
+            className={`mx-auto mt-1 max-w-[320px] text-xs leading-relaxed ${d ? "text-gray-400" : "text-gray-405"}`}
           >
             Chưa có đơn hàng nào được kích hoạt. Hãy dùng chức năng "Tạo đơn
             ngẫu nhiên" hoặc thêm giỏ hàng thanh toán bên cửa hàng.
@@ -376,44 +411,44 @@ export default function OrderManager({
           {orders.map((ord: any) => (
             <div
               key={ord.orderId}
-              className={`rounded-[1.8rem] overflow-hidden shadow-sm text-xs font-sans border ${
-                d ? "bg-[#161b22] border-[#30363d]" : "bg-white border-gray-200"
+              className={`overflow-hidden rounded-[1.8rem] border font-sans text-xs shadow-sm ${
+                d ? "border-[#30363d] bg-[#161b22]" : "border-gray-200 bg-white"
               }`}
             >
               {/* Row 1 Header */}
               <div
-                className={`p-5 flex flex-col md:flex-row justify-between md:items-center gap-4 border-b ${
+                className={`flex flex-col justify-between gap-4 border-b p-5 md:flex-row md:items-center ${
                   d
-                    ? "bg-[#0d1117]/60 border-[#30363d]"
-                    : "bg-gray-50/70 border-gray-150/80"
+                    ? "border-[#30363d] bg-[#0d1117]/60"
+                    : "border-gray-150/80 bg-gray-50/70"
                 }`}
               >
                 {/* Grid layout chia 4 cột: 1. Mã đơn, 2. Khách hàng, 3. Thời gian, 4. Thành tiền */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 items-center w-full max-w-4xl">
+                <div className="grid w-full max-w-4xl grid-cols-2 items-center gap-4 sm:grid-cols-4 sm:gap-8">
                   {/* Cột 1: Mã đơn hàng */}
                   <div className="flex flex-col">
                     <span
-                      className={`text-[9px] uppercase font-bold tracking-wider block mb-1.5 ${d ? "text-gray-500" : "text-gray-400"}`}
+                      className={`mb-1.5 block text-[9px] font-bold tracking-wider uppercase ${d ? "text-gray-500" : "text-gray-400"}`}
                     >
                       Mã đơn hàng
                     </span>
                     <strong
-                      className={`block font-mono text-sm font-extrabold truncate ${d ? "text-white" : "text-gray-955"}`}
+                      className={`block truncate font-mono text-sm font-extrabold ${d ? "text-white" : "text-gray-955"}`}
                       title={ord.orderId}
                     >
                       #{ord.orderId}
                     </strong>
                   </div>
-                  
+
                   {/* Cột 2: Khách hàng */}
                   <div className="flex flex-col">
                     <span
-                      className={`text-[9px] uppercase font-bold tracking-wider block mb-1.5 ${d ? "text-gray-500" : "text-gray-400"}`}
+                      className={`mb-1.5 block text-[9px] font-bold tracking-wider uppercase ${d ? "text-gray-500" : "text-gray-400"}`}
                     >
                       Khách hàng
                     </span>
                     <strong
-                      className={`block font-bold text-sm truncate ${d ? "text-white" : "text-gray-900"}`}
+                      className={`block truncate text-sm font-bold ${d ? "text-white" : "text-gray-900"}`}
                       title={ord.fullName}
                     >
                       {ord.fullName}
@@ -423,7 +458,7 @@ export default function OrderManager({
                   {/* Cột 3: Thời gian */}
                   <div className="flex flex-col">
                     <span
-                      className={`text-[9px] uppercase font-bold tracking-wider block mb-1.5 ${d ? "text-gray-500" : "text-gray-400"}`}
+                      className={`mb-1.5 block text-[9px] font-bold tracking-wider uppercase ${d ? "text-gray-500" : "text-gray-400"}`}
                     >
                       Thời gian
                     </span>
@@ -433,41 +468,46 @@ export default function OrderManager({
                       {new Date(ord.createdAt).toLocaleString("vi-VN")}
                     </strong>
                   </div>
-                  
+
                   {/* Cột 4: Thành tiền */}
                   <div className="flex flex-col">
                     <span
-                      className={`text-[9px] uppercase font-bold tracking-wider block mb-1.5 ${d ? "text-gray-500" : "text-gray-400"}`}
+                      className={`mb-1.5 block text-[9px] font-bold tracking-wider uppercase ${d ? "text-gray-500" : "text-gray-400"}`}
                     >
                       Thành tiền
                     </span>
                     <strong
-                      className={`block font-mono font-black text-sm text-indigo-500 ${d ? "text-indigo-400" : "text-indigo-600"}`}
+                      className={`block font-mono text-sm font-black text-indigo-500 ${d ? "text-indigo-400" : "text-indigo-600"}`}
                     >
-                      {typeof ord.finalTotal === 'number' 
-                        ? ord.finalTotal.toLocaleString("vi-VN") + "₫" 
-                        : parseInt(String(ord.finalTotal || '0').replace(/[^0-9]/g, '')).toLocaleString("vi-VN") + "₫"}
+                      {typeof ord.finalTotal === "number"
+                        ? ord.finalTotal.toLocaleString("vi-VN") + "₫"
+                        : parseInt(
+                            String(ord.finalTotal || "0").replace(
+                              /[^0-9]/g,
+                              "",
+                            ),
+                          ).toLocaleString("vi-VN") + "₫"}
                     </strong>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
                   <span
-                    className={`px-2.5 py-1 text-[9px] font-black uppercase rounded-full ${
+                    className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${
                       ord.status === "Hoàn tất bàn giao"
                         ? d
-                          ? "bg-emerald-950/30 text-emerald-400 border border-emerald-900/40"
-                          : "bg-emerald-50 text-emerald-700 border border-emerald-200/50"
+                          ? "border border-emerald-900/40 bg-emerald-950/30 text-emerald-400"
+                          : "border border-emerald-200/50 bg-emerald-50 text-emerald-700"
                         : ord.status === "Đang giao hàng"
                           ? d
-                            ? "bg-blue-950/30 text-blue-400 border border-blue-900/40"
-                            : "bg-blue-50 text-blue-700 border border-blue-200/50"
+                            ? "border border-blue-900/40 bg-blue-950/30 text-blue-400"
+                            : "border border-blue-200/50 bg-blue-50 text-blue-700"
                           : ord.status === "Hủy bỏ"
                             ? d
-                              ? "bg-rose-950/30 text-rose-400 border border-rose-900/40"
+                              ? "border border-rose-900/40 bg-rose-950/30 text-rose-400"
                               : "bg-rose-50 text-rose-700"
                             : d
-                              ? "bg-amber-950/30 text-amber-400 border border-amber-900/40"
+                              ? "border border-amber-900/40 bg-amber-950/30 text-amber-400"
                               : "bg-amber-50 text-amber-700"
                     }`}
                   >
@@ -477,14 +517,14 @@ export default function OrderManager({
               </div>
 
               {/* Row 2 Details */}
-              <div className="p-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="grid grid-cols-1 gap-6 p-5 lg:grid-cols-12">
                 <div
-                  className={`lg:col-span-4 space-y-2 border-b lg:border-b-0 lg:border-r pb-4 lg:pb-0 lg:pr-6 ${
+                  className={`space-y-2 border-b pb-4 lg:col-span-4 lg:border-r lg:border-b-0 lg:pr-6 lg:pb-0 ${
                     d ? "border-[#30363d]" : "border-gray-150"
                   }`}
                 >
                   <h4
-                    className={`text-[10px] uppercase font-bold tracking-wider ${d ? "text-gray-400" : "text-gray-450"}`}
+                    className={`text-[10px] font-bold tracking-wider uppercase ${d ? "text-gray-400" : "text-gray-450"}`}
                   >
                     Thông tin liên hệ nhận hàng
                   </h4>
@@ -517,10 +557,10 @@ export default function OrderManager({
                     </p>
                     {ord.notes && (
                       <p
-                        className={`text-[10px] p-2 rounded-lg mt-1 border italic ${
+                        className={`mt-1 rounded-lg border p-2 text-[10px] italic ${
                           d
-                            ? "bg-amber-950/20 text-amber-300 border-amber-900/20"
-                            : "bg-amber-50 text-amber-700/90 border-amber-200/20"
+                            ? "border-amber-900/20 bg-amber-950/20 text-amber-300"
+                            : "border-amber-200/20 bg-amber-50 text-amber-700/90"
                         }`}
                       >
                         " {ord.notes} "
@@ -530,23 +570,23 @@ export default function OrderManager({
                 </div>
 
                 {/* Bought Items list */}
-                <div className="lg:col-span-5 space-y-3">
+                <div className="space-y-3 lg:col-span-5">
                   <h4
-                    className={`text-[10px] uppercase font-bold tracking-wider ${d ? "text-gray-400" : "text-gray-450"}`}
+                    className={`text-[10px] font-bold tracking-wider uppercase ${d ? "text-gray-400" : "text-gray-450"}`}
                   >
                     Danh mục thiết bị bưu kiện
                   </h4>
-                  <div className="space-y-2 max-h-[140px] overflow-y-auto">
+                  <div className="max-h-[140px] space-y-2 overflow-y-auto">
                     {ord.cart?.map((item: any, idx: number) => (
                       <div
                         key={idx}
-                        className={`flex justify-between items-center p-2.5 rounded-xl border transition-all duration-300 ${
+                        className={`flex items-center justify-between rounded-xl border p-2.5 transition-all duration-300 ${
                           d
-                            ? "bg-[#0d1117]/40 border-[#30363d] hover:border-indigo-500/40 hover:bg-[#161b22]/40"
-                            : "bg-gray-50/50 border-gray-150 hover:border-indigo-500/30 hover:bg-white hover:shadow-sm"
+                            ? "border-[#30363d] bg-[#0d1117]/40 hover:border-indigo-500/40 hover:bg-[#161b22]/40"
+                            : "border-gray-150 bg-gray-50/50 hover:border-indigo-500/30 hover:bg-white hover:shadow-sm"
                         }`}
                       >
-                        <div className="flex gap-2.5 items-center min-w-0">
+                        <div className="flex min-w-0 items-center gap-2.5">
                           <OrderProductImage
                             item={item}
                             products={products}
@@ -554,23 +594,24 @@ export default function OrderManager({
                           />
                           <div className="min-w-0">
                             <h5
-                              className={`font-extrabold truncate text-[11px] ${d ? "text-white" : "text-gray-900"}`}
+                              className={`truncate text-[11px] font-extrabold ${d ? "text-white" : "text-gray-900"}`}
                             >
                               {item.product?.name}
                             </h5>
-                            <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                              <span className="text-[9px] text-gray-400 font-mono">
-                                Đơn giá: {item.product?.price?.toLocaleString("vi-VN")}₫
+                            <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                              <span className="font-mono text-[9px] text-gray-400">
+                                Đơn giá:{" "}
+                                {item.product?.price?.toLocaleString("vi-VN")}₫
                               </span>
                             </div>
                           </div>
                         </div>
-                        
+
                         <span
-                          className={`font-mono font-bold px-2.5 py-1 rounded shrink-0 ml-2 border ${
+                          className={`ml-2 shrink-0 rounded border px-2.5 py-1 font-mono font-bold ${
                             d
-                              ? "bg-[#21262d] border-[#30363d] text-gray-200"
-                              : "bg-white border-gray-200 text-gray-850"
+                              ? "border-[#30363d] bg-[#21262d] text-gray-200"
+                              : "text-gray-850 border-gray-200 bg-white"
                           }`}
                         >
                           SL: {item.quantity}
@@ -582,14 +623,14 @@ export default function OrderManager({
 
                 {/* Update Status Actions */}
                 <div
-                  className={`lg:col-span-3 flex flex-col justify-center gap-2 p-4 rounded-2xl border ${
+                  className={`flex flex-col justify-center gap-2 rounded-2xl border p-4 lg:col-span-3 ${
                     d
-                      ? "bg-[#0d1117]/30 border-[#30363d]"
-                      : "bg-gray-50/30 border-gray-150"
+                      ? "border-[#30363d] bg-[#0d1117]/30"
+                      : "border-gray-150 bg-gray-50/30"
                   }`}
                 >
                   <h4
-                    className={`text-[9px] uppercase font-bold tracking-wider text-center ${d ? "text-gray-500" : "text-gray-400"}`}
+                    className={`text-center text-[9px] font-bold tracking-wider uppercase ${d ? "text-gray-500" : "text-gray-400"}`}
                   >
                     Hệ luyên phê duyệt chuyển trạng thái
                   </h4>
@@ -602,10 +643,10 @@ export default function OrderManager({
                         "processing",
                       )
                     }
-                    className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                    className={`flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border py-2 text-[10px] font-bold tracking-wider uppercase transition-colors ${
                       d
-                        ? "bg-[#21262d] hover:bg-[#30363d] border-[#30363d] text-gray-200"
-                        : "bg-white hover:bg-gray-100 border-gray-200 text-gray-700"
+                        ? "border-[#30363d] bg-[#21262d] text-gray-200 hover:bg-[#30363d]"
+                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
                     }`}
                   >
                     <Clock size={11} /> Lắp ráp bưu phẩm
@@ -619,32 +660,48 @@ export default function OrderManager({
                         "shipping",
                       )
                     }
-                    className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                    className={`flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border py-2 text-[10px] font-bold tracking-wider uppercase transition-colors ${
                       d
-                        ? "bg-blue-950/40 hover:bg-blue-900/60 border-blue-900/30 text-blue-400"
-                        : "bg-blue-50 hover:bg-blue-100 border-blue-200/40 text-blue-700"
+                        ? "border-blue-900/30 bg-blue-950/40 text-blue-400 hover:bg-blue-900/60"
+                        : "border-blue-200/40 bg-blue-50 text-blue-700 hover:bg-blue-100"
                     }`}
                   >
                     <Truck size={11} /> Giao bưu tá
                   </button>
 
                   {confirmAction[ord.orderId] === "success" ? (
-                    <div className="space-y-1.5 p-2 rounded-xl border border-emerald-500/25 bg-emerald-500/5">
-                      <p className="text-[9px] uppercase font-bold text-center text-emerald-500">Xác nhận hoàn tất đơn hàng?</p>
+                    <div className="space-y-1.5 rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-2">
+                      <p className="text-center text-[9px] font-bold text-emerald-500 uppercase">
+                        Xác nhận hoàn tất đơn hàng?
+                      </p>
                       <div className="flex gap-1.5">
                         <button
                           onClick={() => {
-                            onUpdateOrderStatus(ord.orderId, "Hoàn tất bàn giao", "success");
-                            setConfirmAction(prev => ({ ...prev, [ord.orderId]: null }));
+                            onUpdateOrderStatus(
+                              ord.orderId,
+                              "Hoàn tất bàn giao",
+                              "success",
+                            );
+                            setConfirmAction((prev) => ({
+                              ...prev,
+                              [ord.orderId]: null,
+                            }));
                           }}
-                          className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wider text-[9px] rounded cursor-pointer"
+                          className="flex-1 cursor-pointer rounded bg-emerald-600 py-1.5 text-[9px] font-bold tracking-wider text-white uppercase hover:bg-emerald-700"
                         >
                           Đồng ý
                         </button>
                         <button
-                          onClick={() => setConfirmAction(prev => ({ ...prev, [ord.orderId]: null }))}
-                          className={`flex-1 py-1.5 font-bold uppercase tracking-wider text-[9px] rounded cursor-pointer ${
-                            d ? "bg-[#21262d] hover:bg-[#30363d] text-gray-300" : "bg-white hover:bg-gray-100 border border-gray-200 text-gray-700"
+                          onClick={() =>
+                            setConfirmAction((prev) => ({
+                              ...prev,
+                              [ord.orderId]: null,
+                            }))
+                          }
+                          className={`flex-1 cursor-pointer rounded py-1.5 text-[9px] font-bold tracking-wider uppercase ${
+                            d
+                              ? "bg-[#21262d] text-gray-300 hover:bg-[#30363d]"
+                              : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
                           }`}
                         >
                           Hủy
@@ -652,22 +709,38 @@ export default function OrderManager({
                       </div>
                     </div>
                   ) : confirmAction[ord.orderId] === "cancelled" ? (
-                    <div className="space-y-1.5 p-2 rounded-xl border border-rose-500/25 bg-rose-500/5">
-                      <p className="text-[9px] uppercase font-bold text-center text-rose-500">Xác nhận hủy đơn hàng?</p>
+                    <div className="space-y-1.5 rounded-xl border border-rose-500/25 bg-rose-500/5 p-2">
+                      <p className="text-center text-[9px] font-bold text-rose-500 uppercase">
+                        Xác nhận hủy đơn hàng?
+                      </p>
                       <div className="flex gap-1.5">
                         <button
                           onClick={() => {
-                            onUpdateOrderStatus(ord.orderId, "Hủy bỏ", "cancelled");
-                            setConfirmAction(prev => ({ ...prev, [ord.orderId]: null }));
+                            onUpdateOrderStatus(
+                              ord.orderId,
+                              "Hủy bỏ",
+                              "cancelled",
+                            );
+                            setConfirmAction((prev) => ({
+                              ...prev,
+                              [ord.orderId]: null,
+                            }));
                           }}
-                          className="flex-1 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold uppercase tracking-wider text-[9px] rounded cursor-pointer"
+                          className="flex-1 cursor-pointer rounded bg-rose-600 py-1.5 text-[9px] font-bold tracking-wider text-white uppercase hover:bg-rose-700"
                         >
                           Đồng ý
                         </button>
                         <button
-                          onClick={() => setConfirmAction(prev => ({ ...prev, [ord.orderId]: null }))}
-                          className={`flex-1 py-1.5 font-bold uppercase tracking-wider text-[9px] rounded cursor-pointer ${
-                            d ? "bg-[#21262d] hover:bg-[#30363d] text-gray-300" : "bg-white hover:bg-gray-100 border border-gray-200 text-gray-700"
+                          onClick={() =>
+                            setConfirmAction((prev) => ({
+                              ...prev,
+                              [ord.orderId]: null,
+                            }))
+                          }
+                          className={`flex-1 cursor-pointer rounded py-1.5 text-[9px] font-bold tracking-wider uppercase ${
+                            d
+                              ? "bg-[#21262d] text-gray-300 hover:bg-[#30363d]"
+                              : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
                           }`}
                         >
                           Hủy
@@ -677,22 +750,32 @@ export default function OrderManager({
                   ) : (
                     <>
                       <button
-                        onClick={() => setConfirmAction(prev => ({ ...prev, [ord.orderId]: "success" }))}
-                        className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                        onClick={() =>
+                          setConfirmAction((prev) => ({
+                            ...prev,
+                            [ord.orderId]: "success",
+                          }))
+                        }
+                        className={`flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border py-2 text-[10px] font-bold tracking-wider uppercase transition-colors ${
                           d
-                            ? "bg-emerald-950/40 hover:bg-emerald-900/60 border-emerald-900/30 text-emerald-400"
-                            : "bg-emerald-50 hover:bg-emerald-100 border-emerald-200/40 text-emerald-700"
+                            ? "border-emerald-900/30 bg-emerald-950/40 text-emerald-400 hover:bg-emerald-900/60"
+                            : "border-emerald-200/40 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                         }`}
                       >
                         <CheckCircle size={11} /> Đóng dấu Hoàn tất
                       </button>
 
                       <button
-                        onClick={() => setConfirmAction(prev => ({ ...prev, [ord.orderId]: "cancelled" }))}
-                        className={`w-full py-2 font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                        onClick={() =>
+                          setConfirmAction((prev) => ({
+                            ...prev,
+                            [ord.orderId]: "cancelled",
+                          }))
+                        }
+                        className={`flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg py-2 text-[10px] font-bold tracking-wider uppercase transition-colors ${
                           d
-                            ? "bg-rose-950/30 hover:bg-rose-900/40 text-rose-400"
-                            : "bg-rose-50 hover:bg-rose-100 text-rose-600"
+                            ? "bg-rose-950/30 text-rose-400 hover:bg-rose-900/40"
+                            : "bg-rose-50 text-rose-600 hover:bg-rose-100"
                         }`}
                       >
                         <X size={11} /> Hủy bỏ đơn
@@ -700,36 +783,44 @@ export default function OrderManager({
 
                       {onUpdatePaymentStatus && (
                         <>
-                          <div className={`my-1 h-px ${d ? "bg-[#30363d]" : "bg-gray-200"}`} />
+                          <div
+                            className={`my-1 h-px ${d ? "bg-[#30363d]" : "bg-gray-200"}`}
+                          />
 
                           <button
-                            onClick={() => onUpdatePaymentStatus(ord.orderId, "paid")}
-                            className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                            onClick={() =>
+                              onUpdatePaymentStatus(ord.orderId, "paid")
+                            }
+                            className={`flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border py-2 text-[10px] font-bold tracking-wider uppercase transition-colors ${
                               d
-                                ? "bg-emerald-950/40 hover:bg-emerald-900/60 border-emerald-900/30 text-emerald-400"
-                                : "bg-emerald-50 hover:bg-emerald-100 border-emerald-200/40 text-emerald-700"
+                                ? "border-emerald-900/30 bg-emerald-950/40 text-emerald-400 hover:bg-emerald-900/60"
+                                : "border-emerald-200/40 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                             }`}
                           >
                             <CheckCircle size={11} /> Xác nhận đã trả
                           </button>
 
                           <button
-                            onClick={() => onUpdatePaymentStatus(ord.orderId, "pending")}
-                            className={`w-full py-2 border font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                            onClick={() =>
+                              onUpdatePaymentStatus(ord.orderId, "pending")
+                            }
+                            className={`flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border py-2 text-[10px] font-bold tracking-wider uppercase transition-colors ${
                               d
-                                ? "bg-[#21262d] hover:bg-[#30363d] border-[#30363d] text-gray-200"
-                                : "bg-white hover:bg-gray-100 border-gray-200 text-gray-700"
+                                ? "border-[#30363d] bg-[#21262d] text-gray-200 hover:bg-[#30363d]"
+                                : "border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
                             }`}
                           >
                             <Clock size={11} /> Chờ thanh toán
                           </button>
 
                           <button
-                            onClick={() => onUpdatePaymentStatus(ord.orderId, "failed")}
-                            className={`w-full py-2 font-bold uppercase tracking-wider text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ${
+                            onClick={() =>
+                              onUpdatePaymentStatus(ord.orderId, "failed")
+                            }
+                            className={`flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg py-2 text-[10px] font-bold tracking-wider uppercase transition-colors ${
                               d
-                                ? "bg-rose-950/30 hover:bg-rose-900/40 text-rose-400"
-                                : "bg-rose-50 hover:bg-rose-100 text-rose-600"
+                                ? "bg-rose-950/30 text-rose-400 hover:bg-rose-900/40"
+                                : "bg-rose-50 text-rose-600 hover:bg-rose-100"
                             }`}
                           >
                             <X size={11} /> Thanh toán lỗi
@@ -744,6 +835,12 @@ export default function OrderManager({
           ))}
         </div>
       )}
+
+      <OrderExportModal
+        isOpen={isExportJsonOpen}
+        onClose={() => setIsExportJsonOpen(false)}
+        isDarkMode={d}
+      />
     </div>
   );
 }

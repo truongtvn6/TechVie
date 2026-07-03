@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Product } from '../../types';
-import { Plus, Edit3, Trash2, FileSpreadsheet } from 'lucide-react';
-import CsvImportModal from './CsvImportModal';
+import React, { useState } from "react";
+import { Product } from "../../types";
+import { Plus, Edit3, Trash2, FileSpreadsheet, FileJson } from "lucide-react";
+import CsvImportModal from "./CsvImportModal";
+import JsonImportExportModal from "./JsonImportExportModal";
 
 interface ProductManagerProps {
   products: Product[];
@@ -11,6 +12,7 @@ interface ProductManagerProps {
   onRestore?: (id: string) => void;
   onImportProducts: (parsedData: any[]) => void;
   isDarkMode?: boolean;
+  onRefreshProducts?: () => void;
 }
 
 export default function ProductManager({
@@ -21,32 +23,54 @@ export default function ProductManager({
   onRestore,
   onImportProducts,
   isDarkMode = false,
+  onRefreshProducts,
 }: ProductManagerProps) {
   const d = isDarkMode;
   const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
+  const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
 
   return (
-    <div className="space-y-6 animate-fade-in font-sans">
-      <div className={`flex flex-col sm:flex-row justify-between sm:items-center gap-4 border p-6 sm:p-8 rounded-3xl shadow-sm transition-all duration-300 ${
-        d ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-gray-200'
-      }`}>
-        <div>
-          <h3 className={`font-extrabold text-base uppercase tracking-wider ${d ? 'text-white' : 'text-gray-955'}`}>
+    <div className="animate-fade-in space-y-6 font-sans">
+      <div
+        className={`flex flex-row items-center justify-between gap-6 rounded-3xl border p-6 shadow-sm transition-all duration-300 sm:p-8 ${
+          d ? "border-[#30363d] bg-[#161b22]" : "border-gray-200 bg-white"
+        }`}
+      >
+        <div className="min-w-0">
+          <h3
+            className={`text-base font-extrabold tracking-wider uppercase ${d ? "text-white" : "text-gray-955"}`}
+          >
             Quản lý dải sản phẩm quầy hàng
           </h3>
-          <p className={`text-xs md:text-[13px] font-sans mt-1.5 leading-relaxed ${d ? 'text-gray-400' : 'text-gray-405'}`}>
-            Người quản lý có thể thêm sản phẩm mới hoặc cập nhật các đặc tả của sản phẩm trực tiếp.
+          <p
+            className={`mt-1.5 font-sans text-xs leading-relaxed md:text-[13px] ${d ? "text-gray-400" : "text-gray-405"}`}
+          >
+            Người quản lý có thể thêm sản phẩm mới hoặc cập nhật các đặc tả của
+            sản phẩm trực tiếp.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full sm:w-auto">
+        <div className="flex shrink-0 flex-row flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsJsonModalOpen(true)}
+            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border px-8 text-xs font-black tracking-widest uppercase shadow transition-all active:scale-95 ${
+              d
+                ? "border-emerald-900/30 bg-emerald-950/20 text-emerald-400 hover:bg-emerald-900/35"
+                : "border-emerald-150 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+            }`}
+          >
+            <FileJson size={16} />
+            Nhập JSON/Ảnh
+          </button>
+
           <button
             type="button"
             onClick={() => setIsCsvModalOpen(true)}
-            className={`h-12 px-6 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 border ${
-              d 
-                ? 'border-indigo-900/30 bg-indigo-950/20 text-indigo-400 hover:bg-indigo-900/35' 
-                : 'border-indigo-150 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border px-8 text-xs font-black tracking-widest uppercase shadow transition-all active:scale-95 ${
+              d
+                ? "border-indigo-900/30 bg-indigo-950/20 text-indigo-400 hover:bg-indigo-900/35"
+                : "border-indigo-150 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
             }`}
           >
             <FileSpreadsheet size={16} />
@@ -55,8 +79,10 @@ export default function ProductManager({
 
           <button
             onClick={onOpenCreateForm}
-            className={`h-12 px-6 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
-              d ? ' bg-white! hover:bg-gray-100! text-black' : 'bg-black hover:bg-gray-900 text-white'
+            className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl px-8 text-xs font-black tracking-widest uppercase shadow transition-all active:scale-95 ${
+              d
+                ? "bg-white! text-black hover:bg-gray-100!"
+                : "bg-black text-white hover:bg-gray-900"
             }`}
           >
             <Plus size={16} />
@@ -66,79 +92,117 @@ export default function ProductManager({
       </div>
 
       {/* Table list of active products */}
-      <div className={`border rounded-[2rem] overflow-hidden shadow-sm transition-colors duration-300 ${
-        d ? 'bg-[#161b22] border-[#30363d]' : 'bg-white border-gray-200'
-      }`}>
+      <div
+        className={`overflow-hidden rounded-[2rem] border shadow-sm transition-colors duration-300 ${
+          d ? "border-[#30363d] bg-[#161b22]" : "border-gray-200 bg-white"
+        }`}
+      >
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full border-collapse text-left text-xs">
             <thead>
-              <tr className={`border-b uppercase font-black text-[9px] tracking-wider transition-colors duration-300 ${
-                d ? 'bg-[#0d1117]/60 border-[#30363d] text-gray-500' : 'bg-gray-50 border-gray-200 text-gray-450'
-              }`}>
+              <tr
+                className={`border-b text-[9px] font-black tracking-wider uppercase transition-colors duration-300 ${
+                  d
+                    ? "border-[#30363d] bg-[#0d1117]/60 text-gray-500"
+                    : "text-gray-450 border-gray-200 bg-gray-50"
+                }`}
+              >
                 <th className="px-6 py-4.5">Định danh Ảnh / Tên</th>
                 <th className="px-6 py-4.5">Phân loại</th>
                 <th className="px-6 py-4.5">Giá bán</th>
-                <th className="px-6 py-4.5 col-span-2">Đặc tả / Thông số tiêu biểu</th>
-                <th className="px-6 py-4.5 text-right w-36">Thao tác</th>
+                <th className="col-span-2 px-6 py-4.5">
+                  Đặc tả / Thông số tiêu biểu
+                </th>
+                <th className="w-36 px-6 py-4.5 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className={`divide-y transition-colors duration-300 ${
-              d ? 'divide-[#30363d] text-gray-300' : 'divide-gray-150 text-gray-700'
-            }`}>
+            <tbody
+              className={`divide-y transition-colors duration-300 ${
+                d
+                  ? "divide-[#30363d] text-gray-300"
+                  : "divide-gray-150 text-gray-700"
+              }`}
+            >
               {products.map((p) => (
-                <tr key={p.id} className={`transition-colors duration-200 ${
-                  d ? '' : 'hover:bg-gray-100'
-                }`}>
+                <tr
+                  key={p.id}
+                  className={`transition-colors duration-200 ${
+                    d ? "" : "hover:bg-gray-100"
+                  }`}
+                >
                   <td className="px-6 py-4">
-                    <div className="flex gap-3.5 items-center">
-                      <div className={`w-11 h-11 border rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 transition-colors duration-300 ${
-                        d ? 'bg-[#21262d] border-[#30363d]' : 'bg-white border-gray-150'
-                      }`}>
+                    <div className="flex items-center gap-3.5">
+                      <div
+                        className={`flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border transition-colors duration-300 ${
+                          d
+                            ? "border-[#30363d] bg-[#21262d]"
+                            : "border-gray-150 bg-white"
+                        }`}
+                      >
                         <img
                           src={p.image}
                           alt={p.name}
-                          className={`w-full h-full object-cover ${d ? '' : 'mix-blend-multiply'}`}
+                          className={`h-full w-full object-cover ${d ? "" : "mix-blend-multiply"}`}
                         />
                       </div>
                       <div className="min-w-0">
-                        <span className={`block font-extrabold text-sm truncate flex items-center gap-2 ${d ? 'text-white' : 'text-gray-900'}`}>
+                        <span
+                          className={`block flex items-center gap-2 truncate text-sm font-extrabold ${d ? "text-white" : "text-gray-900"}`}
+                        >
                           {p.name}
-                          {((p as any).isDeleted || (p as any).status === 'DISCONTINUED') && (
-                            <span className={`px-1.5 py-0.5 text-[8px] uppercase tracking-wider rounded font-black border ${
-                              d ? 'bg-rose-950/40 text-rose-400 border-rose-900/40' : 'bg-rose-50 text-rose-600 border-rose-200'
-                            }`}>
+                          {((p as any).isDeleted ||
+                            (p as any).status === "DISCONTINUED") && (
+                            <span
+                              className={`rounded border px-1.5 py-0.5 text-[8px] font-black tracking-wider uppercase ${
+                                d
+                                  ? "border-rose-900/40 bg-rose-950/40 text-rose-400"
+                                  : "border-rose-200 bg-rose-50 text-rose-600"
+                              }`}
+                            >
                               Đã xóa
                             </span>
                           )}
                         </span>
-                        <span className={`font-mono text-[9px] block truncate ${d ? 'text-gray-500' : 'text-gray-400'}`}>{p.id}</span>
+                        <span
+                          className={`block truncate font-mono text-[9px] ${d ? "text-gray-500" : "text-gray-400"}`}
+                        >
+                          {p.id}
+                        </span>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`text-[9px] tracking-wider uppercase font-bold transition-colors duration-300 border-none`}>
+                    <span
+                      className={`border-none text-[9px] font-bold tracking-wider uppercase transition-colors duration-300`}
+                    >
                       {p.category}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <strong className={`font-black text-sm font-mono transition-colors duration-300 ${
-                      d ? 'text-indigo-400' : 'text-gray-955'
-                    }`}>
-                      {p.price.toLocaleString('vi-VN')}₫
+                    <strong
+                      className={`font-mono text-sm font-black transition-colors duration-300 ${
+                        d ? "text-indigo-400" : "text-gray-955"
+                      }`}
+                    >
+                      {p.price.toLocaleString("vi-VN")}₫
                     </strong>
                   </td>
-                  <td className="px-6 py-4 max-w-sm">
-                    <span className={`block line-clamp-2 leading-relaxed text-[11px] mb-1 ${
-                      d ? 'text-gray-400' : 'text-gray-450'
-                    }`}>
+                  <td className="max-w-sm px-6 py-4">
+                    <span
+                      className={`mb-1 line-clamp-2 block text-[11px] leading-relaxed ${
+                        d ? "text-gray-400" : "text-gray-450"
+                      }`}
+                    >
                       {p.description}
                     </span>
-                    <div className="flex gap-1.5 flex-wrap">
+                    <div className="flex flex-wrap gap-1.5">
                       {p.specs.slice(0, 2).map((s, idx) => (
                         <span
                           key={idx}
-                          className={`px-1.5 py-0.5 rounded text-[8px] font-mono transition-colors duration-300 ${
-                            d ? 'bg-indigo-950/40 text-indigo-400 border border-indigo-900/30' : 'bg-indigo-50/50 text-indigo-700'
+                          className={`rounded px-1.5 py-0.5 font-mono text-[8px] transition-colors duration-300 ${
+                            d
+                              ? "border border-indigo-900/30 bg-indigo-950/40 text-indigo-400"
+                              : "bg-indigo-50/50 text-indigo-700"
                           }`}
                         >
                           {s.label}: {s.value}
@@ -148,13 +212,14 @@ export default function ProductManager({
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
-                      {((p as any).isDeleted || (p as any).status === 'DISCONTINUED') ? (
+                      {(p as any).isDeleted ||
+                      (p as any).status === "DISCONTINUED" ? (
                         <button
                           onClick={() => onRestore && onRestore(p.id)}
-                          className={`px-3 h-8 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center justify-center transition-colors border ${
-                            d 
-                              ? 'border-emerald-900/30 text-emerald-400 hover:bg-emerald-950/40 hover:text-emerald-300' 
-                              : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700'
+                          className={`flex h-8 items-center justify-center rounded-lg border px-3 text-[10px] font-bold tracking-wider uppercase transition-colors ${
+                            d
+                              ? "border-emerald-900/30 text-emerald-400 hover:bg-emerald-950/40 hover:text-emerald-300"
+                              : "border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
                           }`}
                           title="Khôi phục thiết bị"
                         >
@@ -164,8 +229,10 @@ export default function ProductManager({
                         <>
                           <button
                             onClick={() => onOpenEditForm(p)}
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-                              d ? 'text-gray-400 hover:text-white hover:bg-[#30363d]' : 'text-gray-500 hover:text-black hover:bg-gray-100'
+                            className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+                              d
+                                ? "text-gray-400 hover:bg-[#30363d] hover:text-white"
+                                : "text-gray-500 hover:bg-gray-100 hover:text-black"
                             }`}
                             title="Sửa thông tin"
                           >
@@ -173,8 +240,10 @@ export default function ProductManager({
                           </button>
                           <button
                             onClick={() => onDelete(p.id, p.name)}
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-                              d ? 'text-rose-500 hover:bg-rose-950/30 text-rose-400' : 'text-rose-500 hover:bg-rose-50'
+                            className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+                              d
+                                ? "text-rose-400 text-rose-500 hover:bg-rose-950/30"
+                                : "text-rose-500 hover:bg-rose-50"
                             }`}
                             title="Xóa thiết bị"
                           >
@@ -195,42 +264,58 @@ export default function ProductManager({
         isOpen={isCsvModalOpen}
         onClose={() => setIsCsvModalOpen(false)}
         title="Nhập danh sách sản phẩm từ Excel / CSV"
-        templateHeaders={["name", "price", "category", "image", "description", "specs"]}
+        templateHeaders={[
+          "name",
+          "price",
+          "category",
+          "image",
+          "description",
+          "specs",
+        ]}
         templateRows={[
           [
-            "Bàn phím cơ Custom TechVie", 
-            "3500000", 
-            "Bàn phím", 
-            "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80", 
-            "Bàn phím custom chất lượng hi-end gõ cực kỳ êm ái.", 
-            "Switches: Linear Gateron Oil King | Layout: 75% compact"
-          ]
+            "Bàn phím cơ Custom TechVie",
+            "3500000",
+            "Bàn phím",
+            "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80",
+            "Bàn phím custom chất lượng hi-end gõ cực kỳ êm ái.",
+            "Switches: Linear Gateron Oil King | Layout: 75% compact",
+          ],
         ]}
         onImport={(data) => {
           // Parse specs for each row from string to array of objects
-          const formattedData = data.map(item => {
+          const formattedData = data.map((item) => {
             const specs: { label: string; value: string }[] = [];
-            if (item.specs && typeof item.specs === 'string') {
-              item.specs.split('|').forEach((s: string) => {
-                const parts = s.split(':');
+            if (item.specs && typeof item.specs === "string") {
+              item.specs.split("|").forEach((s: string) => {
+                const parts = s.split(":");
                 if (parts.length >= 2) {
                   specs.push({
                     label: parts[0].trim(),
-                    value: parts.slice(1).join(':').trim()
+                    value: parts.slice(1).join(":").trim(),
                   });
                 }
               });
             }
             return {
-              name: item.name || '',
+              name: item.name || "",
               price: Number(item.price) || 0,
-              category: item.category || 'Thiết bị',
-              image: item.image || '',
-              description: item.description || '',
-              specs: specs
+              category: item.category || "Thiết bị",
+              image: item.image || "",
+              description: item.description || "",
+              specs: specs,
             };
           });
           onImportProducts(formattedData);
+        }}
+        isDarkMode={d}
+      />
+
+      <JsonImportExportModal
+        isOpen={isJsonModalOpen}
+        onClose={() => setIsJsonModalOpen(false)}
+        onImportCompleted={() => {
+          if (onRefreshProducts) onRefreshProducts();
         }}
         isDarkMode={d}
       />
