@@ -51,6 +51,19 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  averageRating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5,
+    description: "Đánh giá trung bình (0-5)",
+  },
+  reviewCount: {
+    type: Number,
+    default: 0,
+    min: 0,
+    description: "Số lượng đánh giá sản phẩm",
+  },
 }, {
   timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   toJSON: { virtuals: true },
