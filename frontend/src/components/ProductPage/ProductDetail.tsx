@@ -25,6 +25,7 @@ export default function ProductDetail({
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [hasPurchased, setHasPurchased] = useState<boolean>(false);
   const [checkingPurchase, setCheckingPurchase] = useState<boolean>(false);
+  const [canReviewReason, setCanReviewReason] = useState<string>('');
 
   const [newRating, setNewRating] = useState<number>(5);
   const [newTitle, setNewTitle] = useState<string>('');
@@ -38,6 +39,7 @@ export default function ProductDetail({
     const loadReviewsAndUser = async () => {
       setIsLoading(true);
       setErrorMessage('');
+      setCanReviewReason('');
       
       // Tải danh sách đánh giá từ API
       const reviewRes = await getReviewsByProduct(product.id);
@@ -61,6 +63,7 @@ export default function ProductDetail({
             // Gọi endpoint can-review để kiểm tra server-side (chính xác nhất)
             const canReviewRes = await checkCanReview(product.id);
             setHasPurchased(canReviewRes.canReview === true);
+            setCanReviewReason(canReviewRes.reason || '');
           } catch (err) {
             console.error("Lỗi khi tải thông tin tài khoản:", err);
           } finally {
@@ -70,6 +73,7 @@ export default function ProductDetail({
       } else {
         setCurrentUser(null);
         setHasPurchased(false);
+        setCanReviewReason('');
       }
       setIsLoading(false);
     };
@@ -87,6 +91,10 @@ export default function ProductDetail({
         setReviews(reviewRes.reviews);
         setSummary(reviewRes.summary);
       }
+      // Re-check can review after deletion
+      const canReviewRes = await checkCanReview(product!.id);
+      setHasPurchased(canReviewRes.canReview === true);
+      setCanReviewReason(canReviewRes.reason || '');
     } else {
       alert(res.message || "Xóa đánh giá thất bại.");
     }
@@ -107,6 +115,8 @@ export default function ProductDetail({
       setNewComment('');
       setNewTitle('');
       setNewRating(5);
+      setHasPurchased(false);
+      setCanReviewReason('already_reviewed');
       
       const reviewRes = await getReviewsByProduct(product!.id);
       if (reviewRes.success) {
@@ -340,6 +350,11 @@ export default function ProductDetail({
                 </div>
               ) : checkingPurchase ? (
                 <div className="text-center py-4 text-sm text-gray-500">Đang xác minh lịch sử mua hàng...</div>
+              ) : canReviewReason === 'already_reviewed' ? (
+                <div className="bg-indigo-50 rounded-xl p-5 text-center border border-indigo-150 flex flex-col items-center">
+                  <p className="text-sm font-sans font-bold text-indigo-900 mb-1">Cảm ơn bạn đã gửi đánh giá!</p>
+                  <p className="text-xs text-indigo-700">Mỗi sản phẩm chỉ được đánh giá một lần duy nhất.</p>
+                </div>
               ) : !hasPurchased ? (
                 <div className="bg-amber-50 rounded-xl p-4 text-center border border-amber-200 flex flex-col items-center">
                   <p className="text-sm text-amber-800">

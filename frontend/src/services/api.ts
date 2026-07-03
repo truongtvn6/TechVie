@@ -896,3 +896,55 @@ export async function checkCanReview(productId: string): Promise<{ success: bool
   }
 }
 
+// Lấy toàn bộ danh sách đánh giá cho admin
+export async function getAdminReviews(params?: { search?: string; rating?: string; includeDeleted?: boolean }): Promise<{ success: boolean; reviews?: any[]; message?: string }> {
+  try {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    if (params?.rating) query.append('rating', params.rating);
+    if (params?.includeDeleted) query.append('includeDeleted', 'true');
+
+    const response = await fetch(`${API_BASE_URL}/api/reviews/admin/all?${query.toString()}`, {
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể tải danh sách đánh giá admin.');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi tải đánh giá admin:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+// Lấy thống kê đánh giá cho admin
+export async function getAdminReviewStats(): Promise<{ success: boolean; stats?: any; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/admin/stats`, {
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể tải thống kê đánh giá.');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi tải thống kê đánh giá:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+// Khôi phục đánh giá đã xóa
+export async function restoreReview(reviewId: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/restore`, {
+      method: 'PATCH',
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể khôi phục đánh giá.');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi khôi phục đánh giá:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+

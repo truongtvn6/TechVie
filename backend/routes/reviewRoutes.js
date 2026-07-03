@@ -3,6 +3,11 @@ const router = express.Router();
 const reviewController = require("../controllers/reviewController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
+// Admin routes (đặt trước để tránh conflict với :productId)
+router.get("/admin/all", authMiddleware, authMiddleware.adminOnly, reviewController.getAllReviews);
+router.get("/admin/stats", authMiddleware, authMiddleware.adminOnly, reviewController.getReviewStats);
+router.patch("/:reviewId/restore", authMiddleware, authMiddleware.adminOnly, reviewController.restoreReview);
+
 // 1. Lấy tất cả đánh giá của một sản phẩm (Public)
 router.get("/:productId", reviewController.getReviewsByProduct);
 

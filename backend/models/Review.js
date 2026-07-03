@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Product = require("./Product");
 
 const reviewSchema = new mongoose.Schema({
   product_id: {
@@ -81,7 +82,6 @@ reviewSchema.statics.calculateAverageRating = async function(productId) {
   ]);
 
   try {
-    const Product = mongoose.model("Product");
     if (stats.length > 0) {
       await Product.findByIdAndUpdate(productId, {
         reviewCount: stats[0].nRating,

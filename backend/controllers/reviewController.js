@@ -225,3 +225,140 @@ exports.deleteReview = async (req, res) => {
     });
   }
 };
+
+// 4. Lấy danh sách toàn bộ đánh giá (Admin only)
+exports.getAllReviews = async (req, res) => {
+  try {
+    const { search, rating, includeDeleted } = req.query;
+    let query = {};
+
+    if (rating) {
+      const numRating = Number(rating);
+      if (!isNaN(numRating) && numRating >= 1 && numRating <= 5) {
+        query.rating = numRating;
+      }
+    }
+
+    if (includeDeleted !== "true") {
+      query.isDeleted = { $ne: true };
+    }
+
+    if (search && search.trim() !== "") {
+      const searchRegex = new RegExp(search.trim(), "i");
+      
+      // Tìm các sản phẩm khớp tên trước
+      const matchedProducts = await Product.find({ name: searchRegex }, "_id");
+      const matchedProductIds = matchedProducts.map(p => p._id);
+
+      query.$or = [
+        { comment: searchRegex },
+        { title: searchRegex },
+        { username: searchRegex },
+        { product_id: { $in: matchedProductIds } }
+      ];
+    }
+
+    const reviews = await Review.find(query)
+      .populate("user_id", "username email avatar")
+      .populate("product_id", "name image")
+      .sort({ created_at: -1 });
+
+    return res.status(200).json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi khi tải toàn bộ danh sách đánh giá!",
+      error: error.message,
+    });
+  }
+};
+
+// 5. Thống kê đánh giá phục vụ dashboard Admin (Admin only)
+exports.getReviewStats = async (req, res) => {
+  try {
+    const totalReviews = await Review.countDocuments({ isDeleted: { $ne: true } });
+    const deletedReviews = await Review.countDocuments({ isDeleted: true });
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const recentReviews = await Review.countDocuments({
+      isDeleted: { $ne: true },
+      created_at: { $gte: sevenDaysAgo }
+    });
+
+    const activeReviews = await Review.find({ isDeleted: { $ne: true } }, "rating");
+    let totalRating = 0;
+    const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+    activeReviews.forEach(r => {
+      totalRating += r.rating;
+      if (breakdown[r.rating] !== undefined) {
+        breakdown[r.rating]++;
+      }
+    });
+
+    const averageRating = activeReviews.length > 0 
+      ? Math.round((totalRating / activeReviews.length) * 10) / 10 
+      : 0;
+
+    return res.status(200).json({
+      success: true,
+      stats: {
+        totalReviews,
+        deletedReviews,
+        recentReviews,
+        averageRating,
+        breakdown
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi lấy thông tin thống kê đánh giá!",
+      error: error.message,
+    });
+  }
+};
+
+// 6. Khôi phục đánh giá đã xóa mềm (Admin only)
+exports.restoreReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy đánh giá!",
+      });
+    }
+
+    if (!review.isDeleted) {
+      return res.status(400).json({
+        success: false,
+        message: "Đánh giá này hiện chưa bị xóa!",
+      });
+    }
+
+    const updatedReview = await Review.findByIdAndUpdate(
+      reviewId,
+      { isDeleted: false },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Đã khôi phục đánh giá thành công!",
+      review: updatedReview
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi khi khôi phục đánh giá!",
+      error: error.message,
+    });
+  }
+};
