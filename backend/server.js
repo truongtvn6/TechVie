@@ -15,6 +15,7 @@ const contactRoutes = require("./routes/contactRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
 const searchRoutes = require("./routes/searchRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 const Category = require("./models/Category");
 
 const app = express();
@@ -107,6 +108,9 @@ app.use("/api/checkout", checkoutRoutes);
 
 // 13. Định nghĩa API Search Logs (Phổ biến & Lịch sử)
 app.use("/api/search", searchRoutes);
+
+// 14. Định nghĩa API Reviews
+app.use("/api/reviews", reviewRoutes);
 
 // Endpoint nhận log từ Client và in ra CMD của server
 app.post("/api/logs", (req, res) => {

@@ -12,6 +12,37 @@ export interface Product {
     value: string;
   }[];
   colors?: string[];
+  averageRating?: number;
+  reviewCount?: number;
+}
+
+export interface ReviewUser {
+  _id: string;
+  username: string;
+  avatar?: string;
+  email?: string;
+}
+
+export interface Review {
+  id: string;
+  _id: string;
+  product_id: string;
+  user_id: ReviewUser | string;
+  username: string;
+  order_id: string;
+  rating: number;
+  title?: string;
+  comment: string;
+  verified_purchase: boolean;
+  created_at: string;
+}
+
+export interface ReviewSummary {
+  averageRating: number;
+  reviewCount: number;
+  breakdown: {
+    [key: number]: number;
+  };
 }
 
 export interface CartItem {

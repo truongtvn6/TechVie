@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Eye, Plus, Check } from 'lucide-react';
+import { Eye, Plus, Check, Star } from 'lucide-react';
 import { Product } from '../../types';
 
 interface ProductCardProps {
@@ -104,6 +104,25 @@ export default function ProductCard({
         <h3 className="text-xl font-bold text-gray-900 tracking-tight mt-6 truncate group-hover:text-black transition-colors">
           {product.name}
         </h3>
+        {product.averageRating !== undefined && product.averageRating > 0 ? (
+          <div className="flex items-center gap-1 mt-1.5 text-xs text-amber-500 font-bold select-none">
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map(star => (
+                <Star 
+                  key={star} 
+                  size={11} 
+                  className={star <= Math.round(product.averageRating || 0) ? "text-yellow-400 fill-yellow-400" : "text-gray-200"} 
+                />
+              ))}
+            </div>
+            <span className="text-gray-800 text-[11px] font-mono ml-1">{product.averageRating.toFixed(1)}</span>
+            <span className="text-gray-400 font-normal">({product.reviewCount})</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 mt-1.5 text-xs text-gray-400 select-none">
+            <span className="text-[10px]">Chưa có đánh giá</span>
+          </div>
+        )}
         <p className="text-gray-550 font-sans text-xs leading-relaxed mt-2 line-clamp-2 h-8">
           {product.description}
         </p>

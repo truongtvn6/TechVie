@@ -1,4 +1,4 @@
-import { Product } from '../types';
+import { Product, Review, ReviewSummary } from '../types';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -830,3 +830,121 @@ export async function sendEmailVerification(): Promise<{ success: boolean; messa
     return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
   }
 }
+
+// Lấy danh sách đánh giá của sản phẩm
+export async function getReviewsByProduct(productId: string): Promise<{ success: boolean; reviews: Review[]; summary: ReviewSummary; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể lấy danh sách đánh giá!');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi lấy đánh giá sản phẩm:', error);
+    return {
+      success: false,
+      reviews: [],
+      summary: { averageRating: 0, reviewCount: 0, breakdown: {} },
+      message: error.message || 'Không thể kết nối đến máy chủ.'
+    };
+  }
+}
+
+// Tạo đánh giá mới cho sản phẩm
+export async function createReview(productId: string, reviewData: { rating: number; title?: string; comment: string }): Promise<{ success: boolean; review?: Review; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(reviewData)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể tạo đánh giá!');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi tạo đánh giá sản phẩm:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+// Xóa đánh giá
+export async function deleteReview(reviewId: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể xóa đánh giá!');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi xóa đánh giá sản phẩm:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+// Kiểm tra quyền đánh giá sản phẩm (server-side, chính xác nhất)
+export async function checkCanReview(productId: string): Promise<{ success: boolean; canReview: boolean; reason?: string; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}/can-review`, {
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi kiểm tra quyền đánh giá:', error);
+    return { success: false, canReview: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+// Lấy toàn bộ danh sách đánh giá cho admin
+export async function getAdminReviews(params?: { search?: string; rating?: string; includeDeleted?: boolean }): Promise<{ success: boolean; reviews?: any[]; message?: string }> {
+  try {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    if (params?.rating) query.append('rating', params.rating);
+    if (params?.includeDeleted) query.append('includeDeleted', 'true');
+
+    const response = await fetch(`${API_BASE_URL}/api/reviews/admin/all?${query.toString()}`, {
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể tải danh sách đánh giá admin.');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi tải đánh giá admin:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+// Lấy thống kê đánh giá cho admin
+export async function getAdminReviewStats(): Promise<{ success: boolean; stats?: any; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/admin/stats`, {
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể tải thống kê đánh giá.');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi tải thống kê đánh giá:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+// Khôi phục đánh giá đã xóa
+export async function restoreReview(reviewId: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/restore`, {
+      method: 'PATCH',
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể khôi phục đánh giá.');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi khôi phục đánh giá:', error);
+    return { success: false, message: error.message || 'Không thể kết nối đến máy chủ.' };
+  }
+}
+
+

@@ -408,7 +408,8 @@ exports.getUserOrders = async (req, res) => {
     const orders = await Order.find({ email }).sort({ created_at: -1 });
 
     const mappedOrders = orders.map((o) => {
-      const mappedCart = o.items.map((item) => ({
+      const mappedItems = o.items.map((item) => ({
+        product_id: item.product_id,   // ← thêm để frontend kiểm tra verified_purchase
         name: item.product_name,
         qty: item.quantity,
         type: "Thiết bị TechVie",
@@ -420,7 +421,7 @@ exports.getUserOrders = async (req, res) => {
         total: o.final_total,
         status: o.status,
         statusType: o.status_type,
-        items: mappedCart,
+        items: mappedItems,
       };
     });
 

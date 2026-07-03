@@ -16,7 +16,8 @@ import {
   deleteCategory,
   restoreCategory,
   toggleCategory,
-  hardDeleteCategory
+  hardDeleteCategory,
+  getAdminReviewStats
 } from '../../services/api';
 import AdminSidebar from './AdminSidebar';
 
@@ -30,6 +31,7 @@ import ProductFormModal from './ProductFormModal';
 import PromoManager from './PromoManager';
 import UserManager from './UserManager';
 import CategoryManager from './CategoryManager';
+import ReviewManager from './ReviewManager';
 import AdminDemoPanel from '../../demo/AdminDemoPanel';
 import { IS_DEMO_ENABLED } from '../../demo/demoConfig';
 
@@ -182,11 +184,25 @@ export default function AdminPage({
   // Admin active sub tab
   const pathParts = location.pathname.split('/');
   const subRoute = pathParts[2] || 'overview';
-  const validTabs = ['overview', 'categories', 'products', 'orders', 'messages', 'promos', 'users'];
+  const validTabs = ['overview', 'categories', 'products', 'orders', 'messages', 'promos', 'users', 'reviews'];
   const activeSubTab = validTabs.includes(subRoute) ? subRoute as any : 'overview';
 
   const setActiveSubTab = (tab: string) => {
     navigate(`/admin/${tab}`);
+  };
+
+  const [reviewsCount, setReviewsCount] = useState<number>(0);
+
+  const fetchReviewsCount = () => {
+    getAdminReviewStats()
+      .then(res => {
+        if (res.success && res.stats) {
+          setReviewsCount(res.stats.totalReviews || 0);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching admin review count:', err);
+      });
   };
 
   // Product categories state (always fetch all, including soft-deleted)
@@ -493,6 +509,7 @@ export default function AdminPage({
     fetchOrders();
     fetchMessages();
     fetchCategories();
+    fetchReviewsCount();
   }, []);
 
 
@@ -627,6 +644,7 @@ export default function AdminPage({
               if (tab === 'overview' || tab === 'orders') fetchOrders();
               if (tab === 'overview' || tab === 'messages') fetchMessages();
               if (tab === 'overview' || tab === 'categories') fetchCategories();
+              if (tab === 'overview' || tab === 'reviews') fetchReviewsCount();
             }}
             isDarkMode={isDarkMode}
             setIsDarkMode={setIsDarkMode}
@@ -636,6 +654,7 @@ export default function AdminPage({
             messagesCount={messages.length}
             promosCount={promos.length}
             usersCount={systemUsers.length}
+            reviewsCount={reviewsCount}
             onNavigate={onNavigate}
             onSearch={handleSidebarSearch}
           />
@@ -649,7 +668,7 @@ export default function AdminPage({
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 border-b border-gray-200 pb-6">
             <div>
               <span className="text-[10px] uppercase tracking-[0.25em] text-gray-400 font-extrabold mb-1 block">
-                {activeSubTab === 'overview' ? 'DASHBOARD OVERVIEW' : activeSubTab === 'categories' ? 'PRODUCT CATEGORIES' : activeSubTab === 'products' ? 'PRODUCT MANAGER' : activeSubTab === 'orders' ? 'LIVE ORDERS REGISTRY' : activeSubTab === 'messages' ? 'CUSTOMER INQUIRIES' : activeSubTab === 'promos' ? 'PROMO CAMPAIGNS' : 'USER ROLES & ACCOUNTS'}
+                {activeSubTab === 'overview' ? 'DASHBOARD OVERVIEW' : activeSubTab === 'categories' ? 'PRODUCT CATEGORIES' : activeSubTab === 'products' ? 'PRODUCT MANAGER' : activeSubTab === 'orders' ? 'LIVE ORDERS REGISTRY' : activeSubTab === 'messages' ? 'CUSTOMER INQUIRIES' : activeSubTab === 'promos' ? 'PROMO CAMPAIGNS' : activeSubTab === 'reviews' ? 'PRODUCT REVIEWS' : 'USER ROLES & ACCOUNTS'}
               </span>
               <h1 className="text-3xl font-black text-gray-950 uppercase tracking-tighter flex items-center gap-2.5">
                 {activeSubTab === 'overview' && 'Bảng Tổng Quan Hệ Thống'}
@@ -659,6 +678,7 @@ export default function AdminPage({
                 {activeSubTab === 'messages' && 'Thư Phản Hồi Khách Hàng'}
                 {activeSubTab === 'promos' && 'Hệ Thống Voucher & Khuyến Mãi'}
                 {activeSubTab === 'users' && 'Sổ Nhân Sự & Thành Viên'}
+                {activeSubTab === 'reviews' && 'Quản Lý Đánh Giá Sản Phẩm'}
               </h1>
               <p className="text-xs text-gray-400 font-sans mt-1">
                 {activeSubTab === 'overview' && 'Giao diện tổng quan trạng thái, cập nhật dữ liệu máy chủ thực tế tức thời.'}
@@ -668,6 +688,7 @@ export default function AdminPage({
                 {activeSubTab === 'messages' && 'Phản hồi ý kiến đóng góp, đề đạt yêu cầu làm đại lý hoặc câu hỏi hỗ trợ khách hàng.'}
                 {activeSubTab === 'promos' && 'Cấu hình mã giảm giá toàn sàn, lưu trực tiếp máy chủ và hiển thị cho người dùng tức thời khi checkout.'}
                 {activeSubTab === 'users' && 'Điều chỉnh phân quyền cán bộ nhân viên, xem thông tin số điện thoại email và trạng thái khoá tài khoản.'}
+                {activeSubTab === 'reviews' && 'Xem các đánh giá từ khách hàng, lọc theo số sao, ẩn/hiển thị đánh giá và xóa/khôi phục đánh giá.'}
               </p>
             </div>
           </div>
@@ -764,6 +785,13 @@ export default function AdminPage({
               onDeleteUser={handleDeleteUser}
               onRestoreUser={handleRestoreUserWrapper}
               isDarkMode={isDarkMode}
+            />
+          )}
+
+          {activeSubTab === 'reviews' && (
+            <ReviewManager
+              isDarkMode={isDarkMode}
+              onRefreshStats={fetchReviewsCount}
             />
           )}
 

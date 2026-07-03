@@ -32,7 +32,9 @@ const normalizeProduct = (p: any): Product => {
     category: p.category || 'Thiết bị',
     description: p.description || 'Mô tả đang được cập nhật.',
     specs: safeSpecs,
-    colors: Array.isArray(p.colors) ? p.colors : (typeof p.colors === 'string' ? p.colors.split(',').map((c: string) => c.trim()) : [])
+    colors: Array.isArray(p.colors) ? p.colors : (typeof p.colors === 'string' ? p.colors.split(',').map((c: string) => c.trim()) : []),
+    averageRating: typeof p.averageRating === 'number' ? p.averageRating : 0,
+    reviewCount: typeof p.reviewCount === 'number' ? p.reviewCount : 0,
   };
 };
 
