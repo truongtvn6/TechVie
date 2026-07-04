@@ -35,6 +35,41 @@ export default function PromoManager({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Helper functions for formatting price with dots (thousands separator) without cursor jumping
+  const formatPriceWithDots = (num: number): string => {
+    if (num === 0) return "";
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  const handleMinOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const selectionStart = input.selectionStart || 0;
+    const valueBeforeCursor = input.value.slice(0, selectionStart);
+    const digitsBefore = valueBeforeCursor.replace(/\D/g, "").length;
+
+    const rawValue = input.value.replace(/\D/g, "");
+    const parsedValue = parseInt(rawValue, 10) || 0;
+
+    setNewPromoMinOrder(parsedValue);
+
+    const formatted = formatPriceWithDots(parsedValue);
+
+    setTimeout(() => {
+      let newCursorPos = 0;
+      let digitCount = 0;
+      for (let i = 0; i < formatted.length; i++) {
+        if (formatted[i] !== ".") {
+          digitCount++;
+        }
+        newCursorPos = i + 1;
+        if (digitCount === digitsBefore) {
+          break;
+        }
+      }
+      input.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
   // Close dropdown on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -68,6 +103,7 @@ export default function PromoManager({
     onAddPromo(newPromo);
     setNewPromoCode('');
     setNewPromoDesc('');
+    setNewPromoMinOrder(0);
   };
 
   const d = isDarkMode;
@@ -180,10 +216,10 @@ export default function PromoManager({
             <div className="space-y-1.5 flex flex-col text-left">
               <label className="text-[10px] uppercase font-bold text-gray-400">Hạn định đơn tối thiểu (VND)</label>
               <input
-                type="number"
-                value={newPromoMinOrder}
-                onChange={(e) => setNewPromoMinOrder(parseInt(e.target.value) || 0)}
-                placeholder="Ví dụ: 10000000"
+                type="text"
+                value={formatPriceWithDots(newPromoMinOrder)}
+                onChange={handleMinOrderChange}
+                placeholder="Ví dụ: 10.000.000"
                 className={`w-full rounded-xl px-4 py-3 outline-none text-xs font-mono font-bold transition-all duration-300 border ${
                   d
                     ? 'bg-[#0d1117]/60 border-[#30363d] text-white focus:bg-[#161b22] focus:border-indigo-500 placeholder-gray-500'

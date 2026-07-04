@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem } from '../../types';
-import { getCheckoutPaymentStatus, submitCheckoutOrder } from '../../services/api';
+import { getCheckoutPaymentStatus, submitCheckoutOrder, getVouchers } from '../../services/api';
 import { Gift, Info } from 'lucide-react';
 
 import CheckoutForm from './CheckoutForm';
@@ -70,6 +70,18 @@ export default function CheckoutPage({
   const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
   const [promoError, setPromoError] = useState('');
   const [promoSuccess, setPromoSuccess] = useState('');
+  const [backendPromos, setBackendPromos] = useState<any[]>([]);
+
+  // Fetch promos from database
+  useEffect(() => {
+    getVouchers().then(res => {
+      if (res.success && res.promos) {
+        setBackendPromos(res.promos);
+      }
+    }).catch(err => {
+      console.error("Lỗi khi fetch vouchers từ db:", err);
+    });
+  }, []);
 
   // Calculations
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -83,19 +95,28 @@ export default function CheckoutPage({
     setPromoSuccess('');
     const code = promoCode.trim().toUpperCase();
 
-    // Đọc mã giảm giá động từ localStorage để đồng bộ với trang Admin
-    let localPromos = [];
+    // Kết hợp mã từ database/localStorage
+    let localPromos = [...backendPromos];
+    
     try {
       const saved = localStorage.getItem('techvie_promos');
       if (saved) {
-        localPromos = JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Tránh trùng lặp mã đã có từ db
+          parsed.forEach((p: any) => {
+            if (!localPromos.some((bp: any) => bp.code.toUpperCase() === p.code.toUpperCase())) {
+              localPromos.push(p);
+            }
+          });
+        }
       }
     } catch (err) {
       console.error(err);
     }
 
-    // Nếu localStorage trống, sử dụng các giá trị mặc định làm phương án dự phòng
-    if (!Array.isArray(localPromos) || localPromos.length === 0) {
+    // Nếu trống hoàn toàn, sử dụng các giá trị mặc định làm phương án dự phòng
+    if (localPromos.length === 0) {
       localPromos = [
         { code: 'TECHVIE2026', discount: 0.1, description: 'Giảm giá ra mắt sản phẩm 10%', isActive: true },
         { code: 'FUTURE', discount: 0.1, description: 'Đặc quyền tương lai 10%', isActive: true },
