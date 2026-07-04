@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Cpu, Star, Send, ShieldCheck, Trash2, User, Pencil, MessageSquare } from 'lucide-react';
+import { Cpu, Star, Send, ShieldCheck, Trash2, User, Pencil, MessageSquare, ZoomIn, X } from 'lucide-react';
 import { Product, TabType, Review, ReviewSummary } from '../../types';
 import { getReviewsByProduct, createReview, deleteReview, getCurrentUser, checkCanReview, updateReview } from '../../services/api';
 
@@ -20,6 +20,7 @@ export default function ProductDetail({
   isLoggedIn = false,
 }: ProductDetailProps) {
   const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [summary, setSummary] = useState<ReviewSummary | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -40,6 +41,27 @@ export default function ProductDetail({
   const [editTitle, setEditTitle] = useState<string>('');
   const [editComment, setEditComment] = useState<string>('');
   const [isEditingSubmitting, setIsEditingSubmitting] = useState<boolean>(false);
+
+  // Khóa scroll body khi modal mở, restore khi đóng
+  useEffect(() => {
+    if (!product) return;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    };
+  }, [product]);
+
+  // Đóng lightbox bằng Escape
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsImageZoomed(false);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
 
   // Khi product thay đổi, tự động chọn màu đầu tiên nếu có
   useEffect(() => {
@@ -163,10 +185,11 @@ export default function ProductDetail({
   if (!product) return null;
 
   return (
+    <>
     <AnimatePresence>
       <div 
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 backdrop-blur-[6px] z-[100] flex items-center justify-center p-4 cursor-pointer animate-fade-in"
+        className="fixed inset-0 bg-black/50 backdrop-blur-[6px] z-[100] flex items-start justify-center pt-16 pb-8 px-4 cursor-pointer animate-fade-in overflow-y-auto"
       >
         {/* Floating Close Button outside the scrollable modal card */}
         <button 
@@ -182,36 +205,72 @@ export default function ProductDetail({
           initial={{ opacity: 0, scale: 0.95, y: 30 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 30 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-          className="bg-white rounded-[2.5rem] border border-gray-200 p-8 md:p-12 max-w-[95vw] md:max-w-6xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl cursor-default"
+          transition={{ type: 'spring', damping: 22, stiffness: 300 }}
+          style={{ filter: 'none' }}
+          className="bg-white rounded-[2.5rem] border border-gray-200 p-8 md:p-12 max-w-[95vw] md:max-w-6xl w-full relative shadow-2xl cursor-default"
         >
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-start">
-            {/* Image side */}
-            <div className="bg-gray-50 rounded-2xl p-6 flex items-center justify-center aspect-square">
-              <img 
-                src={product.image} 
+            {/* Image side — click to zoom */}
+            <motion.div
+              initial={{ opacity: 0, x: -40, scale: 0.96 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ type: 'spring', damping: 24, stiffness: 280, delay: 0.08 }}
+              whileHover={{ scale: 1.02, rotate: 0.5 }}
+              onClick={() => setIsImageZoomed(true)}
+              className="bg-gray-50 rounded-2xl p-6 flex items-center justify-center aspect-square overflow-hidden cursor-zoom-in relative group"
+            >
+              {/* Zoom hint overlay */}
+              <div className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center z-10 pointer-events-none">
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg">
+                  <ZoomIn size={18} className="text-gray-700" />
+                </div>
+              </div>
+              <motion.img
+                src={product.image}
                 alt={product.name}
                 referrerPolicy="no-referrer"
                 className="max-h-80 md:max-h-[450px] w-full object-contain mix-blend-multiply"
+                whileHover={{ scale: 1.07, rotate: -1 }}
+                transition={{ type: 'spring', damping: 20, stiffness: 200 }}
               />
-            </div>
+            </motion.div>
 
             {/* Info side */}
             <div className="text-left">
-              <span className="text-xs uppercase tracking-[0.2em] text-secondary font-bold block mb-1">
+              <motion.span
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12 }}
+                className="text-xs uppercase tracking-[0.2em] text-secondary font-bold block mb-1"
+              >
                 {product.category} • TECHVIE REFINERY
-              </span>
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-950 mb-3">
+              </motion.span>
+              <motion.h2
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.17, type: 'spring', damping: 20 }}
+                className="text-2xl md:text-3xl font-bold tracking-tight text-gray-950 mb-3"
+              >
                 {product.name}
-              </h2>
-              <p className="text-sm font-black text-indigo-600 mb-6">
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.22 }}
+                className="text-sm font-black text-indigo-600 mb-6"
+              >
                 {product.price.toLocaleString('vi-VN')}₫
-              </p>
+              </motion.p>
 
-              <p className="text-sm text-gray-600 leading-relaxed font-sans mb-6">
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.27 }}
+                className="text-sm text-gray-600 leading-relaxed font-sans mb-6"
+              >
                 {product.description}
-              </p>
+              </motion.p>
               {/* Select color option — interactive picker */}
               {Array.isArray(product.colors) && product.colors.length > 0 && (
                 <div className="mb-6">
@@ -229,23 +288,28 @@ export default function ProductDetail({
                     {product.colors.map((color, idx) => {
                       const isSelected = selectedColor === color;
                       return (
-                        <button
+                        <motion.button
                           key={idx}
                           type="button"
                           onClick={() => setSelectedColor(color)}
                           title={color}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: isSelected ? 1.05 : 1 }}
+                          transition={{ delay: 0.32 + idx * 0.05, type: 'spring', damping: 18 }}
+                          whileHover={{ scale: isSelected ? 1.08 : 1.05 }}
+                          whileTap={{ scale: 0.94 }}
                           className={[
-                            'relative px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer select-none',
+                            'relative px-3.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer select-none border-2 transition-colors duration-200',
                             isSelected
-                              ? 'bg-black text-white border-2 border-black shadow-md scale-105'
-                              : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-400 hover:shadow-sm hover:scale-102',
+                              ? 'bg-black text-white border-black shadow-md'
+                              : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:shadow-sm',
                           ].join(' ')}
                         >
                           {isSelected && (
                             <span className="mr-1 inline-block align-middle">✓</span>
                           )}
                           {color}
-                        </button>
+                        </motion.button>
                       );
                     })}
                   </div>
@@ -273,16 +337,19 @@ export default function ProductDetail({
                     ⚠ Vui lòng chọn màu sắc trước khi thêm vào giỏ
                   </p>
                 )}
-                <button
+                <motion.button
                   onClick={() => {
                     onAddToCart(product, selectedColor);
                     onClose();
                   }}
                   disabled={Array.isArray(product.colors) && product.colors.length > 0 && !selectedColor}
-                  className="flex-grow bg-black text-white hover:bg-gray-800 py-4 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-all cursor-pointer text-center disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-black"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', damping: 16, stiffness: 400 }}
+                  className="flex-grow bg-black text-white hover:bg-gray-800 py-4 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-colors cursor-pointer text-center disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-black"
                 >
                   Thành lập liên kết & Thêm vào giỏ
-                </button>
+                </motion.button>
               </div>
             </div>
           </div>
@@ -330,7 +397,34 @@ export default function ProductDetail({
             {/* List of reviews for this product */}
             <div className="space-y-4 mb-8">
               {isLoading ? (
-                <div className="text-center py-6 text-sm text-gray-500">Đang tải đánh giá...</div>
+                <div className="space-y-4">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="bg-gray-50 rounded-2xl p-5 border border-gray-100 animate-pulse">
+                      {/* Header: avatar + name */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0" />
+                        <div className="flex-1 space-y-1.5">
+                          <div className="h-3 bg-gray-200 rounded-full w-32" />
+                          <div className="h-2 bg-gray-100 rounded-full w-20" />
+                        </div>
+                        {/* Stars */}
+                        <div className="flex gap-1">
+                          {[1,2,3,4,5].map(s => (
+                            <div key={s} className="w-3 h-3 rounded-sm bg-gray-200" />
+                          ))}
+                        </div>
+                      </div>
+                      {/* Title */}
+                      <div className="h-3 bg-gray-200 rounded-full w-1/2 mb-2" />
+                      {/* Body lines */}
+                      <div className="space-y-1.5">
+                        <div className="h-2.5 bg-gray-100 rounded-full w-full" />
+                        <div className="h-2.5 bg-gray-100 rounded-full w-5/6" />
+                        <div className="h-2.5 bg-gray-100 rounded-full w-3/4" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : reviews.length > 0 ? (
                 reviews.map(review => {
                   const userObj = typeof review.user_id === 'object' ? review.user_id : null;
@@ -494,7 +588,7 @@ export default function ProductDetail({
             </div>
 
             {/* Add new review form */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xl">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xl min-h-[160px]">
               <h4 className="text-sm font-bold text-gray-900 mb-4">Viết đánh giá của bạn</h4>
               {!isLoggedIn ? (
                 <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100 flex flex-col items-center">
@@ -510,7 +604,11 @@ export default function ProductDetail({
                   </button>
                 </div>
               ) : checkingPurchase ? (
-                <div className="text-center py-4 text-sm text-gray-500">Đang xác minh lịch sử mua hàng...</div>
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 animate-pulse flex flex-col gap-2.5">
+                  <div className="h-3 bg-gray-200 rounded-full w-2/3" />
+                  <div className="h-2.5 bg-gray-100 rounded-full w-full" />
+                  <div className="h-2.5 bg-gray-100 rounded-full w-5/6" />
+                </div>
               ) : canReviewReason === 'already_reviewed' ? (
                 <div className="bg-indigo-50 rounded-xl p-5 text-center border border-indigo-150 flex flex-col items-center">
                   <p className="text-sm font-sans font-bold text-indigo-900 mb-1">Cảm ơn bạn đã gửi đánh giá!</p>
@@ -576,5 +674,55 @@ export default function ProductDetail({
         </motion.div>
       </div>
     </AnimatePresence>
+
+    {/* Image Lightbox */}
+    <AnimatePresence>
+      {isImageZoomed && product && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={() => setIsImageZoomed(false)}
+          className="fixed inset-0 z-[200] bg-black/92 backdrop-blur-xl flex items-center justify-center p-4 cursor-zoom-out"
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setIsImageZoomed(false)}
+            className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 border border-white/20 text-white flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 z-10"
+            title="Đóng (Esc)"
+          >
+            <X size={18} />
+          </button>
+
+          {/* Image */}
+          <motion.img
+            src={product.image}
+            alt={product.name}
+            referrerPolicy="no-referrer"
+            onClick={(e) => e.stopPropagation()}
+            initial={{ scale: 0.85, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.85, opacity: 0, y: 20 }}
+            transition={{ type: 'spring', damping: 22, stiffness: 280 }}
+            className="max-w-[90vw] max-h-[88vh] object-contain drop-shadow-2xl cursor-default"
+          />
+
+          {/* Caption */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: 0.15 }}
+            className="absolute bottom-6 left-0 right-0 text-center pointer-events-none"
+          >
+            <span className="text-white/70 text-xs font-mono tracking-widest uppercase">
+              {product.name}
+            </span>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
 }
