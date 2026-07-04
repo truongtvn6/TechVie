@@ -7,8 +7,8 @@ interface CartSidePanelProps {
   isOpen: boolean;
   onClose: () => void;
   cart: CartItem[];
-  onQuantityChange: (productId: string, delta: number) => void;
-  onRemoveItem: (productId: string) => void;
+  onQuantityChange: (productId: string, delta: number, selectedColor?: string) => void;
+  onRemoveItem: (productId: string, selectedColor?: string) => void;
   onClearCart: () => void;
   onNavigate: (tab: TabType) => void;
 }
@@ -90,7 +90,7 @@ export default function CartSidePanel({
                     <div className="space-y-4">
                       {cart.map((item, idx) => (
                         <motion.div
-                          key={item.product.id}
+                          key={`${item.product.id}::${item.selectedColor ?? ''}`}
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: idx * 0.06, duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
@@ -109,9 +109,9 @@ export default function CartSidePanel({
                             <div className="flex justify-between items-start gap-2">
                               <h4 className="font-bold text-xs sm:text-sm text-gray-950 truncate">{item.product.name}</h4>
                               <button
-                                onClick={() => onRemoveItem(item.product.id)}
+                                onClick={() => onRemoveItem(item.product.id, item.selectedColor)}
                                 className="text-gray-400 hover:text-red-500 transition-colors shrink-0 cursor-pointer active:scale-90"
-                                title="Xoá khỏi giỏ"
+                                title="Xoà khỏi giỏ"
                               >
                                 <Trash2 size={13} />
                               </button>
@@ -119,18 +119,24 @@ export default function CartSidePanel({
                             <p className="text-xs text-gray-500 font-mono mt-0.5">
                               {item.product.price.toLocaleString('vi-VN')}₫
                             </p>
+                            {/* Hiển thị màu đã chọn */}
+                            {item.selectedColor && (
+                              <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-gray-100 text-[10px] font-bold text-gray-600 uppercase tracking-wide">
+                                ● {item.selectedColor}
+                              </span>
+                            )}
 
                             <div className="flex justify-between items-center mt-2.5 pt-2.5 border-t border-gray-50">
                               <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                                 <button
-                                  onClick={() => onQuantityChange(item.product.id, -1)}
+                                  onClick={() => onQuantityChange(item.product.id, -1, item.selectedColor)}
                                   className="p-1 px-2 sm:px-2.5 hover:bg-gray-100 text-gray-500 cursor-pointer active:scale-90 transition-transform"
                                 >
                                   <Minus size={10} />
                                 </button>
                                 <span className="px-2.5 sm:px-3 text-xs font-bold font-mono text-gray-800 bg-gray-50">{item.quantity}</span>
                                 <button
-                                  onClick={() => onQuantityChange(item.product.id, 1)}
+                                  onClick={() => onQuantityChange(item.product.id, 1, item.selectedColor)}
                                   className="p-1 px-2 sm:px-2.5 hover:bg-gray-100 text-gray-500 cursor-pointer active:scale-90 transition-transform"
                                 >
                                   <Plus size={10} />

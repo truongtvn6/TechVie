@@ -95,7 +95,7 @@ const ProductSkeleton = () => (
 
 interface ProductPageProps {
   products?: Product[];
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, selectedColor?: string) => void;
   onNavigate: (tab: TabType) => void;
 }
 
@@ -188,7 +188,7 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
     return allProducts.filter(p => p.category === category).length;
   };
 
-  const handleAddToCartWithSuccess = (product: Product, e?: MouseEvent<HTMLButtonElement>) => {
+  const handleAddToCartWithSuccess = (product: Product, selectedColor?: string, e?: React.MouseEvent<HTMLButtonElement>) => {
     let rippleX = 50;
     let rippleY = 20;
     let startX = window.innerWidth / 2;
@@ -229,7 +229,7 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
       setMagneticRefId(null);
     }, 600);
 
-    onAddToCart(product);
+    onAddToCart(product, selectedColor);
     setJustAddedId(product.id);
     setTimeout(() => {
       setJustAddedId(null);

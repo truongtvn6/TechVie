@@ -6,7 +6,7 @@ import { Product } from '../../types';
 interface ProductCardProps {
   product: Product;
   onSelect: (product: Product) => void;
-  onAddToCart: (product: Product, e: React.MouseEvent<HTMLButtonElement>) => void;
+  onAddToCart: (product: Product, selectedColor: string | undefined, e: React.MouseEvent<HTMLButtonElement>) => void;
   isJustAdded: boolean;
   isMagnetized: boolean;
 }
@@ -40,18 +40,35 @@ export default function ProductCard({
 
   const handleAddToCartLocal = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
+
+    const hasColors = Array.isArray(product.colors) && product.colors.length > 0;
+
+    // Hướng 1: Nếu sản phẩm có màu → mở modal để chọn màu trước
+    if (hasColors) {
+      // Hướng 2: Nếu chỉ có đúng 1 màu → thêm thẳng với màu đó (không cần mở modal)
+      if (product.colors!.length === 1) {
+        const buttonRect = e.currentTarget.getBoundingClientRect();
+        const rippleX = e.clientX - buttonRect.left;
+        const rippleY = e.clientY - buttonRect.top;
+        const rippleId = Date.now() + Math.random();
+        setRipples(prev => [...prev, { id: rippleId, x: rippleX, y: rippleY }]);
+        setTimeout(() => { setRipples(prev => prev.filter(r => r.id !== rippleId)); }, 800);
+        onAddToCart(product, product.colors![0], e);
+      } else {
+        // Nhiều màu → buộc mở modal để chọn
+        onSelect(product);
+      }
+      return;
+    }
+
+    // Không có màu → thêm thẳng bình thường
     const buttonRect = e.currentTarget.getBoundingClientRect();
     const rippleX = e.clientX - buttonRect.left;
     const rippleY = e.clientY - buttonRect.top;
-    
     const rippleId = Date.now() + Math.random();
     setRipples(prev => [...prev, { id: rippleId, x: rippleX, y: rippleY }]);
-
-    setTimeout(() => {
-      setRipples(prev => prev.filter(r => r.id !== rippleId));
-    }, 800);
-
-    onAddToCart(product, e);
+    setTimeout(() => { setRipples(prev => prev.filter(r => r.id !== rippleId)); }, 800);
+    onAddToCart(product, undefined, e);
   };
 
   return (

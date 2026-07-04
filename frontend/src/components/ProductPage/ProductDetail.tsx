@@ -7,7 +7,7 @@ import { getReviewsByProduct, createReview, deleteReview, getCurrentUser, checkC
 interface ProductDetailProps {
   product: Product | null;
   onClose: () => void;
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, selectedColor?: string) => void;
   onNavigate: (tab: TabType) => void;
   isLoggedIn?: boolean;
 }
@@ -19,6 +19,7 @@ export default function ProductDetail({
   onNavigate,
   isLoggedIn = false,
 }: ProductDetailProps) {
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [summary, setSummary] = useState<ReviewSummary | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -40,8 +41,14 @@ export default function ProductDetail({
   const [editComment, setEditComment] = useState<string>('');
   const [isEditingSubmitting, setIsEditingSubmitting] = useState<boolean>(false);
 
+  // Khi product thay đổi, tự động chọn màu đầu tiên nếu có
   useEffect(() => {
     if (!product) return;
+    setSelectedColor(
+      Array.isArray(product.colors) && product.colors.length > 0
+        ? product.colors[0]
+        : undefined
+    );
 
     const loadReviewsAndUser = async () => {
       setIsLoading(true);
@@ -205,21 +212,42 @@ export default function ProductDetail({
               <p className="text-sm text-gray-600 leading-relaxed font-sans mb-6">
                 {product.description}
               </p>
-              {/* Select color option */}
+              {/* Select color option — interactive picker */}
               {Array.isArray(product.colors) && product.colors.length > 0 && (
                 <div className="mb-6">
-                  <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest block mb-2.5">
-                    Màu sắc có sẵn:
-                  </span>
-                  <div className="flex gap-2 flex-wrap">
-                    {product.colors.map((color, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3.5 py-1.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-800 bg-white shadow-xs"
-                      >
-                        {color}
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">
+                      Chọn màu sắc:
+                    </span>
+                    {selectedColor && (
+                      <span className="text-[10px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-md">
+                        {selectedColor}
                       </span>
-                    ))}
+                    )}
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {product.colors.map((color, idx) => {
+                      const isSelected = selectedColor === color;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setSelectedColor(color)}
+                          title={color}
+                          className={[
+                            'relative px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer select-none',
+                            isSelected
+                              ? 'bg-black text-white border-2 border-black shadow-md scale-105'
+                              : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-400 hover:shadow-sm hover:scale-102',
+                          ].join(' ')}
+                        >
+                          {isSelected && (
+                            <span className="mr-1 inline-block align-middle">✓</span>
+                          )}
+                          {color}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -238,13 +266,20 @@ export default function ProductDetail({
                 ))}
               </div>
 
-              <div className="flex gap-4">
-                <button 
+              <div className="flex flex-col gap-3">
+                {/* Cảnh báo nếu sản phẩm có màu nhưng chưa chọn */}
+                {Array.isArray(product.colors) && product.colors.length > 0 && !selectedColor && (
+                  <p className="text-[11px] text-amber-600 font-semibold text-center">
+                    ⚠ Vui lòng chọn màu sắc trước khi thêm vào giỏ
+                  </p>
+                )}
+                <button
                   onClick={() => {
-                    onAddToCart(product);
+                    onAddToCart(product, selectedColor);
                     onClose();
                   }}
-                  className="flex-grow bg-black text-white hover:bg-gray-800 py-4 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-colors cursor-pointer text-center"
+                  disabled={Array.isArray(product.colors) && product.colors.length > 0 && !selectedColor}
+                  className="flex-grow bg-black text-white hover:bg-gray-800 py-4 rounded-full font-sans text-xs uppercase tracking-widest font-black transition-all cursor-pointer text-center disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-black"
                 >
                   Thành lập liên kết & Thêm vào giỏ
                 </button>
