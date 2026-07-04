@@ -538,28 +538,32 @@ function AppContent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Cart operations
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: Product, selectedColor?: string) => {
     setCart((prevCart) => {
-      const existing = prevCart.find((item) => item.product.id === product.id);
+      // Phân biệt cart item theo cả productId lẫn selectedColor
+      const existing = prevCart.find(
+        (item) => item.product.id === product.id && item.selectedColor === selectedColor
+      );
       if (existing) {
         return prevCart.map((item) =>
-          item.product.id === product.id
+          item.product.id === product.id && item.selectedColor === selectedColor
             ? { ...item, quantity: item.quantity + 1 }
             : item,
         );
       }
-      return [...prevCart, { product, quantity: 1 }];
+      return [...prevCart, { product, quantity: 1, selectedColor }];
     });
-    showSuccess(`Đã thêm ${product.name} vào giỏ hàng`, { position: "top-center", duration: 3000 });
+    const colorNote = selectedColor ? ` (${selectedColor})` : '';
+    showSuccess(`Đã thêm ${product.name}${colorNote} vào giỏ hàng`, { position: "top-center", duration: 3000 });
     // Open cart drawer so customer enjoys the feedback
     setIsCartOpen(true);
   };
 
-  const handleQuantityChange = (productId: string, delta: number) => {
+  const handleQuantityChange = (productId: string, delta: number, selectedColor?: string) => {
     setCart((prevCart) =>
       prevCart
         .map((item) => {
-          if (item.product.id === productId) {
+          if (item.product.id === productId && item.selectedColor === selectedColor) {
             const newQty = item.quantity + delta;
             return { ...item, quantity: newQty };
           }
@@ -569,9 +573,11 @@ function AppContent() {
     );
   };
 
-  const handleRemoveItem = (productId: string) => {
+  const handleRemoveItem = (productId: string, selectedColor?: string) => {
     setCart((prevCart) =>
-      prevCart.filter((item) => item.product.id !== productId),
+      prevCart.filter(
+        (item) => !(item.product.id === productId && item.selectedColor === selectedColor)
+      ),
     );
   };
 
@@ -775,7 +781,7 @@ function AppContent() {
             } />
             <Route path="/account" element={
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="w-full">
-                <AccountPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} setIsLoggedIn={handleSetIsLoggedIn} userProfile={userProfile} setUserProfile={setUserProfile} token={token} />
+                <AccountPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} setIsLoggedIn={handleSetIsLoggedIn} userProfile={userProfile} setUserProfile={setUserProfile} token={token} onAddToCart={handleAddToCart} />
               </motion.div>
             } />
             <Route path="/admin/*" element={

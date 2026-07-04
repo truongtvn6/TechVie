@@ -55,6 +55,7 @@ export interface ReviewSummary {
 export interface CartItem {
   product: Product;
   quantity: number;
+  selectedColor?: string;
 }
 
 export interface NewsArticle {
