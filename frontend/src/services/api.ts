@@ -998,4 +998,68 @@ export async function toggleHideReview(reviewId: string, isHidden?: boolean): Pr
   }
 }
 
+// ================= VOUCHER APIS =================
+
+export async function getVouchers(): Promise<{ success: boolean; promos?: any[]; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/vouchers`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể lấy danh sách voucher');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi lấy danh sách voucher:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function createVoucher(voucherData: any): Promise<{ success: boolean; promo?: any; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/vouchers`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(voucherData)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể tạo voucher');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi tạo voucher:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function toggleVoucherStatus(id: string): Promise<{ success: boolean; promo?: any; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/vouchers/${id}/toggle`, {
+      method: 'PUT',
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể cập nhật trạng thái voucher');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi cập nhật trạng thái voucher:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function deleteVoucher(id: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/vouchers/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Không thể xóa voucher');
+    return data;
+  } catch (error: any) {
+    console.error('Lỗi khi xóa voucher:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+
 

@@ -16,6 +16,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const voucherRoutes = require("./routes/voucherRoutes");
 const Category = require("./models/Category");
 
 const app = express();
@@ -111,6 +112,9 @@ app.use("/api/search", searchRoutes);
 
 // 14. Định nghĩa API Reviews
 app.use("/api/reviews", reviewRoutes);
+
+// 15. Định nghĩa API Vouchers
+app.use("/api/vouchers", voucherRoutes);
 
 // Endpoint nhận log từ Client và in ra CMD của server
 app.post("/api/logs", (req, res) => {

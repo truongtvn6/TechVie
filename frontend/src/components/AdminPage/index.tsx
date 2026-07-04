@@ -19,6 +19,10 @@ import {
   toggleCategory,
   hardDeleteCategory,
   getAdminReviewStats,
+  getVouchers,
+  createVoucher,
+  toggleVoucherStatus,
+  deleteVoucher,
 } from "../../services/api";
 import AdminSidebar from "./AdminSidebar";
 
@@ -369,48 +373,20 @@ export default function AdminPage({
     }
   };
 
-  // Dynamic Promo Campaigns local state with localStorage persistence
-  const [promos, setPromos] = useState<any[]>(() => {
-    try {
-      const saved = localStorage.getItem("techvie_promos");
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error(e);
-    }
-    return [
-      {
-        code: "TECHVIE2026",
-        discount: 0.1,
-        description: "Giảm giá ra mắt sản phẩm 10%",
-        usedCount: 34,
-        isActive: true,
-      },
-      {
-        code: "FUTURE",
-        discount: 0.1,
-        description: "Đặc quyền tương lai 10%",
-        usedCount: 12,
-        isActive: true,
-      },
-      {
-        code: "VIPLAB",
-        discount: 0.25,
-        description: "Siêu đặc quyền từ TechVie Lab 25%",
-        usedCount: 7,
-        isActive: true,
-        minOrderVal: 30000000,
-      },
-    ];
-  });
+  // Dynamic Promo Campaigns state
+  const [promos, setPromos] = useState<any[]>([]);
 
-  // Sync promos to localStorage
+  const fetchPromos = () => {
+    getVouchers().then((res) => {
+      if (res.success && res.promos) {
+        setPromos(res.promos);
+      }
+    }).catch(err => console.error("Lỗi lấy danh sách khuyến mãi:", err));
+  };
+
   useEffect(() => {
-    try {
-      localStorage.setItem("techvie_promos", JSON.stringify(promos));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [promos]);
+    fetchPromos();
+  }, []);
 
   // Real-time fetched datasets from backend
   const [orders, setOrders] = useState<any[]>([]);
@@ -434,32 +410,36 @@ export default function AdminPage({
 
   // Promo Handlers
   const handleAddPromo = (newPromo: any) => {
-    if (
-      promos.some((p) => p.code.toUpperCase() === newPromo.code.toUpperCase())
-    ) {
-      addLog(`Lỗi: Mã bưu khuyến mãi ${newPromo.code} đã tồn tại!`);
-      console.warn(`Mã coupon ${newPromo.code} đã tồn tại!`);
-      return;
-    }
-    setPromos((prev) => [newPromo, ...prev]);
-    addLog(`Đã ban hành mã khuyến mãi mới thành công: ${newPromo.code}`);
+    createVoucher(newPromo).then(res => {
+      if (res.success && res.promo) {
+        setPromos(prev => [res.promo, ...prev]);
+        addLog(`Đã ban hành mã khuyến mãi mới thành công: ${res.promo.code}`);
+      } else {
+        addLog(`Lỗi: ${res.message}`);
+      }
+    });
   };
 
   const handleTogglePromoStatus = (code: string) => {
-    setPromos((prev) =>
-      prev.map((p) => (p.code === code ? { ...p, isActive: !p.isActive } : p)),
-    );
-    const findP = promos.find((p) => p.code === code);
-    if (findP) {
-      addLog(
-        `Trạng thái mã ${code}: ${!findP.isActive ? "Đang kích hoạt" : "Đã tạm dừng"}`,
-      );
-    }
+    toggleVoucherStatus(code).then(res => {
+      if (res.success && res.promo) {
+        setPromos(prev => prev.map(p => p.code === code ? { ...p, isActive: res.promo.isActive } : p));
+        addLog(`Trạng thái mã ${code}: ${res.promo.isActive ? "Đang kích hoạt" : "Đã tạm dừng"}`);
+      } else {
+        addLog(`Lỗi: ${res.message}`);
+      }
+    });
   };
 
   const handleDeletePromo = (code: string) => {
-    setPromos((prev) => prev.filter((p) => p.code !== code));
-    addLog(`Đã gỡ bỏ mã khuyến mãi khỏi hệ thống: ${code}`);
+    deleteVoucher(code).then(res => {
+      if (res.success) {
+        setPromos(prev => prev.filter(p => p.code !== code));
+        addLog(`Đã gỡ bỏ mã khuyến mãi khỏi hệ thống: ${code}`);
+      } else {
+        addLog(`Lỗi: ${res.message}`);
+      }
+    });
   };
 
   // User Handlers (Calling parent API callbacks with dynamic logging)
@@ -796,6 +776,7 @@ export default function AdminPage({
               if (tab === "overview" || tab === "messages") fetchMessages();
               if (tab === "overview" || tab === "categories") fetchCategories();
               if (tab === "overview" || tab === "reviews") fetchReviewsCount();
+              if (tab === "overview" || tab === "promos") fetchPromos();
             }}
             isDarkMode={isDarkMode}
             setIsDarkMode={setIsDarkMode}
