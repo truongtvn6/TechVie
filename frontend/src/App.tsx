@@ -781,7 +781,7 @@ function AppContent() {
             } />
             <Route path="/account" element={
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="w-full">
-                <AccountPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} setIsLoggedIn={handleSetIsLoggedIn} userProfile={userProfile} setUserProfile={setUserProfile} token={token} />
+                <AccountPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} setIsLoggedIn={handleSetIsLoggedIn} userProfile={userProfile} setUserProfile={setUserProfile} token={token} onAddToCart={handleAddToCart} />
               </motion.div>
             } />
             <Route path="/admin/*" element={

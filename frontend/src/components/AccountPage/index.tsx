@@ -32,6 +32,7 @@ interface AccountPageProps {
   userProfile?: any;
   setUserProfile?: (profile: any) => void;
   token?: string;
+  onAddToCart?: (product: any, selectedColor?: string) => void;
 }
 
 export default function AccountPage({
@@ -41,6 +42,7 @@ export default function AccountPage({
   userProfile: externalUserProfile,
   setUserProfile: externalSetUserProfile,
   token = "",
+  onAddToCart,
 }: AccountPageProps) {
   const [localIsLoggedIn, localSetIsLoggedIn] = useState(false);
   const isLoggedIn =
@@ -231,6 +233,13 @@ export default function AccountPage({
           background: rgba(45, 55, 72, 0.2);
           border-radius: 9999px;
         }
+        .hide-scrollbar {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
       `}</style>
 
       {/* Absolute Background Layer */}
@@ -263,7 +272,7 @@ export default function AccountPage({
       </AnimatePresence>
 
       {/* Main Content Layout Container */}
-      <div className="px-container-margin relative z-10 mx-auto flex min-h-[85vh] max-w-[1400px] items-center justify-center py-12 md:py-20">
+      <div className="px-container-margin relative z-10 mx-auto flex min-h-[85vh] max-w-[1400px] items-start justify-center py-12 md:py-20">
         <AnimatePresence mode="wait">
           {/* CASE 1: USER NOT SIGNED IN */}
           {!isLoggedIn ? (
@@ -294,7 +303,7 @@ export default function AccountPage({
                   />
 
                   {/* RIGHT MAIN PANEL: Dynamic Content Section */}
-                  <div className="mt-8 lg:col-span-8 lg:mt-0">
+                  <div className="mt-8 lg:col-span-8 lg:mt-0 overflow-y-auto max-h-[75vh] hide-scrollbar pr-1">
                     <AnimatePresence mode="wait">
                       {accountTab === "profile" && (
                         <motion.div
@@ -319,7 +328,7 @@ export default function AccountPage({
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <TabOrders orders={orders} />
+                          <TabOrders orders={orders} onNavigate={onNavigate} onAddToCart={onAddToCart} />
                         </motion.div>
                       )}
 
