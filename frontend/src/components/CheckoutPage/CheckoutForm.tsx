@@ -346,7 +346,7 @@ export default function CheckoutForm({
         {/* Title Header */}
         <div>
           <h1 className="text-2xl font-black tracking-tight text-gray-900 uppercase md:text-3xl">
-            THANH TOÁN THIẾT BỊ
+            THANH TOÁN ĐƠN HÀNG
           </h1>
           <p className="mt-2 font-sans text-xs text-gray-500">
             Xác thực địa chỉ giao hàng và lựa chọn phương thức ủy nhiệm thanh
