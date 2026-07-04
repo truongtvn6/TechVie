@@ -509,33 +509,33 @@ export default function ProductPage({ products, onAddToCart, onNavigate }: Produ
           <div className="flex flex-wrap items-center gap-2 mt-4 text-md text-gray-500 font-sans">
             <span>Đang lọc theo:</span>
             {selectedCategory !== 'Tất cả' && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider cursor-pointer" onClick={() => setSelectedCategory('Tất cả')}>
                 {selectedCategory}
-                <X size={10} className="cursor-pointer" onClick={() => setSelectedCategory('Tất cả')} />
+                <X size={10} />
               </span>
             )}
             {searchQuery && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider cursor-pointer" onClick={() => setSearchQuery('')}>
                 Tìm: "{searchQuery}"
-                <X size={10} className="cursor-pointer" onClick={() => setSearchQuery('')} />
+                <X size={10} />
               </span>
             )}
             {sortBy !== 'default' && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider cursor-pointer" onClick={() => setSortBy('default')}>
                 {sortBy === 'price-asc' ? 'Giá tăng dần' : 'Giá giảm dần'}
-                <X size={10} className="cursor-pointer" onClick={() => setSortBy('default')} />
+                <X size={10} />
               </span>
             )}
             {selectedColors.map(c => (
-              <span key={c} className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
+              <span key={c} className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider cursor-pointer" onClick={() => setSelectedColors(selectedColors.filter(color => color !== c))}>
                 Màu: {c}
-                <X size={10} className="cursor-pointer" onClick={() => setSelectedColors(selectedColors.filter(color => color !== c))} />
+                <X size={10} />
               </span>
             ))}
             {(priceRange[0] > 0 || priceRange[1] < maxProductPrice) && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full font-sans font-bold text-[12px] uppercase tracking-wider cursor-pointer" onClick={() => setPriceRange([0, maxProductPrice])}>
                 Giá: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ
-                <X size={10} className="cursor-pointer" onClick={() => setPriceRange([0, maxProductPrice])} />
+                <X size={10} />
               </span>
             )}
             <span className="text-[13px] font-mono text-gray-900 uppercase tracking-wide flex items-center gap-1.5 ml-auto">
