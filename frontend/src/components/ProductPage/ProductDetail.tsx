@@ -176,17 +176,17 @@ export default function ProductDetail({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 30 }}
           transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-          className="bg-white rounded-[2.5rem] border border-gray-200 p-8 md:p-12 max-w-3xl w-full max-h-[85vh] overflow-y-auto relative shadow-2xl cursor-default"
+          className="bg-white rounded-[2.5rem] border border-gray-200 p-8 md:p-12 max-w-[95vw] md:max-w-6xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl cursor-default"
         >
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-start">
             {/* Image side */}
             <div className="bg-gray-50 rounded-2xl p-6 flex items-center justify-center aspect-square">
               <img 
                 src={product.image} 
                 alt={product.name}
                 referrerPolicy="no-referrer"
-                className="max-h-60 object-contain mix-blend-multiply"
+                className="max-h-80 md:max-h-[450px] w-full object-contain mix-blend-multiply"
               />
             </div>
 
