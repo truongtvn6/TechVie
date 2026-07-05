@@ -1,0 +1,62 @@
+# =============================================
+# render.yaml — Infrastructure as Code cho Render
+# Đặt ở root dự án, Render sẽ tự detect
+# =============================================
+
+services:
+  - type: web
+    name: techvie-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free       # Đổi thành 'starter' nếu cần tránh cold start
+    region: singapore  # Gần nhất với Việt Nam
+
+    # Health check endpoint
+    healthCheckPath: /
+
+    # Environment variables — Điền giá trị thực trên Render Dashboard
+    # KHÔNG commit giá trị thật vào file này
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: PORT
+        value: 5000
+
+      # ⬇ Điền các giá trị này trên Render Dashboard (không để ở đây)
+      - key: MONGODB_URI
+        sync: false     # Render sẽ hỏi giá trị khi deploy lần đầu
+
+      - key: JWT_SECRET
+        sync: false
+
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+
+      - key: CLOUDINARY_API_KEY
+        sync: false
+
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+
+      - key: GOOGLE_REDIRECT_URI
+        sync: false     # Đổi thành URL production: https://techvie-backend.onrender.com/api/auth/google/callback
+
+      - key: EMAIL_SERVICE
+        value: gmail
+
+      - key: EMAIL_USER
+        sync: false
+
+      - key: EMAIL_PASS
+        sync: false
+
+      - key: FRONTEND_URL
+        sync: false     # URL của Vercel frontend: https://techvie.vercel.app

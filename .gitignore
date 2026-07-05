@@ -1,0 +1,31 @@
+# ===== ENVIRONMENT FILES =====
+# Không bao giờ commit file .env thật lên git
+*.env
+.env
+.env.local
+.env.*.local
+
+# Chỉ file example được phép commit
+!**/.env.example
+
+# ===== DEPENDENCIES =====
+node_modules/
+
+# ===== BUILD OUTPUT =====
+dist/
+build/
+
+# ===== OS & EDITOR =====
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# ===== LOGS =====
+*.log
+npm-debug.log*
+
+# ===== DOCKER =====
+# (Docker images/containers không lưu trong git)
+.agents
