@@ -320,7 +320,7 @@ export default function ProductDetail({
               <div className="space-y-3 bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-6 text-xs">
                 <h4 className="text-[10px] uppercase font-bold text-gray-400 tracking-widest flex items-center gap-1.5 border-b border-gray-200 pb-2 mb-2">
                   <Cpu size={12} />
-                  Bảng thông số kỹ thuật (Tech Sheet)
+                  Đặc điểm/Thông số kỹ thuật
                 </h4>
                 {product.specs.map((spec) => (
                   <div key={spec.label} className="flex justify-between py-1">

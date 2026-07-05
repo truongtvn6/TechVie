@@ -247,7 +247,7 @@ export default function ProductFormModal({
                 : "bg-black hover:bg-gray-900 text-white"
             }`}
           >
-            {editingProduct ? "thay đổi sản phẩm" : "đăng bán sản phẩm"}
+            {editingProduct ? "cập nhật sản phẩm" : "đăng bán sản phẩm"}
           </button>
           <button
             type="button"
@@ -673,7 +673,7 @@ export default function ProductFormModal({
             >
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  04 / Thông số kỹ thuật
+                  04 / Đặc điểm - Thông số kỹ thuật
                 </span>
                 <div
                   className={`h-px flex-1 ${d ? "bg-[#30363d]/60" : "bg-gray-200/60"}`}
@@ -692,7 +692,7 @@ export default function ProductFormModal({
                     <div className="flex-1 min-w-0 grid grid-cols-2 gap-4">
                       <div className="space-y-0.5">
                         <span className="text-[8px] uppercase font-black text-slate-400 tracking-wider block">
-                          Tên thông số
+                          Đặc điểm/Thông số
                         </span>
                         <textarea
                           required
@@ -718,7 +718,7 @@ export default function ProductFormModal({
 
                       <div className="space-y-0.5">
                         <span className="text-[8px] uppercase font-black text-slate-400 tracking-wider block">
-                          Giá trị
+                          Nội dung
                         </span>
                         <textarea
                           required
@@ -734,7 +734,7 @@ export default function ProductFormModal({
                               ? "text-white placeholder-slate-600"
                               : "text-slate-900 placeholder-slate-350"
                           }`}
-                          placeholder="Giá trị..."
+                          placeholder="Nhập nội dung..."
                           style={{
                             scrollbarWidth: "none",
                             msOverflowStyle: "none",
@@ -777,7 +777,7 @@ export default function ProductFormModal({
                   }`}
                 >
                   <Plus size={12} />
-                  <span>Thêm thông số mới</span>
+                  <span>Thêm đặc điểm/thông số mới</span>
                 </button>
               </div>
             </section>

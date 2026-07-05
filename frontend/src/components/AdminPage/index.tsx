@@ -620,6 +620,7 @@ export default function AdminPage({
         image: productData.image || editingProduct.image,
         description: productData.description,
         specs: productData.specs,
+        colors: productData.colors,
       };
       onEditProduct(updated, selectedImageFile);
       addLog(`Cập nhật thành công thiết bị: ${productData.name}`);
@@ -633,6 +634,7 @@ export default function AdminPage({
         image: productData.image,
         description: productData.description,
         specs: productData.specs,
+        colors: productData.colors,
       };
       onAddProduct(created, selectedImageFile);
       addLog(`Thêm mới thiết bị thành công: ${productData.name}`);

@@ -248,6 +248,9 @@ function AppContent() {
       formData.append("category", newProduct.category);
       formData.append("description", newProduct.description || "");
       formData.append("specs", JSON.stringify(newProduct.specs || []));
+      if (newProduct.colors) {
+        formData.append("colors", JSON.stringify(newProduct.colors));
+      }
       if (imageFile) {
         formData.append("imageFile", imageFile);
       } else if (newProduct.image) {
@@ -265,6 +268,7 @@ function AppContent() {
           image: res.product.image || newProduct.image,
           description: res.product.description,
           specs: res.product.specs || [],
+          colors: res.product.colors || newProduct.colors || [],
         };
         console.log(
           "Thêm sản phẩm thành công vào state React! Sản phẩm:",
@@ -307,6 +311,9 @@ function AppContent() {
       formData.append("category", editedProduct.category);
       formData.append("description", editedProduct.description || "");
       formData.append("specs", JSON.stringify(editedProduct.specs || []));
+      if (editedProduct.colors) {
+        formData.append("colors", JSON.stringify(editedProduct.colors));
+      }
       if (imageFile) {
         formData.append("imageFile", imageFile);
       } else if (editedProduct.image) {
@@ -324,6 +331,7 @@ function AppContent() {
           image: res.product.image || editedProduct.image,
           description: res.product.description,
           specs: res.product.specs || [],
+          colors: res.product.colors || editedProduct.colors || [],
         };
         console.log(
           "Cập nhật sản phẩm thành công trong state React! Sản phẩm:",
