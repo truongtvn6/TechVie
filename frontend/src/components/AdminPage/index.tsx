@@ -28,6 +28,7 @@ import AdminSidebar from "./AdminSidebar";
 
 // Sub-components imports
 import DashboardStats from "./DashboardStats";
+import DashboardCharts from "./DashboardCharts";
 import SystemConsole from "./SystemConsole";
 import ProductManager from "./ProductManager";
 import OrderManager from "./OrderManager";
@@ -857,6 +858,14 @@ export default function AdminPage({
                     lowStockCount={products.filter((p) => (p.stock ?? 0) > 0 && (p.stock ?? 0) <= 5).length}
                     isDarkMode={isDarkMode}
                   />
+                  
+                  {/* Graphical Charts Dashboard */}
+                  <DashboardCharts 
+                    orders={orders} 
+                    products={products} 
+                    isDarkMode={isDarkMode} 
+                  />
+
                   <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                     <SystemConsole
                       logs={logs}

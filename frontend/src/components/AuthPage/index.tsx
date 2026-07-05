@@ -382,16 +382,7 @@ export default function AuthPage({
         <ArrowLeft size={13} className="text-white group-hover:-translate-x-0.5 transition-transform duration-200" />
         <span className="relative z-10 text-white/90 group-hover:text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Trở lại Trang chủ</span>
       </a>
-
-      {/* Guest access — browse without logging in */}
-      <button
-        type="button"
-        onClick={() => onNavigate('home')}
-        className="absolute top-20 left-6 md:left-12 z-50 text-[10px] font-semibold text-white/40 hover:text-white/70 tracking-wider transition-colors duration-200 font-jakarta underline underline-offset-4 cursor-pointer"
-      >
-        Tiếp tục không đăng nhập →
-      </button>
-
+      
       {/* Left Column: Full-bleed high precision product image (60vw on desktop, hidden on mobile) */}
       <div className="hidden lg:block lg:w-[60vw] h-screen relative overflow-hidden bg-black">
         {/* Dynamic Light source ambient orbs for real-time backdrop refraction */}
