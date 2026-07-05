@@ -124,7 +124,7 @@ exports.replyContactMessage = async (req, res) => {
           <p><strong>Đội ngũ TechVie Shop xin phản hồi như sau:</strong></p>
           <p style="white-space: pre-line;">${replyContent}</p>
           <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #666;">Trân trọng,<br/><strong>Đội ngũ hỗ trợ TechVie Shop</strong><br/>Website: http://localhost:3000</p>
+          <p style="font-size: 12px; color: #666;">Trân trọng,<br/><strong>Đội ngũ hỗ trợ TechVie Shop</strong><br/>Website: ${process.env.FRONTEND_URL || "http://localhost:3000"}</p>
         </div>
       `,
     });
