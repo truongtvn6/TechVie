@@ -12,10 +12,11 @@ const authController = {
   getGoogleAuthUrl: async (req, res) => {
     try {
       const state = crypto.randomBytes(32).toString("hex");
+      const isProduction = process.env.NODE_ENV === "production";
       res.cookie("oauth_state", state, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 5 * 60 * 1000
       });
       const { clientId, redirectUri, authUrl, scopes } = oauthConfig.google;

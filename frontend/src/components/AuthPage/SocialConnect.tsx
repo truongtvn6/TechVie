@@ -15,7 +15,9 @@ export default function SocialConnect({
 }: SocialConnectProps) {
   const handleGoogleClick = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/google`);
+      const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+        credentials: 'include',
+      });
       const data = await response.json();
       if (data.success && data.url) {
         window.location.href = data.url;
