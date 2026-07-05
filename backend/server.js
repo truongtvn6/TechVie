@@ -23,7 +23,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // 1. Cấu hình CORS (Cho phép giao diện kết nối không bị chặn)
-app.use(cors());
+// Production: chỉ cho phép FRONTEND_URL (Vercel)
+// Development: cho phép tất cả origin
+const allowedOrigins = process.env.NODE_ENV === "production"
+  ? [process.env.FRONTEND_URL].filter(Boolean)
+  : ["http://localhost:3000", "http://localhost:5173", "http://localhost:4173"];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Cho phép request không có origin (mobile app, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+    if (process.env.NODE_ENV !== "production") return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: Origin '${origin}' không được phép truy cập.`));
+  },
+  credentials: true,
+}));
 
 // 2. Cấu hình đọc dữ liệu JSON & URL-encoded & Cookies
 app.use(express.json());
