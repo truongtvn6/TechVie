@@ -1,4 +1,7 @@
 import React from "react";
+import imgNganHang from "../../assets/images/nganhang.jpg";
+import imgMomo from "../../assets/images/momo.jpg";
+import imgZalopay from "../../assets/images/zalopay.jpg";
 import { motion, AnimatePresence } from "motion/react";
 import { CartItem } from "../../types";
 import {
@@ -113,10 +116,10 @@ export default function CheckoutForm({
             <div className="flex flex-col items-center justify-around gap-4 rounded-xl border border-indigo-100 bg-white p-4 md:flex-row">
               <div className="relative flex-shrink-0 rounded-xl border border-gray-200 bg-white p-2 shadow-sm">
                 <img
-                  src="/src/assets/images/nganhang.jpg"
+                  src={imgNganHang}
                   alt="QR VietQR MB Bank"
                   className="h-[190px] w-[150px] rounded-lg object-cover cursor-zoom-in hover:brightness-90 transition-all"
-                  onClick={() => setZoomImageSrc("/src/assets/images/nganhang.jpg")}
+                  onClick={() => setZoomImageSrc(imgNganHang)}
                   title="Nhấp vào để phóng to mã QR"
                 />
                 <div className="absolute bottom-[-10px] left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-2 py-0.5 text-[8px] font-black tracking-wider text-white uppercase">
@@ -201,10 +204,10 @@ export default function CheckoutForm({
             </div>
             <div className="grid grid-cols-1 items-center gap-4 rounded-xl border border-[#ffd1eb] bg-white p-4 md:grid-cols-[150px_1fr]">
               <img
-                src="/src/assets/images/momo.jpg"
+                src={imgMomo}
                 alt="QR thanh toán MoMo"
                 className="mx-auto h-[190px] w-[150px] rounded-xl border border-pink-100 object-cover cursor-zoom-in hover:brightness-90 transition-all"
-                onClick={() => setZoomImageSrc("/src/assets/images/momo.jpg")}
+                onClick={() => setZoomImageSrc(imgMomo)}
                 title="Nhấp vào để phóng to mã QR"
               />
               <div className="space-y-2">
@@ -263,10 +266,10 @@ export default function CheckoutForm({
             </div>
             <div className="grid grid-cols-1 items-center gap-4 rounded-xl border border-blue-100 bg-white p-4 md:grid-cols-[150px_1fr]">
               <img
-                src="/src/assets/images/zalopay.jpg"
+                src={imgZalopay}
                 alt="QR thanh toán ZaloPay"
                 className="mx-auto h-[190px] w-[150px] rounded-xl border border-blue-100 object-cover cursor-zoom-in hover:brightness-90 transition-all"
-                onClick={() => setZoomImageSrc("/src/assets/images/zalopay.jpg")}
+                onClick={() => setZoomImageSrc(imgZalopay)}
                 title="Nhấp vào để phóng to mã QR"
               />
               <div className="space-y-2">

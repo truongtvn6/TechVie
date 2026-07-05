@@ -2,6 +2,9 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { CartItem } from '../../types';
 import { CheckCircle2, Clock3, RefreshCw } from 'lucide-react';
+import imgNganHang from '../../assets/images/nganhang.jpg';
+import imgMomo from '../../assets/images/momo.jpg';
+import imgZalopay from '../../assets/images/zalopay.jpg';
 
 interface CheckoutSuccessProps {
   email: string;
@@ -57,11 +60,11 @@ export default function CheckoutSuccess({
           ? 'Thanh toán khi nhận hàng'
           : 'Phương thức thanh toán';
   const paymentQrSrc = provider === 'bank_transfer'
-    ? '/src/assets/images/nganhang.jpg'
+    ? imgNganHang
     : provider === 'momo'
-      ? '/src/assets/images/momo.jpg'
+      ? imgMomo
       : provider === 'zalopay'
-        ? '/src/assets/images/zalopay.jpg'
+        ? imgZalopay
         : '';
   const isWaitingPayment = paymentStatus !== 'paid' && provider !== 'cod';
 
