@@ -1,6 +1,11 @@
 import { Product, Review, ReviewSummary } from '../types';
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+let rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+// Xóa dấu slash ở cuối nếu có
+if (rawBaseUrl.endsWith('/')) rawBaseUrl = rawBaseUrl.slice(0, -1);
+// Xóa /api ở cuối nếu user vô tình thêm vào (vì code bên dưới đã tự động thêm /api)
+if (rawBaseUrl.endsWith('/api')) rawBaseUrl = rawBaseUrl.slice(0, -4);
+export const API_BASE_URL = rawBaseUrl;
 
 /**
  * TechVie E-Commerce API Service
