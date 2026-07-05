@@ -12,20 +12,16 @@ const authController = {
   getGoogleAuthUrl: async (req, res) => {
     try {
       const state = crypto.randomBytes(32).toString("hex");
-      const isProduction = process.env.NODE_ENV === "production";
-      res.cookie("oauth_state", state, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
-        maxAge: 5 * 60 * 1000
-      });
+      // Ký state bằng JWT secret để xác thực khi callback, tránh lỗi cross-site cookie
+      const jwtSecret = process.env.JWT_SECRET || "techvie_jwt_secret_key_2026";
+      const signedState = require("jsonwebtoken").sign({ state }, jwtSecret, { expiresIn: "5m" });
       const { clientId, redirectUri, authUrl, scopes } = oauthConfig.google;
       const params = new URLSearchParams({
         client_id: clientId,
         redirect_uri: redirectUri,
         response_type: "code",
         scope: scopes.join(" "),
-        state: state,
+        state: signedState,
         access_type: "offline",
         prompt: "consent"
       });
@@ -38,15 +34,16 @@ const authController = {
 
   googleCallback: async (req, res) => {
     try {
-      const { code, state } = req.query;
-      const storedState = req.cookies.oauth_state;
-      res.clearCookie("oauth_state");
-
-      if (!state || !storedState || state !== storedState) {
-        return res.status(403).json({ success: false, message: "Cảnh báo bảo mật: Yêu cầu không hợp lệ." });
+      const { code, state: signedState } = req.query;
+      // Xác thực state bằng JWT (không dùng cookie để tránh lỗi cross-site)
+      if (!signedState || !code) {
+        return res.status(400).json({ success: false, message: "Thiếu thông tin xác thực OAuth." });
       }
-      if (!code) {
-        return res.status(400).json({ success: false, message: "Thiếu mã xác thực." });
+      try {
+        const jwtSecret = process.env.JWT_SECRET || "techvie_jwt_secret_key_2026";
+        require("jsonwebtoken").verify(signedState, jwtSecret);
+      } catch (e) {
+        return res.status(403).json({ success: false, message: "Cảnh báo bảo mật: State OAuth không hợp lệ hoặc đã hết hạn." });
       }
 
       const tokens = await exchangeCodeForTokens(code);
