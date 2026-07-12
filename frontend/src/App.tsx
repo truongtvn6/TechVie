@@ -855,6 +855,62 @@ function AppContent() {
         }}
       />
 
+      {/* Zalo Contact Button */}
+      {activeTab !== 'login' && activeTab !== 'register' && !String(activeTab).startsWith('admin') && (
+        <a
+          href="https://zalo.me/0123456789"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-24 right-6 z-[40] group flex items-center gap-2 cursor-pointer"
+          title="Liên hệ Zalo"
+          style={{ textDecoration: 'none' }}
+        >
+          {/* Tooltip label */}
+          <span
+            style={{
+              background: 'white',
+              color: '#0068FF',
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              padding: '6px 14px',
+              borderRadius: '999px',
+              boxShadow: '0 4px 18px rgba(0,104,255,0.18)',
+              border: '1.5px solid #0068FF',
+              opacity: 0,
+              transform: 'translateX(8px)',
+              transition: 'all 0.25s cubic-bezier(.4,0,.2,1)',
+              pointerEvents: 'none',
+              whiteSpace: 'nowrap',
+            }}
+            className="group-hover:!opacity-100 group-hover:!translate-x-0"
+          >
+            Liên hệ Zalo
+          </span>
+          {/* Zalo icon bubble */}
+          <span
+            style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #0068FF 60%, #00AAFF 100%)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 20px rgba(0,104,255,0.40)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              flexShrink: 0,
+            }}
+            className="group-hover:scale-110 group-hover:shadow-blue-400/60"
+          >
+            {/* Zalo Official SVG Logo */}
+            <svg width="30" height="30" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Z letter */}
+              <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="22" fontWeight="900" fontFamily="'Arial Black', Arial, sans-serif" letterSpacing="-1">Z</text>
+            </svg>
+          </span>
+        </a>
+      )}
+
       {/* Back to Top Button */}
       <AnimatePresence>
         {showScrollTop && 
