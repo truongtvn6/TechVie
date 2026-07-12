@@ -540,10 +540,26 @@ function AppContent() {
     }
   };
 
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('techvie_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Persist cart to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('techvie_cart', JSON.stringify(cart));
+    } catch {
+      // Ignore storage errors (e.g. private browsing quota)
+    }
+  }, [cart]);
 
   // Cart operations
   const handleAddToCart = (product: Product, selectedColor?: string) => {

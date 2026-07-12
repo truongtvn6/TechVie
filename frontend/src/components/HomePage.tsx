@@ -25,7 +25,7 @@ import img_card from "../assets/images/home_page_card.png";
 interface HomePageProps {
   products?: Product[];
   onNavigate: (tab: TabType) => void;
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, selectedColor?: string) => void;
   isLoggedIn?: boolean;
   userEmail?: string;
   userProfile?: any;
@@ -124,12 +124,13 @@ export default function HomePage({
 
   const handleAddToCartWithSuccess = (
     product: Product,
+    selectedColor?: string,
     e?: React.MouseEvent<HTMLButtonElement>,
   ) => {
     let startX = window.innerWidth / 2;
     let startY = window.innerHeight / 2;
 
-    if (e) {
+    if (e && e.currentTarget) {
       const buttonRect = e.currentTarget.getBoundingClientRect();
       startX = buttonRect.left + buttonRect.width / 2;
       startY = buttonRect.top + buttonRect.height / 2;
@@ -155,7 +156,7 @@ export default function HomePage({
       setMagneticRefId(null);
     }, 600);
 
-    onAddToCart(product);
+    onAddToCart(product, selectedColor);
     setJustAddedId(product.id);
     setTimeout(() => {
       setJustAddedId(null);

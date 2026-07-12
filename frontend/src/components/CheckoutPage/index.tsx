@@ -64,6 +64,61 @@ export default function CheckoutPage({
       if (userProfile.address) setAddress(userProfile.address);
     }
   }, [userProfile]);
+
+  // Catch payment redirects
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const statusParam = params.get('status');
+    const orderIdParam = params.get('orderId');
+
+    if (statusParam && orderIdParam) {
+      setStep('processing');
+      getCheckoutPaymentStatus(orderIdParam).then(res => {
+        if (res.success) {
+          setServerOrderId(orderIdParam);
+          setPaymentDetails(res.payment || res.order || null);
+          
+          if (res.order) {
+            setFullName(res.order.fullName || '');
+            setPhone(res.order.phone || '');
+            setEmail(res.order.email || '');
+            setAddress(res.order.address || '');
+            setDeliveryMethod(res.order.deliveryMethod === 'Hỏa tốc (Express)' ? 'express' : 'standard');
+            setPaymentMethod(res.order.paymentProvider as PaymentMethodType || 'vnpay');
+            
+            // Reconstruct cart snapshot
+            if (res.order.cart) {
+              setCompletedCart(res.order.cart);
+            }
+            
+            // Note: We can't perfectly reconstruct subtotal/discount from just finalTotal
+            // but we can set finalTotal so CheckoutSuccess doesn't show 0
+            const parsedTotal = parseInt(String(res.order.finalTotal).replace(/[^\d]/g, '')) || 0;
+            setCompletedTotals({
+              subtotal: parsedTotal,
+              discountAmount: 0,
+              deliveryFee: 0,
+              finalTotal: parsedTotal
+            });
+          }
+
+          if (statusParam === 'success') {
+            setPaymentStatusMessage('Giao dịch thanh toán trực tuyến thành công!');
+          } else {
+            setPaymentStatusMessage('Giao dịch thanh toán bị hủy hoặc thất bại.');
+          }
+          
+          onClearCart();
+          setStep('success');
+        } else {
+          setStep('form');
+        }
+      }).catch(err => {
+        console.error(err);
+        setStep('form');
+      });
+    }
+  }, []);
   
   // Promo code
   const [promoCode, setPromoCode] = useState('');

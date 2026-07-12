@@ -27,7 +27,7 @@ exports.generateVNPayPaymentUrl = (req, order) => {
   const tmnCode = process.env.VNPAY_TMN_CODE;
   const secretKey = process.env.VNPAY_HASH_SECRET;
   let vnpUrl = process.env.VNPAY_URL || "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-  const returnUrl = process.env.VNPAY_RETURN_URL || `${process.env.FRONTEND_URL}/checkout`;
+  const returnUrl = process.env.VNPAY_RETURN_URL || `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/payment/vnpay/return`;
 
   const date = new Date();
   
