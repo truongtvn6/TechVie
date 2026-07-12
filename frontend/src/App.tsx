@@ -858,7 +858,7 @@ function AppContent() {
       {/* Zalo Contact Button */}
       {activeTab !== 'login' && activeTab !== 'register' && !String(activeTab).startsWith('admin') && (
         <a
-          href="https://zalo.me/0123456789"
+          href="https://zalo.me/0332210729"
           target="_blank"
           rel="noopener noreferrer"
           className="fixed bottom-24 right-6 z-[40] group flex items-center gap-2 cursor-pointer"
