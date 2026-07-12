@@ -789,7 +789,7 @@ export async function submitCheckoutOrder(orderData: {
   email: string;
   address: string;
   notes: string;
-  paymentMethod: string;
+  paymentMethod: 'vnpay' | 'cod' | 'momo';
   deliveryMethod: string;
   cart: Array<{ product: Product; quantity: number }>;
   finalTotal: string;

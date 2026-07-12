@@ -1,6 +1,7 @@
 const Order = require("../models/Order");
+const paymentUtils = require("../utils/paymentUtils");
 
-const PAYMENT_METHODS = ["cod", "card_online", "bank_transfer", "momo", "zalopay"];
+const PAYMENT_METHODS = ["cod", "card_online", "bank_transfer", "momo", "vnpay"];
 const PAYMENT_STATUSES = ["pending", "paid", "failed", "cancelled"];
 
 const paymentLabels = {
@@ -8,7 +9,7 @@ const paymentLabels = {
   card_online: "Thẻ tín dụng / Thẻ ghi nợ",
   bank_transfer: "Chuyển khoản ngân hàng",
   momo: "Ví điện tử MoMo",
-  zalopay: "Ví điện tử ZaloPay",
+  vnpay: "Thanh toán qua VNPay",
 };
 
 const paymentStatusLabels = {
@@ -24,12 +25,13 @@ const normalizePaymentMethod = (paymentMethod = "") => {
 
   if (PAYMENT_METHODS.includes(raw)) return raw;
   if (pmLower.includes("momo")) return "momo";
-  if (pmLower.includes("zalo")) return "zalopay";
+  if (pmLower.includes("zalo")) return "cod"; // Fallback cho đơn zalopay cũ
+  if (pmLower.includes("vnpay")) return "vnpay";
   if (pmLower.includes("bank") || pmLower.includes("transfer") || pmLower.includes("chuyển khoản") || pmLower.includes("chuyen khoan") || pmLower.includes("ngân hàng") || pmLower.includes("ngan hang")) {
     return "bank_transfer";
   }
   if (pmLower.includes("card") || pmLower.includes("visa") || pmLower.includes("master") || pmLower.includes("tín dụng") || pmLower.includes("tin dung") || pmLower.includes("online")) {
-    return "card_online";
+    return "vnpay";
   }
   if (pmLower.includes("cod") || pmLower.includes("nhận hàng") || pmLower.includes("nhan hang")) {
     return "cod";
@@ -51,7 +53,7 @@ const normalizeDeliveryMethod = (deliveryMethod = "") => {
 
 const buildOrderReference = (order) => `TECHVIE-${order._id.toString().slice(-6).toUpperCase()}`;
 
-const buildPaymentDetails = (req, order, paymentMethod) => {
+const buildPaymentDetails = async (req, order, paymentMethod) => {
   const reference = buildOrderReference(order);
   const shortCode = reference.replace("TECHVIE-", "");
 
@@ -63,11 +65,21 @@ const buildPaymentDetails = (req, order, paymentMethod) => {
     };
   }
 
-  if (paymentMethod === "momo" || paymentMethod === "zalopay") {
+  if (paymentMethod === "momo") {
+    const paymentUrl = await paymentUtils.generateMomoPaymentUrl(order);
     return {
       payment_reference: reference,
       payment_note: `${reference} ${String(order.phone || "").slice(-4)}`,
-      payment_url: "",
+      payment_url: paymentUrl,
+    };
+  }
+
+  if (paymentMethod === "vnpay") {
+    const paymentUrl = paymentUtils.generateVNPayPaymentUrl(req, order);
+    return {
+      payment_reference: reference,
+      payment_note: `Thanh toan don hang ${reference}`,
+      payment_url: paymentUrl,
     };
   }
 
@@ -192,7 +204,10 @@ exports.createOrder = async (req, res) => {
       };
     });
 
-    const requiresSellerVerification = ["bank_transfer", "momo", "zalopay"].includes(normalizedPayment);
+    const requiresSellerVerification = ["bank_transfer", "momo", "vnpay"].includes(normalizedPayment);
+
+    const date = new Date();
+    const expireDate = new Date(date.getTime() + 24 * 60 * 60 * 1000); // 24h
 
     const newOrder = new Order({
       full_name: fullName,
@@ -208,9 +223,10 @@ exports.createOrder = async (req, res) => {
       items,
       status: requiresSellerVerification ? "Chờ xác nhận thanh toán" : "Đang lắp ráp chuẩn bị gửi",
       status_type: "processing",
+      expires_at: requiresSellerVerification ? expireDate : undefined,
     });
 
-    Object.assign(newOrder, buildPaymentDetails(req, newOrder, normalizedPayment));
+    Object.assign(newOrder, await buildPaymentDetails(req, newOrder, normalizedPayment));
 
     await newOrder.save();
 

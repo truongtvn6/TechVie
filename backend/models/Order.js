@@ -54,13 +54,13 @@ const orderSchema = new mongoose.Schema({
   payment_method: {
     type: String,
     required: true,
-    enum: ["cod", "card_online", "bank_transfer", "momo", "zalopay"],
-    description: "Phương thức: 'cod', 'card_online', 'bank_transfer', 'momo', 'zalopay'",
+    enum: ["cod", "card_online", "bank_transfer", "momo", "vnpay"],
+    description: "Phương thức: 'cod', 'card_online', 'bank_transfer', 'momo', 'vnpay'",
   },
   payment_provider: {
     type: String,
     required: true,
-    enum: ["cod", "card_online", "bank_transfer", "momo", "zalopay"],
+    enum: ["cod", "card_online", "bank_transfer", "momo", "vnpay"],
     default: "cod",
     index: true,
     description: "Nhà cung cấp/cổng thanh toán được chọn",
@@ -93,6 +93,10 @@ const orderSchema = new mongoose.Schema({
   paid_at: {
     type: Date,
     description: "Thời điểm thanh toán được xác nhận",
+  },
+  expires_at: {
+    type: Date,
+    description: "Thời điểm đơn hàng treo sẽ tự động hết hạn",
   },
   delivery_method: {
     type: String,

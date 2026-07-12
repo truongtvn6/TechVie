@@ -18,7 +18,7 @@ interface CheckoutPageProps {
   userProfile?: any;
 }
 
-type PaymentMethodType = 'bank' | 'cod' | 'momo' | 'zalopay';
+type PaymentMethodType = 'vnpay' | 'cod' | 'momo';
 type DeliveryMethodType = 'standard' | 'express';
 
 export default function CheckoutPage({
@@ -31,7 +31,7 @@ export default function CheckoutPage({
   const [showGuestNotice, setShowGuestNotice] = useState(!isLoggedIn);
   // Steps: 'form' | 'processing' | 'success'
   const [step, setStep] = useState<'form' | 'processing' | 'success'>('form');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('bank');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('vnpay');
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethodType>('standard');
   const [serverOrderId, setServerOrderId] = useState<number | string | null>(null);
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
@@ -169,7 +169,6 @@ export default function CheckoutPage({
         finalTotal: finalTotal.toString()
       });
 
-      // Trì hoãn xử lý màn hình 1.5 giây để hiệu ứng load động mượt mà, chân thực
       setTimeout(() => {
         if (data.success && data.orderId) {
           setServerOrderId(data.orderId);
@@ -187,7 +186,12 @@ export default function CheckoutPage({
           // Clear the global cart immediately
           onClearCart();
           
-          setStep('success');
+          const pUrl = data.payment?.paymentUrl || data.order?.paymentUrl;
+          if (pUrl) {
+            window.location.href = pUrl;
+          } else {
+            setStep('success');
+          }
         } else {
           setApiError(data.message || 'Lỗi hệ thống khi khởi tạo bưu kiện đơn hàng.');
           setStep('form');

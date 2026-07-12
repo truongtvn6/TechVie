@@ -2,9 +2,6 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { CartItem } from '../../types';
 import { CheckCircle2, Clock3, RefreshCw } from 'lucide-react';
-import imgNganHang from '../../assets/images/nganhang.jpg';
-import imgMomo from '../../assets/images/momo.jpg';
-import imgZalopay from '../../assets/images/zalopay.jpg';
 
 interface CheckoutSuccessProps {
   email: string;
@@ -50,22 +47,13 @@ export default function CheckoutSuccess({
   const paymentReference = paymentDetails?.reference || paymentDetails?.paymentReference || '';
   const paymentNote = paymentDetails?.note || paymentDetails?.paymentNote || '';
   const paymentStatusLabel = paymentDetails?.statusLabel || paymentDetails?.paymentStatusLabel || (paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán');
-  const paymentMethodLabel = provider === 'bank_transfer'
-    ? 'Chuyển khoản ngân hàng'
+  const paymentMethodLabel = provider === 'vnpay'
+    ? 'Thanh toán qua VNPay'
     : provider === 'momo'
       ? 'Ví điện tử MoMo'
-      : provider === 'zalopay'
-        ? 'Ví điện tử ZaloPay'
-        : provider === 'cod'
-          ? 'Thanh toán khi nhận hàng'
-          : 'Phương thức thanh toán';
-  const paymentQrSrc = provider === 'bank_transfer'
-    ? imgNganHang
-    : provider === 'momo'
-      ? imgMomo
-      : provider === 'zalopay'
-        ? imgZalopay
-        : '';
+      : provider === 'cod'
+        ? 'Thanh toán khi nhận hàng'
+        : 'Phương thức thanh toán';
   const isWaitingPayment = paymentStatus !== 'paid' && provider !== 'cod';
 
   return (
@@ -159,32 +147,9 @@ export default function CheckoutSuccess({
                   <span className="font-mono font-bold text-right">{paymentNote}</span>
                 </div>
               )}
-              {provider === 'bank_transfer' && paymentStatus !== 'paid' && (
-                <p className="text-[10px] leading-relaxed pt-2 border-t border-amber-200/60">
-                  Vui lòng chuyển khoản đúng nội dung trên. Admin sẽ đối soát và chuyển trạng thái sang "Đã thanh toán" trong trang quản trị.
-                </p>
-              )}
             </div>
           )}
 
-          {paymentQrSrc && isWaitingPayment && (
-            <div className="rounded-2xl border border-gray-150 bg-gray-50/70 p-4 grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-4 items-center">
-              <img
-                src={paymentQrSrc}
-                alt={`QR ${paymentMethodLabel}`}
-                className="w-[140px] h-[178px] object-cover rounded-xl border border-gray-200 mx-auto bg-white"
-              />
-              <div className="space-y-2">
-                <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider block">Quét mã để thanh toán</span>
-                <p className="text-[11px] text-gray-600 leading-relaxed">
-                  Sau khi bạn chuyển tiền, người bán sẽ kiểm tra giao dịch thực tế trên tài khoản/ví nhận tiền. Trang này chỉ đổi sang <strong>Đã thanh toán</strong> khi admin xác nhận trong hệ thống quản trị.
-                </p>
-                <p className="text-[10px] font-mono text-gray-900 bg-white border border-gray-100 rounded-lg p-2 break-all">
-                  Nội dung: {paymentNote || paymentReference || `TECHVIE-${serverOrderId}`}
-                </p>
-              </div>
-            </div>
-          )}
 
           {/* Items breakdown summary */}
           <div className="border-t border-b border-gray-100 py-4 space-y-3">

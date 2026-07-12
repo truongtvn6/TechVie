@@ -187,10 +187,7 @@ export default function OrderManager({
           ) ||
           0,
         "Trạng Thái Đơn Hàng": statusVi,
-        "Phương Thức Thanh Toán":
-          ord.paymentMethod === "cod"
-            ? "Thanh toán COD"
-            : "Chuyển khoản Banking",
+        "Phương Thức Thanh Toán": ord.paymentMethod || "COD",
         "Thời Gian Đặt Hàng": new Date(ord.createdAt).toLocaleString("vi-VN"),
       };
     });
@@ -271,7 +268,7 @@ export default function OrderManager({
         `"${productsText.replace(/"/g, '""')}"`,
         totalPrice,
         `"${statusVi}"`,
-        `"${ord.paymentMethod === "cod" ? "Thanh toán COD" : "Chuyển khoản Banking"}"`,
+        `"${ord.paymentMethod || "COD"}"`,
         `"${new Date(ord.createdAt).toLocaleString("vi-VN")}"`,
       ].join(",");
     });

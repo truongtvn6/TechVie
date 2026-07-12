@@ -17,7 +17,11 @@ const checkoutRoutes = require("./routes/checkoutRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const voucherRoutes = require("./routes/voucherRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 const Category = require("./models/Category");
+
+// Start background jobs
+require("./jobs/expireOrders");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -130,6 +134,9 @@ app.use("/api/reviews", reviewRoutes);
 
 // 15. Định nghĩa API Vouchers
 app.use("/api/vouchers", voucherRoutes);
+
+// 16. Định nghĩa API Payment Webhooks
+app.use("/api/payment", paymentRoutes);
 
 // Endpoint nhận log từ Client và in ra CMD của server
 app.post("/api/logs", (req, res) => {
