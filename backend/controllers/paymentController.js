@@ -76,10 +76,10 @@ exports.vnpayReturn = async (req, res) => {
     delete rawParams['vnp_SecureHash'];
     delete rawParams['vnp_SecureHashType'];
 
-    // Sort keys alphabetically
-    const sortedKeys = Object.keys(rawParams).sort();
-    // VNPay verify: use raw (decoded) values joined by &
-    const signData = sortedKeys.map(key => `${key}=${rawParams[key]}`).join('&');
+    // VNPay verifies hash based on URL-encoded values.
+    // Express decodes req.query automatically, so we must re-encode it using sortObject.
+    const sortedParams = sortObject(rawParams);
+    const signData = Object.keys(sortedParams).map(key => `${key}=${sortedParams[key]}`).join('&');
 
     const secretKey = process.env.VNPAY_HASH_SECRET;
     const hmac = crypto.createHmac("sha512", secretKey);
@@ -131,8 +131,8 @@ exports.vnpayIpn = async (req, res) => {
     delete rawParams['vnp_SecureHash'];
     delete rawParams['vnp_SecureHashType'];
 
-    const sortedKeys = Object.keys(rawParams).sort();
-    const signData = sortedKeys.map(key => `${key}=${rawParams[key]}`).join('&');
+    const sortedParams = sortObject(rawParams);
+    const signData = Object.keys(sortedParams).map(key => `${key}=${sortedParams[key]}`).join('&');
 
     const secretKey = process.env.VNPAY_HASH_SECRET;
     const hmac = crypto.createHmac("sha512", secretKey);

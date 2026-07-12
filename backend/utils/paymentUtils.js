@@ -52,8 +52,9 @@ exports.generateVNPayPaymentUrl = (req, order) => {
   const amountStr = order.final_total.replace(/[^\d]/g, "");
   const amount = parseInt(amountStr) * 100;
 
-  // Build raw params object (values NOT encoded)
-  const rawParams = {
+  // VNPay requires the signData to be built from URL-encoded values, 
+  // and sorted alphabetically. We'll use the provided sortObject function.
+  let vnp_Params = {
     vnp_Version: "2.1.0",
     vnp_Command: "pay",
     vnp_TmnCode: tmnCode,
@@ -69,20 +70,19 @@ exports.generateVNPayPaymentUrl = (req, order) => {
     vnp_ExpireDate: expireDate,
   };
 
-  // Sort keys alphabetically
-  const sortedKeys = Object.keys(rawParams).sort();
+  vnp_Params = sortObject(vnp_Params);
 
-  // signData: raw values (NOT URL-encoded) — this is what VNPay verifies
-  const signData = sortedKeys.map(key => `${key}=${rawParams[key]}`).join('&');
+  // signData is built from the encoded values (which sortObject returns)
+  const signData = Object.keys(vnp_Params).map(key => `${key}=${vnp_Params[key]}`).join('&');
   const hmac = crypto.createHmac("sha512", secretKey);
   const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
-  // Build final URL: values ARE encoded for safe URL transport
-  const queryString = sortedKeys
-    .map(key => `${key}=${encodeURIComponent(rawParams[key])}`)
-    .join('&');
+  vnp_Params['vnp_SecureHash'] = signed;
 
-  return `${vnpBaseUrl}?${queryString}&vnp_SecureHash=${signed}`;
+  // Build final URL
+  const queryString = Object.keys(vnp_Params).map(key => `${key}=${vnp_Params[key]}`).join('&');
+
+  return `${vnpBaseUrl}?${queryString}`;
 };
 
 // MoMo Utils
