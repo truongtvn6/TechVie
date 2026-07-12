@@ -26,24 +26,21 @@ exports.generateVNPayPaymentUrl = (req, order) => {
 
   const tmnCode = process.env.VNPAY_TMN_CODE;
   const secretKey = process.env.VNPAY_HASH_SECRET;
-  let vnpUrl = process.env.VNPAY_URL || "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+  const vnpBaseUrl = process.env.VNPAY_URL || "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
   const returnUrl = process.env.VNPAY_RETURN_URL || `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/payment/vnpay/return`;
 
   const date = new Date();
-  
-  // Format for VNPay: YYYYMMDDHHmmss
   const pad = (n) => (n < 10 ? '0' + n : n);
-  const createDate = 
+  const createDate =
     date.getFullYear().toString() +
     pad(date.getMonth() + 1) +
     pad(date.getDate()) +
     pad(date.getHours()) +
     pad(date.getMinutes()) +
     pad(date.getSeconds());
-  
-  // Create expire date (24h later)
+
   const expireDateObj = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-  const expireDate = 
+  const expireDate =
     expireDateObj.getFullYear().toString() +
     pad(expireDateObj.getMonth() + 1) +
     pad(expireDateObj.getDate()) +
@@ -52,43 +49,40 @@ exports.generateVNPayPaymentUrl = (req, order) => {
     pad(expireDateObj.getSeconds());
 
   const orderId = order._id.toString();
-  
-  // final_total format is "28.500.000₫", we need to convert to number
   const amountStr = order.final_total.replace(/[^\d]/g, "");
   const amount = parseInt(amountStr) * 100;
 
-  let vnp_Params = {};
-  vnp_Params["vnp_Version"] = "2.1.0";
-  vnp_Params["vnp_Command"] = "pay";
-  vnp_Params["vnp_TmnCode"] = tmnCode;
-  vnp_Params["vnp_Locale"] = "vn";
-  vnp_Params["vnp_CurrCode"] = "VND";
-  vnp_Params["vnp_TxnRef"] = orderId;
-  vnp_Params["vnp_OrderInfo"] = "Thanh toan don hang TECHVIE-" + orderId.slice(-6).toUpperCase();
-  vnp_Params["vnp_OrderType"] = "other";
-  vnp_Params["vnp_Amount"] = amount;
-  vnp_Params["vnp_ReturnUrl"] = returnUrl;
-  vnp_Params["vnp_IpAddr"] = ipAddr;
-  vnp_Params["vnp_CreateDate"] = createDate;
-  vnp_Params["vnp_ExpireDate"] = expireDate;
+  // Build raw params object (values NOT encoded)
+  const rawParams = {
+    vnp_Version: "2.1.0",
+    vnp_Command: "pay",
+    vnp_TmnCode: tmnCode,
+    vnp_Locale: "vn",
+    vnp_CurrCode: "VND",
+    vnp_TxnRef: orderId,
+    vnp_OrderInfo: "Thanh toan don hang TECHVIE-" + orderId.slice(-6).toUpperCase(),
+    vnp_OrderType: "other",
+    vnp_Amount: amount,
+    vnp_ReturnUrl: returnUrl,
+    vnp_IpAddr: ipAddr,
+    vnp_CreateDate: createDate,
+    vnp_ExpireDate: expireDate,
+  };
 
-  vnp_Params = sortObject(vnp_Params);
+  // Sort keys alphabetically
+  const sortedKeys = Object.keys(rawParams).sort();
 
-  const signData = Object.keys(vnp_Params)
-    .map(key => `${key}=${vnp_Params[key]}`)
-    .join('&');
-    
+  // signData: raw values (NOT URL-encoded) — this is what VNPay verifies
+  const signData = sortedKeys.map(key => `${key}=${rawParams[key]}`).join('&');
   const hmac = crypto.createHmac("sha512", secretKey);
-  const signed = hmac.update(new Buffer.from(signData, "utf-8")).digest("hex");
-  vnp_Params["vnp_SecureHash"] = signed;
+  const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
-  const paymentUrlQuery = Object.keys(vnp_Params)
-    .map(key => `${key}=${vnp_Params[key]}`)
+  // Build final URL: values ARE encoded for safe URL transport
+  const queryString = sortedKeys
+    .map(key => `${key}=${encodeURIComponent(rawParams[key])}`)
     .join('&');
-    
-  vnpUrl += "?" + paymentUrlQuery;
-  
-  return vnpUrl;
+
+  return `${vnpBaseUrl}?${queryString}&vnp_SecureHash=${signed}`;
 };
 
 // MoMo Utils

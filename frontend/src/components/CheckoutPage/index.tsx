@@ -88,45 +88,70 @@ export default function CheckoutPage({
 
     if (statusParam === 'success' && orderIdParam) {
       setStep('processing');
-      getCheckoutPaymentStatus(orderIdParam).then(res => {
-        if (res.success) {
-          setServerOrderId(orderIdParam);
-          setPaymentDetails(res.payment || res.order || null);
-          
-          if (res.order) {
-            setFullName(res.order.fullName || '');
-            setPhone(res.order.phone || '');
-            setEmail(res.order.email || '');
-            setAddress(res.order.address || '');
-            setDeliveryMethod(res.order.deliveryMethod === 'Hỏa tốc (Express)' ? 'express' : 'standard');
-            setPaymentMethod(res.order.paymentProvider as PaymentMethodType || 'vnpay');
-            
-            if (res.order.cart) {
-              setCompletedCart(res.order.cart);
-            }
-            
-            const parsedTotal = parseInt(String(res.order.finalTotal).replace(/[^\d]/g, '')) || 0;
-            setCompletedTotals({
-              subtotal: parsedTotal,
-              discountAmount: 0,
-              deliveryFee: 0,
-              finalTotal: parsedTotal
-            });
-          }
 
-          setPaymentStatusMessage('Giao dịch thanh toán trực tuyến thành công!');
-          onClearCart(); // Chỉ xóa giỏ hàng khi THÀNH CÔNG
-          window.history.replaceState({}, '', window.location.pathname);
-          setStep('success');
-        } else {
-          setApiError('Không thể xác nhận đơn hàng. Vui lòng liên hệ hỗ trợ.');
-          setStep('form');
-        }
-      }).catch(err => {
-        console.error(err);
-        setStep('form');
-      });
+      // Poll until payment_status = 'paid' to avoid race condition with DB update
+      const MAX_RETRIES = 8;
+      const RETRY_INTERVAL_MS = 1500;
+      let attempts = 0;
+
+      const pollUntilPaid = () => {
+        attempts++;
+        getCheckoutPaymentStatus(orderIdParam).then(res => {
+          const isPaid = res.success && res.payment?.status === 'paid';
+          const isLastAttempt = attempts >= MAX_RETRIES;
+
+          if (isPaid || isLastAttempt) {
+            // Either confirmed paid or timed out — show success screen anyway
+            if (res.success) {
+              setServerOrderId(orderIdParam);
+              setPaymentDetails(res.payment || res.order || null);
+
+              if (res.order) {
+                setFullName(res.order.fullName || '');
+                setPhone(res.order.phone || '');
+                setEmail(res.order.email || '');
+                setAddress(res.order.address || '');
+                setDeliveryMethod(res.order.deliveryMethod === 'Hỏa tốc (Express)' ? 'express' : 'standard');
+                setPaymentMethod(res.order.paymentProvider as PaymentMethodType || 'vnpay');
+
+                if (res.order.cart) {
+                  setCompletedCart(res.order.cart);
+                }
+
+                const parsedTotal = parseInt(String(res.order.finalTotal).replace(/[^\d]/g, '')) || 0;
+                setCompletedTotals({
+                  subtotal: parsedTotal,
+                  discountAmount: 0,
+                  deliveryFee: 0,
+                  finalTotal: parsedTotal
+                });
+              }
+
+              setPaymentStatusMessage('Giao dịch thanh toán trực tuyến thành công!');
+              onClearCart();
+              window.history.replaceState({}, '', window.location.pathname);
+              setStep('success');
+            } else {
+              setApiError('Không thể xác nhận đơn hàng. Vui lòng liên hệ hỗ trợ.');
+              setStep('form');
+            }
+          } else {
+            // Not yet paid, retry after delay
+            setTimeout(pollUntilPaid, RETRY_INTERVAL_MS);
+          }
+        }).catch(err => {
+          console.error('Poll error:', err);
+          if (attempts >= MAX_RETRIES) {
+            setStep('form');
+          } else {
+            setTimeout(pollUntilPaid, RETRY_INTERVAL_MS);
+          }
+        });
+      };
+
+      pollUntilPaid();
     }
+
   }, []);
 
   
@@ -248,13 +273,13 @@ export default function CheckoutPage({
             finalTotal
           });
           
-          // Clear the global cart immediately
-          onClearCart();
-          
           const pUrl = data.payment?.paymentUrl || data.order?.paymentUrl;
           if (pUrl) {
+            // Không xóa giỏ hàng ở đây vì user mới chỉ redirect đi, chưa chắc đã thanh toán thành công
             window.location.href = pUrl;
           } else {
+            // Xóa giỏ hàng ngay vì đây là phương thức thanh toán trực tiếp / COD (chắc chắn thành công)
+            onClearCart();
             setStep('success');
           }
         } else {
