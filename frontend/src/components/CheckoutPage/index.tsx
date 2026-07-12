@@ -65,13 +65,28 @@ export default function CheckoutPage({
     }
   }, [userProfile]);
 
-  // Catch payment redirects
+  // Catch payment redirects (VNPay/MoMo return URL)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const statusParam = params.get('status');
     const orderIdParam = params.get('orderId');
 
-    if (statusParam && orderIdParam) {
+    if (!statusParam) return;
+
+    if (statusParam === 'failed' || statusParam === 'cancelled') {
+      // Giao dịch thất bại — GIỮ LẠI giỏ hàng, quay về form với thông báo lỗi
+      const code = params.get('code') || params.get('reason') || '';
+      const msg = code === '24'
+        ? 'Bạn đã hủy giao dịch. Giỏ hàng vẫn được giữ nguyên, hãy thử lại!'
+        : 'Giao dịch thanh toán thất bại. Vui lòng thử lại hoặc chọn phương thức khác.';
+      setApiError(msg);
+      // Xóa query params trên URL mà không reload trang
+      window.history.replaceState({}, '', window.location.pathname);
+      setStep('form');
+      return;
+    }
+
+    if (statusParam === 'success' && orderIdParam) {
       setStep('processing');
       getCheckoutPaymentStatus(orderIdParam).then(res => {
         if (res.success) {
@@ -86,13 +101,10 @@ export default function CheckoutPage({
             setDeliveryMethod(res.order.deliveryMethod === 'Hỏa tốc (Express)' ? 'express' : 'standard');
             setPaymentMethod(res.order.paymentProvider as PaymentMethodType || 'vnpay');
             
-            // Reconstruct cart snapshot
             if (res.order.cart) {
               setCompletedCart(res.order.cart);
             }
             
-            // Note: We can't perfectly reconstruct subtotal/discount from just finalTotal
-            // but we can set finalTotal so CheckoutSuccess doesn't show 0
             const parsedTotal = parseInt(String(res.order.finalTotal).replace(/[^\d]/g, '')) || 0;
             setCompletedTotals({
               subtotal: parsedTotal,
@@ -102,15 +114,12 @@ export default function CheckoutPage({
             });
           }
 
-          if (statusParam === 'success') {
-            setPaymentStatusMessage('Giao dịch thanh toán trực tuyến thành công!');
-          } else {
-            setPaymentStatusMessage('Giao dịch thanh toán bị hủy hoặc thất bại.');
-          }
-          
-          onClearCart();
+          setPaymentStatusMessage('Giao dịch thanh toán trực tuyến thành công!');
+          onClearCart(); // Chỉ xóa giỏ hàng khi THÀNH CÔNG
+          window.history.replaceState({}, '', window.location.pathname);
           setStep('success');
         } else {
+          setApiError('Không thể xác nhận đơn hàng. Vui lòng liên hệ hỗ trợ.');
           setStep('form');
         }
       }).catch(err => {
@@ -119,6 +128,7 @@ export default function CheckoutPage({
       });
     }
   }, []);
+
   
   // Promo code
   const [promoCode, setPromoCode] = useState('');

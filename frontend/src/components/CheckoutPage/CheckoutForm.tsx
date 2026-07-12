@@ -113,9 +113,6 @@ export default function CheckoutForm({
 
             <div className="text-blue-505 flex items-center gap-2 rounded-lg border border-blue-100/50 bg-blue-50 p-2.5 text-[10px]">
               <Info size={14} />
-              <span>
-                Thẻ test sandbox: Ngân hàng NCB, Số thẻ: 9704198526191432198, Tên: NGUYEN VAN A, Ngày phát hành: 07/15, OTP: 123456
-              </span>
             </div>
           </motion.div>
         );
@@ -136,7 +133,6 @@ export default function CheckoutForm({
                 </h4>
                 <p className="text-gray-550 leading-relaxed">
                   Bạn sẽ được chuyển hướng sang ứng dụng hoặc trang web MoMo để hoàn tất thanh toán. 
-                  (Môi trường Sandbox - Thử nghiệm)
                 </p>
               </div>
             </div>
