@@ -74,12 +74,19 @@ exports.generateVNPayPaymentUrl = (req, order) => {
 
   vnp_Params = sortObject(vnp_Params);
 
-  const signData = require("querystring").stringify(vnp_Params, { encode: false });
+  const signData = Object.keys(vnp_Params)
+    .map(key => `${key}=${vnp_Params[key]}`)
+    .join('&');
+    
   const hmac = crypto.createHmac("sha512", secretKey);
   const signed = hmac.update(new Buffer.from(signData, "utf-8")).digest("hex");
   vnp_Params["vnp_SecureHash"] = signed;
 
-  vnpUrl += "?" + require("querystring").stringify(vnp_Params, { encode: false });
+  const paymentUrlQuery = Object.keys(vnp_Params)
+    .map(key => `${key}=${vnp_Params[key]}`)
+    .join('&');
+    
+  vnpUrl += "?" + paymentUrlQuery;
   
   return vnpUrl;
 };

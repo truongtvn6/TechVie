@@ -77,7 +77,9 @@ exports.vnpayReturn = async (req, res) => {
 
     vnp_Params = sortObject(vnp_Params);
     const secretKey = process.env.VNPAY_HASH_SECRET;
-    const signData = require("querystring").stringify(vnp_Params, { encode: false });
+    const signData = Object.keys(vnp_Params)
+      .map(key => `${key}=${vnp_Params[key]}`)
+      .join('&');
     const hmac = crypto.createHmac("sha512", secretKey);
     const signed = hmac.update(new Buffer.from(signData, "utf-8")).digest("hex");
 
@@ -128,7 +130,9 @@ exports.vnpayIpn = async (req, res) => {
 
     vnp_Params = sortObject(vnp_Params);
     const secretKey = process.env.VNPAY_HASH_SECRET;
-    const signData = require("querystring").stringify(vnp_Params, { encode: false });
+    const signData = Object.keys(vnp_Params)
+      .map(key => `${key}=${vnp_Params[key]}`)
+      .join('&');
     const hmac = crypto.createHmac("sha512", secretKey);
     const signed = hmac.update(new Buffer.from(signData, "utf-8")).digest("hex");
 
